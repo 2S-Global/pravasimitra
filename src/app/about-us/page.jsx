@@ -12,7 +12,6 @@ const AboutUs = () =>{
 <Header />
 <OtherBanner page_title="About Us" />
 <HomeAbout />
-<Testimonials />
 <Footer />
 </>
 

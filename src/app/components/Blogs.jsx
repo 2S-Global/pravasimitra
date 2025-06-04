@@ -44,7 +44,7 @@ return(
             <a href="blog-details.html" className="tm-readmore">
               Read more <i className="fas fa-chevron-right" />
             </a>
-            <a href="blog-details.html">Comment 02</a>
+            <a href="#">Comment 02</a>
           </div>
         </div>
       </div>

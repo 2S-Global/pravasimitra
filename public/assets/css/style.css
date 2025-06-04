@@ -1925,8 +1925,8 @@ button.tm-videobutton:hover span {
 
 .tm-slider-dots ul.slick-dots li button {
   padding: 0;
-  height: 15px;
-  width: 15px;
+  height: 15px !important;
+  width: 15px !important;
   border: 3px solid #c30707;
   border-radius: 100px;
   background: #ffffff;

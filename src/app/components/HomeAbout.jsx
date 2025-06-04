@@ -54,31 +54,15 @@ const HomeAbout = () =>{
 		color: white;
 		}
 		</style> */}
-        <div className="col-lg-5 order-1 order-lg-2 offset-1 slider-new">
-          <div className="heroslider-slider tm-slider-dots tm-slider-dots-left">
-            <div
-              className="heroslider-singleslider"
-              data-bgimage="assets/images/others/about_image1.jpg"
-              style={{ height: 100 }}
-            />
-            <div
-              className="heroslider-singleslider"
-              data-bgimage="assets/images/others/about_image2.jpg"
-              style={{ height: 100 }}
-            />
-            <div
-              className="heroslider-singleslider"
-              data-bgimage="assets/images/others/about_image3.jpg"
-              style={{ height: 100 }}
-            />
-            <div
-              className="heroslider-singleslider"
-              data-bgimage="assets/images/others/about_image4.jpg"
-              style={{ height: 100 }}
-            />
-            {/*   <div class="heroslider-singleslider" data-bgimage="assets/images/others/every.jpg" style="height: 100px;"></div> */}
-          </div>
-        </div>
+<div className="col-lg-5 order-1 order-lg-2 offset-1 slider-new">
+  <div className="single-image-wrapper text-center">
+    <img
+      src="assets/images/others/about_image1.jpg"
+      alt="About"
+      style={{ width: "100%", height: "auto", maxHeight: 400, objectFit: "cover", borderRadius: "10px" }}
+    />
+  </div>
+</div>
       </div>
     </div>
   </div>
