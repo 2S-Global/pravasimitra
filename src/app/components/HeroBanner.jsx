@@ -1,4 +1,4 @@
-
+import Link from "next/link";
 const HeroBanner = () =>{
 
 return(
@@ -8,15 +8,15 @@ return(
   <div className="heroslider-slider tm-slider-dots tm-slider-dots-left">
     <div
       className="heroslider-singleslider"
-      data-bgimage="assets/images/heroslider/heroslider-image-1.jpg"
+      data-bgimage="assets/images/heroslider/1.jpg"
     />
     <div
       className="heroslider-singleslider"
-      data-bgimage="assets/images/heroslider/heroslider-image-2.jpg"
+      data-bgimage="assets/images/heroslider/2.jpg"
     />
     <div
       className="heroslider-singleslider"
-      data-bgimage="assets/images/heroslider/heroslider-image-3.jpg"
+      data-bgimage="assets/images/heroslider/3.jpg"
     />
   </div>
   {/*// Heroslider Slider */}
@@ -34,20 +34,20 @@ return(
               data-out-shuffle="true"
               data-wow-delay="0.5s"
             >
-              We are Providing Best Business Service
+              We are Providing Best Service
             </h1>
             <p className="wow fadeInUp" data-wow-delay="0.7s">
               Business plan draws on a wide range of knowledge from many
               different business disciplines
             </p>
-            <a
-              href="about-us.html"
+            <Link
+              href="/about-us"
               className="tm-button wow fadeInUp"
               data-wow-delay="0.9s"
             >
               About Us
               <b />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

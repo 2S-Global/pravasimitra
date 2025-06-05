@@ -1,5 +1,5 @@
 
-
+import Link from "next/link"
 const HomeAbout = () =>{
 
     return(
@@ -44,9 +44,9 @@ const HomeAbout = () =>{
                 needs.
               </li>
             </ul>
-            <a href="about-us.php" className="tm-button">
+            <Link href="/about-us" className="tm-button">
               About Us <b />
-            </a>
+            </Link>
           </div>
         </div>
         {/*     <style>
@@ -63,6 +63,7 @@ const HomeAbout = () =>{
     />
   </div>
 </div>
+
       </div>
     </div>
   </div>
