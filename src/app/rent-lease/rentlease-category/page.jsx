@@ -10,7 +10,9 @@ const MarketPlaceCategory = () => {
 
   const handleClick = (category) => {
     const slug = encodeURIComponent(category.toLowerCase().replace(/\s+/g, '-'))
-    router.push(`/rent-lease/${slug}`)
+   router.push(`/rent-lease/${slug}`)
+
+   // router.push(`/rent-lease/category_id?name=${slug}`)
   }
 
   const categories = [

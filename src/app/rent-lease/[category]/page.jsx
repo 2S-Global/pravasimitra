@@ -7,6 +7,18 @@ import { useParams, useRouter } from 'next/navigation'
 
 const ListHomes = () => {
 
+
+  const categories = [
+  "All",  
+  "Rent Home",
+  "Rent Apartments",
+  "Rent Townhouses",
+  "Lease Home",
+  "Lease Apartments",
+  "Lease Townhouses"
+];
+
+
 const router = useRouter()
   const { category } = useParams()
   console.log(category)
@@ -23,8 +35,28 @@ const router = useRouter()
             <div className="profile-info col-md-12">
 
 
+              <div className="container mb-4">
+  <div className="category-scroll d-flex gap-3 overflow-auto py-2 px-3 mb-4">
+    {categories.map((cat, idx) => (
+      <button
+        key={idx}
+        className="btn btn-outline-secondary btn-sm text-nowrap"
+        style={{
+          whiteSpace: 'nowrap',
+          borderRadius: '20px',
+          padding: '6px 16px',
+          backgroundColor: cat === category ? '#c12020' : '',
+          color: cat === category ? '#fff' : '',
+          borderColor: cat === category ? '#c12020' : ''
+        }}
+        onClick={() => router.push(`/rent-lease/${encodeURIComponent(cat.toLowerCase().replace(/\s+/g, '-'))}`)}
+      >
+        {cat}
+      </button>
+    ))}
+  </div>
+</div>
 
-              
            
 
 {/* Search Panel */}
