@@ -551,3 +551,25 @@ margin: 4px 2px;
 a{
     text-decoration: none !important;
 }
+
+/* Hide scrollbar across all major browsers */
+#thumbnail-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+#thumbnail-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+#thumbnail-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.category-scroll::-webkit-scrollbar {
+  display: none;
+}
+.category-scroll {
+  -ms-overflow-style: none;  /* IE 10+ */
+  scrollbar-width: none;     /* Firefox */
+}
