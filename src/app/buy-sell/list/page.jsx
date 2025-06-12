@@ -18,8 +18,8 @@ const ContactedUsersList = () => {
     price: "100$",
     counter: "2",
     images: [
-      "https://via.placeholder.com/100x100?text=Image1",
-      "https://via.placeholder.com/100x100?text=Image2",
+      "https://5.imimg.com/data5/IH/ZP/YN/SELLER-1084552/wodden-table.jpg",
+      "https://images.woodenstreet.de/image/cache/data/coffee-table/elevate-sheesham-wood-glass-top-coffee-table-with-storage-walnut-finish/walnut-finish/new-logo/1-750x650.jpg",
     ],
     contacts: [
       { name: "Alice", email: "alice@example.com", phone: "1234567890" },
@@ -33,7 +33,7 @@ const ContactedUsersList = () => {
     price: "100$",
     counter: "1",
     images: [
-      "https://via.placeholder.com/100x100?text=Chair1"
+      "https://m.media-amazon.com/images/I/710GKrS7GvL._AC_UF894,1000_QL80_.jpg"
     ],
     contacts: [
       { name: "Charlie", email: "charlie@example.com", phone: "9999999999" },
