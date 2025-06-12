@@ -7,11 +7,11 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
     title: "",
     price: "",
     description: "",
-    images: [], // new images to upload
+    images: [],
   });
 
-  const [existingImages, setExistingImages] = useState([]); // URLs from server
-  const [imagePreviews, setImagePreviews] = useState([]); // preview for new images
+  const [existingImages, setExistingImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
 
   useEffect(() => {
     if (itemData) {
@@ -21,8 +21,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
         description: itemData.description || "",
         images: [],
       });
-
-      setExistingImages(itemData.images || []); // assume these are image URLs
+      setExistingImages(itemData.images || []);
       setImagePreviews([]);
     }
   }, [itemData]);
@@ -50,7 +49,6 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
       const updated = [...existingImages];
       updated.splice(index, 1);
       setExistingImages(updated);
-      
     } else {
       const updated = [...formData.images];
       updated.splice(index, 1);
@@ -61,8 +59,8 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const { title, price, description, images } = formData;
+
     if (!title || !price || !description || (images.length === 0 && existingImages.length === 0)) {
       alert("Please fill all fields and have at least one image.");
       return;
@@ -72,30 +70,53 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
     data.append("title", title);
     data.append("price", price);
     data.append("description", description);
-    data.append("existingImages", JSON.stringify(existingImages)); 
-
+    data.append("existingImages", JSON.stringify(existingImages));
     images.forEach((img) => data.append("images[]", img));
 
-    // Send to backend
     onSave(data);
 
-    // Cleanup
     setFormData({ title: "", price: "", description: "", images: [] });
     setImagePreviews([]);
     setExistingImages([]);
     onClose();
+  };
 
+  const imageBoxStyle = {
+    position: "relative",
+    width: "100px",
+    height: "100px",
+    borderRadius: "12px",
+    overflow: "hidden",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+  };
+
+  const closeBtnStyle = {
+    position: "absolute",
+    top: "4px",
+    right: "4px",
+    borderRadius: "50%",
+    padding: "0px 5px",
+    lineHeight: "1",
+    fontSize: "14px",
+    color: "#dc3545",
+    backgroundColor: "#ffffff",
+    border: "1px solid #dee2e6",
+    boxShadow: "0 0 3px rgba(0,0,0,0.1)",
   };
 
   return (
     <Modal show={show} onHide={onClose} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Item</Modal.Title>
+      <Modal.Header
+        closeButton
+        style={{ background: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}
+      >
+        <Modal.Title className="fw-semibold text-primary">✏️ Edit Item</Modal.Title>
       </Modal.Header>
+
       <Modal.Body>
         <Form onSubmit={handleSubmit} encType="multipart/form-data">
           <Form.Group className="mb-3">
-            <Form.Label>Title</Form.Label>
+            <Form.Label>🏷️ Title</Form.Label>
             <Form.Control
               type="text"
               name="title"
@@ -106,7 +127,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Price</Form.Label>
+            <Form.Label>💰 Price</Form.Label>
             <Form.Control
               type="text"
               name="price"
@@ -117,7 +138,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Description</Form.Label>
+            <Form.Label>📝 Description</Form.Label>
             <Form.Control
               as="textarea"
               name="description"
@@ -129,7 +150,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Upload New Images</Form.Label>
+            <Form.Label>📷 Upload New Images</Form.Label>
             <Form.Control
               type="file"
               name="images[]"
@@ -139,108 +160,66 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
             />
           </Form.Group>
 
-          {/* Existing Image Previews */}
           {existingImages.length > 0 && (
-            <div className="d-flex gap-2 mt-3 flex-wrap">
-              {existingImages.map((src, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    position: "relative",
-                    width: "100px",
-                    height: "100px",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-                  }}
-                >
-                  <img
-                    src={src}
-                    alt={`Existing Preview ${idx + 1}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      borderRadius: "12px",
-                    }}
-                  />
-                  <Button
-                    variant="light"
-                    size="sm"
-                    style={{
-                      position: "absolute",
-                      top: "4px",
-                      right: "4px",
-                      borderRadius: "50%",
-                      padding: "0px 5px",
-                      lineHeight: "1",
-                      fontSize: "14px",
-                      color: "#dc3545",
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #dee2e6",
-                      boxShadow: "0 0 3px rgba(0,0,0,0.1)",
-                    }}
-                    onClick={() => handleRemoveImage(idx, true)}
-                  >
-                    ×
-                  </Button>
-                </div>
-              ))}
-            </div>
+            <>
+              <p className="fw-bold mt-3">🖼️ Existing Images</p>
+              <div className="d-flex gap-2 flex-wrap">
+                {existingImages.map((src, idx) => (
+                  <div key={idx} style={imageBoxStyle}>
+                    <img
+                      src={src}
+                      alt={`Existing ${idx + 1}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "12px",
+                      }}
+                    />
+                    <Button variant="light" size="sm" style={closeBtnStyle} onClick={() => handleRemoveImage(idx, true)}>
+                      ×
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
 
-          {/* New Image Previews */}
           {imagePreviews.length > 0 && (
-            <div className="d-flex gap-2 mt-3 flex-wrap">
-              {imagePreviews.map((src, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    position: "relative",
-                    width: "100px",
-                    height: "100px",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-                  }}
-                >
-                  <img
-                    src={src}
-                    alt={`Preview ${idx + 1}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      borderRadius: "12px",
-                    }}
-                  />
-                  <Button
-                    variant="light"
-                    size="sm"
-                    style={{
-                      position: "absolute",
-                      top: "4px",
-                      right: "4px",
-                      borderRadius: "50%",
-                      padding: "0px 5px",
-                      lineHeight: "1",
-                      fontSize: "14px",
-                      color: "#dc3545",
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #dee2e6",
-                      boxShadow: "0 0 3px rgba(0,0,0,0.1)",
-                    }}
-                    onClick={() => handleRemoveImage(idx, false)}
-                  >
-                    ×
-                  </Button>
-                </div>
-              ))}
-            </div>
+            <>
+              <p className="fw-bold mt-4">🆕 New Image Previews</p>
+              <div className="d-flex gap-2 flex-wrap">
+                {imagePreviews.map((src, idx) => (
+                  <div key={idx} style={imageBoxStyle}>
+                    <img
+                      src={src}
+                      alt={`New Preview ${idx + 1}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "12px",
+                      }}
+                    />
+                    <Button variant="light" size="sm" style={closeBtnStyle} onClick={() => handleRemoveImage(idx, false)}>
+                      ×
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
 
-          <Button type="submit" variant="primary" className="mt-4">
-            Save Changes
+          <Button
+            type="submit"
+            className="mt-4 px-4 py-2 fw-medium rounded-pill"
+            style={{
+              background: "#c12020",
+              color: "#fff",
+              border: "none",
+            }}
+          >
+            💾 Save Changes
           </Button>
         </Form>
       </Modal.Body>
