@@ -11,48 +11,53 @@ const JobCategory = () => {
 
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
+  const [selectedSubCategory, setSelectedSubCategory] = useState("")
 
-  // 🛒 All Items List
   const allItems = [
     {
       title: "Wood Bed With Side Storage",
       desc: "Buy Sofa Online 2+1+1+ Center table / Black",
       image: "/assets/buy-sell/bed1.webp",
-      category: "Home Furniture"
+      category: "Home Furniture",
+      subCategory: "Bed"
     },
     {
       title: "Luxury Wood Bed with Storage",
       desc: "Short description of the product goes here.",
       image: "/assets/buy-sell/bed2.jpg",
-      category: "Home Furniture"
+      category: "Home Furniture",
+      subCategory: "Bed"
     },
     {
       title: "Wooden Sofa Set - Solid Sheesham",
       desc: "Buy Sofa Online 2+1+1+ Center table / Black",
       image: "/assets/buy-sell/sofa1.jpg",
-      category: "Home Furniture"
+      category: "Home Furniture",
+      subCategory: "Sofa"
     },
     {
       title: "WOODEN SOFA SET (Teak)",
       desc: "Short description of the product goes here.",
       image: "/assets/buy-sell/sofa2.jpg",
-      category: "Office Furniture"
+      category: "Office Furniture",
+      subCategory: "Sofa"
     },
     {
       title: "L Shape Sofa Modern Sofa Set Design",
       desc: "Short description of the product goes here.",
       image: "/assets/buy-sell/sofa3.webp",
-      category: "Office Furniture"
+      category: "Office Furniture",
+      subCategory: "L-Sofa"
     },
     {
       title: "Buy Luxury Sofas Online",
       desc: "Short description of the product goes here.",
       image: "/assets/buy-sell/sofa4.jpg",
-      category: "Electronics"
+      category: "Electronics",
+      subCategory: "Smart TV"
     }
   ]
 
-  // 📂 Predefined Categories
   const allCategories = [
     "Home Furniture",
     "Office Furniture",
@@ -62,24 +67,61 @@ const JobCategory = () => {
     "House Holds"
   ]
 
-  // 🧠 Filter Logic
+  const subCategories = {
+    "Home Furniture": ["Bed", "Sofa", "Cupboard"],
+    "Office Furniture": ["Desk", "Chair", "Sofa", "L-Sofa"],
+    "Electronics": ["Smart TV", "Refrigerator", "Laptop"],
+    "Clothing": ["Men", "Women", "Kids"],
+    "Vehicles": ["Car", "Bike", "Truck"],
+    "House Holds": ["Decor", "Appliances"]
+  }
+
   const filteredItems = allItems.filter(item =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedCategory === "" || item.category === selectedCategory)
+    (selectedCategory === "" || item.category === selectedCategory) &&
+    (selectedSubCategory === "" || item.subCategory === selectedSubCategory)
   )
 
   return (
     <>
       <Header />
-      <OtherBanner page_title={category || "All Furniture"} banner_image="/assets/images/bg/furniture_banner.jpg" />
+      <OtherBanner
+        page_title={category || "All Furniture"}
+        banner_image="/assets/images/bg/furniture_banner.jpg"
+      />
 
       <div className="tm-section tm-login-register-area bg-white tm-padding-section">
         <div className="container">
           <div className="row col-md-12">
             <div className="profile-info col-md-12">
 
-              {/* 🔍 Search Panel */}
-              <div className="search-panel p-4 mb-4 rounded shadow-sm border bg-light">
+              {/* 📂 Main Category Filter */}
+              <div className="mb-4 text-center">
+                <div className="d-flex flex-wrap justify-content-center gap-2">
+                  {allCategories.map(cat => (
+                    <button
+                      key={cat}
+                      className={`btn btn-sm rounded-pill px-4 py-2 fw-semibold 
+                        ${selectedCategory === cat ? 'btn-primary' : 'btn-outline-primary'} 
+                        shadow-sm`}
+                      onClick={() => {
+                        if (selectedCategory === cat) {
+                          setSelectedCategory("")
+                          setSelectedSubCategory("")
+                        } else {
+                          setSelectedCategory(cat)
+                          setSelectedSubCategory("")
+                        }
+                      }}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 🔍 Search Box */}
+              <div className="search-panel p-4 mb-3 rounded shadow-sm border bg-light">
                 <div className="row g-3 align-items-center">
                   <div className="col-md-10">
                     <input
@@ -97,6 +139,7 @@ const JobCategory = () => {
                       onClick={() => {
                         setSearchTerm("")
                         setSelectedCategory("")
+                        setSelectedSubCategory("")
                       }}
                     >
                       Clear
@@ -105,18 +148,26 @@ const JobCategory = () => {
                 </div>
               </div>
 
-              {/* 📂 Category Filter Buttons */}
-              <div className="mb-4 text-center">
-                {allCategories.map(cat => (
-                  <button
-                    key={cat}
-                    className={`btn me-2 mb-2 ${selectedCategory === cat ? 'btn-primary' : 'btn-outline-secondary'}`}
-                    onClick={() => setSelectedCategory(cat === selectedCategory ? "" : cat)}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              {/* 📁 Sub Category Filter */}
+              {selectedCategory && subCategories[selectedCategory] && (
+                <div className="mb-4 text-center">
+                  <div className="d-flex flex-wrap justify-content-center gap-2">
+                    {subCategories[selectedCategory].map(sub => (
+                      <button
+                        key={sub}
+                        className={`btn btn-sm rounded-pill px-4 py-2 fw-semibold 
+                          ${selectedSubCategory === sub ? 'btn-success' : 'btn-outline-success'} 
+                          shadow-sm`}
+                        onClick={() =>
+                          setSelectedSubCategory(sub === selectedSubCategory ? "" : sub)
+                        }
+                      >
+                        {sub}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* 🪑 Product Grid */}
               <div className="container my-5">
