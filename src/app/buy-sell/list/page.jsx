@@ -1,43 +1,75 @@
-'use client'
-import { useState } from "react"
-import Header from "@/app/components/Header"
-import Footer from "@/app/components/Footer"
-import OtherBanner from "@/app/components/OtherBanner"
+"use client";
+import { useState } from "react";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
+import OtherBanner from "@/app/components/OtherBanner";
 // import Sidebar from "@/app/components/Sidebar"
+import ContactModal from "@/app/components/ContactModal";
+import AddItemModal from "@/app/components/AddItemModel";
+
+import EditItemModal from "@/app/components/EditItemModal";
 
 const ContactedUsersList = () => {
   const [users] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "9876543210",
-      type: "Buy",
-      item: "Wooden Table",
-      date: "2025-06-01"
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      phone: "9123456789",
-      type: "Sell",
-      item: "Office Chair",
-      date: "2025-06-02"
-    }
-  ])
+  {
+    id: 1,
+    item: "Wooden Table",
+    date: "2025-06-01",
+    price: "100$",
+    counter: "2",
+    images: [
+      "https://via.placeholder.com/100x100?text=Image1",
+      "https://via.placeholder.com/100x100?text=Image2",
+    ],
+    contacts: [
+      { name: "Alice", email: "alice@example.com", phone: "1234567890" },
+      { name: "Bob", email: "bob@example.com", phone: "9876543210" },
+    ],
+  },
+  {
+    id: 2,
+    item: "Wooden Chair",
+    date: "2025-06-01",
+    price: "100$",
+    counter: "1",
+    images: [
+      "https://via.placeholder.com/100x100?text=Chair1"
+    ],
+    contacts: [
+      { name: "Charlie", email: "charlie@example.com", phone: "9999999999" },
+    ],
+  },
+]);
 
-  const [activeTab, setActiveTab] = useState("Buy")
 
-  const handleViewDetails = (user) => {
-    alert(`Details:\n\nName: ${user.name}\nEmail: ${user.email}\nPhone: ${user.phone}\nType: ${user.type}\nItem: ${user.item}\nDate: ${user.date}`)
-  }
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItemContacts, setSelectedItemContacts] = useState([]);
+  const [selectedItemName, setSelectedItemName] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState(null);
+
+  const handleViewDetails = (itemName, contacts) => {
+    setSelectedItemName(itemName);
+    setSelectedItemContacts(contacts);
+
+    setShowModal(true);
+  };
 
   const handleAdd = () => {
-    alert('Redirect to add new contact form or open modal')
-  }
+    setShowAddModal(true); // Open add modal
+  };
+const handleEdit = (item) => {
+  setItemToEdit({
+    title: item.item, // map 'item' to 'title'
+    price: item.price,
+    description: "Sample description here", // fallback if not present
+    images: item.images || [],
+  });
+  setShowEditModal(true);
+};
 
-  const filteredUsers = users.filter(user => user.type === activeTab)
+  const filteredUsers = users;
 
   return (
     <>
@@ -55,90 +87,93 @@ const ContactedUsersList = () => {
                   style={{
                     textAlign: "center",
                     fontWeight: "bold",
-                    textDecoration: "underline"
+                    textDecoration: "underline",
                   }}
                 >
-                  Users Who Contacted (Buy/Sell)
+                  My Posted Items
                 </h4>
 
                 <div className="container my-4">
-
-                  {/* Tabs */}
-                  <ul className="nav nav-tabs mb-3">
-                    <li className="nav-item">
-                      <button
-                        className={`nav-link ${activeTab === "Buy" ? "active" : ""}`}
-                        onClick={() => setActiveTab("Buy")}
-                        type="button"
-                      >
-                        Buy
-                      </button>
-                    </li>
-                    <li className="nav-item">
-                      <button
-                        className={`nav-link ${activeTab === "Sell" ? "active" : ""}`}
-                        onClick={() => setActiveTab("Sell")}
-                        type="button"
-                      >
-                        Sell
-                      </button>
-                    </li>
-                  </ul>
-
                   {/* Add New Button */}
                   <div className="mb-3 text-end">
-                    <button type="button" className="btn btn-primary " onClick={handleAdd}  style={{
-    background: '#c12020',
-    color: '#fff',
-    border: '#c12020'
-  }}>
+                    <button
+                      type="button"
+                      className="btn btn-primary "
+                      onClick={handleAdd}
+                      style={{
+                        background: "#c12020",
+                        color: "#fff",
+                        border: "#c12020",
+                      }}
+                    >
                       <i className="bi bi-plus-lg me-1" /> Add New Item
                     </button>
                   </div>
 
                   {/* Table */}
                   <div className="table-responsive">
-                    <table className="table table-striped align-middle">
+                    <table className="table table-striped align-middle text-center">
                       <thead className="table-light">
                         <tr>
                           <th>#</th>
-                          <th>Name</th>
-                          <th>Email / Phone</th>
-                          <th>Type</th>
-                          <th>Item</th>
+                          <th>Item Name</th>
+                          <th>Price</th>
+
                           <th>Date</th>
+                          <th>Contact Person</th>
                           <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredUsers.length > 0 ? filteredUsers.map((user, index) => (
-                          <tr key={user.id}>
-                            <td>{index + 1}</td>
-                            <td>{user.name}</td>
-                            <td>
-                              <div>{user.email}</div>
-                              <small className="text-muted">{user.phone}</small>
-                            </td>
-                            <td>
-                              <span className={`badge ${user.type === 'Buy' ? 'bg-success' : 'bg-warning text-dark'}`}>
-                                {user.type}
-                              </span>
-                            </td>
-                            <td>{user.item}</td>
-                            <td>{new Date(user.date).toLocaleDateString()}</td>
-                            <td>
-                              <button
-                                className="btn btn-sm btn-outline-info"
-                                title="View Details"
-                                onClick={() => handleViewDetails(user)}
-                              >
-                                <i className="bi bi-eye" />
-                              </button>
-                            </td>
-                          </tr>
-                        )) : (
+                        {filteredUsers.length > 0 ? (
+                          filteredUsers.map((user, index) => (
+                            <tr key={user.id}>
+                              <td>{index + 1}</td>
+                              <td>{user.item}</td>
+                              <td>{user.price}</td>
+
+                              <td>
+                                {new Date(user.date).toLocaleDateString()}
+                              </td>
+                              <td>
+                                <button
+                                  className="btn btn-sm btn-outline-info"
+                                  title="View Details"
+                                  type="button"
+                                  onClick={() =>
+                                    handleViewDetails(user.item, user.contacts)
+                                  }
+                                >
+                                  {user.counter}
+                                </button>
+                              </td>
+                              <td>
+                                <div className="d-flex justify-content-center gap-1">
+                                  <button
+                                    className="btn btn-sm btn-outline-warning"
+                                    title="Edit"
+                                    type="button"
+                                    onClick={() => handleEdit(user)}
+                                  >
+                                    <i className="bi bi-pencil-square"></i>
+                                  </button>
+
+                                  <button
+                                    className="btn btn-sm btn-outline-danger"
+                                    title="Delete"
+                                    onClick={() => handleDelete(user.id)}
+                                  >
+                                    <i className="bi bi-trash" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
                           <tr>
-                            <td colSpan="7" className="text-center text-muted">No {activeTab} users found.</td>
+                            <td colSpan="7" className="text-center text-muted">
+                              No users found.
+                            </td>
                           </tr>
                         )}
                       </tbody>
@@ -151,8 +186,33 @@ const ContactedUsersList = () => {
                   className="btn btn-danger rounded-circle position-fixed"
                   style={{ bottom: 20, right: 20, width: 50, height: 50 }}
                 >
-                  <img src="/assets/images/icon-sos.png" alt="" style={{ maxWidth: 25 }} />
+                  <img
+                    src="/assets/images/icon-sos.png"
+                    alt=""
+                    style={{ maxWidth: 25 }}
+                  />
                 </button>
+
+                <ContactModal
+                  show={showModal}
+                  onClose={() => setShowModal(false)}
+                  contacts={selectedItemContacts}
+                  itemName={selectedItemName}
+                />
+
+                <AddItemModal
+                  show={showAddModal}
+                  onClose={() => setShowAddModal(false)}
+                />
+                <EditItemModal
+                  show={showEditModal}
+                  onClose={() => setShowEditModal(false)}
+                  itemData={itemToEdit}
+                  onSave={(formData) => {
+                    // You can handle formData submission to your API here
+                    console.log("Submit updated item", formData);
+                  }}
+                />
               </form>
             </div>
           </div>
@@ -161,7 +221,7 @@ const ContactedUsersList = () => {
 
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default ContactedUsersList
+export default ContactedUsersList;
