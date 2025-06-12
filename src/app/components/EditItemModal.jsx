@@ -116,7 +116,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
       <Modal.Body>
         <Form onSubmit={handleSubmit} encType="multipart/form-data">
           <Form.Group className="mb-3">
-            <Form.Label>🏷️ Title</Form.Label>
+            <Form.Label> Title</Form.Label>
             <Form.Control
               type="text"
               name="title"
@@ -127,7 +127,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>💰 Price</Form.Label>
+            <Form.Label>Price</Form.Label>
             <Form.Control
               type="text"
               name="price"
@@ -138,7 +138,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>📝 Description</Form.Label>
+            <Form.Label>Description</Form.Label>
             <Form.Control
               as="textarea"
               name="description"
@@ -150,7 +150,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>📷 Upload New Images</Form.Label>
+            <Form.Label>Upload New Images</Form.Label>
             <Form.Control
               type="file"
               name="images[]"
@@ -162,7 +162,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
 
           {existingImages.length > 0 && (
             <>
-              <p className="fw-bold mt-3">🖼️ Existing Images</p>
+              <p className="fw-bold mt-3">Existing Images</p>
               <div className="d-flex gap-2 flex-wrap">
                 {existingImages.map((src, idx) => (
                   <div key={idx} style={imageBoxStyle}>
@@ -210,17 +210,20 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
             </>
           )}
 
-          <Button
-            type="submit"
-            className="mt-4 px-4 py-2 fw-medium rounded-pill"
-            style={{
-              background: "#c12020",
-              color: "#fff",
-              border: "none",
-            }}
-          >
-            💾 Save Changes
-          </Button>
+      <div className="text-end">
+  <Button
+    type="submit"
+    className="mt-4 px-4 py-2 fw-medium rounded-pill"
+    style={{
+      background: "#c12020",
+      color: "#fff",
+      border: "none",
+    }}
+  >
+    Submit
+  </Button>
+</div>
+
         </Form>
       </Modal.Body>
     </Modal>
