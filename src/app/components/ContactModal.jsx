@@ -7,22 +7,32 @@ const ContactModal = ({ show, onClose, contacts, itemName }) => {
     "https://t4.ftcdn.net/jpg/02/14/74/61/360_F_214746128_31JkeaP6rU0NzzzdFC4khGkmqc8noe6h.jpg";
 
   return (
-    <Modal show={show} onHide={onClose} centered size="lg">
-      <Modal.Header closeButton>
+    <Modal
+      show={show}
+      onHide={onClose}
+      centered
+      size="lg"
+      className="custom-modal"
+    >
+      <Modal.Header closeButton className="bg-light border-bottom-0">
         <Modal.Title>
-          <span className="fw-bold text-primary">
-            Contacted Users for "{itemName}"
-          </span>
+          <h5 className="text-primary mb-0 fw-bold">
+            📇 Contacted Users for "{itemName}"
+          </h5>
         </Modal.Title>
       </Modal.Header>
 
       <Modal.Body style={{ maxHeight: "400px", overflowY: "auto" }}>
         {contacts.length > 0 ? (
-          <Table striped bordered hover responsive className="mb-0 align-middle">
-            <thead className="table-primary">
+          <Table
+            hover
+            responsive
+            className="align-middle text-center table-borderless"
+          >
+            <thead className="bg-primary text-white sticky-top">
               <tr>
                 <th>#</th>
-                <th>Image</th>
+                <th>Avatar</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
@@ -30,32 +40,41 @@ const ContactModal = ({ show, onClose, contacts, itemName }) => {
             </thead>
             <tbody>
               {contacts.map((contact, index) => (
-                <tr key={index}>
+                <tr
+                  key={index}
+                  className="bg-light shadow-sm mb-2 rounded-3"
+                  style={{ borderBottom: "1px solid #dee2e6" }}
+                >
                   <td>{index + 1}</td>
                   <td>
                     <Image
                       src={contact.image || defaultImage}
                       alt={contact.name}
                       roundedCircle
-                      width={90}
-                      height={100}
-                      style={{ objectFit: "cover" }}
+                      style={{
+                        objectFit: "cover",
+                        width: "60px",
+                        height: "60px",
+                        border: "2px solid #dee2e6",
+                      }}
                     />
                   </td>
-                  <td>{contact.name}</td>
-                  <td>{contact.email}</td>
-                  <td>{contact.phone}</td>
+                  <td>{contact.name || <i className="text-muted">N/A</i>}</td>
+                  <td>{contact.email || <i className="text-muted">N/A</i>}</td>
+                  <td>{contact.phone || <i className="text-muted">N/A</i>}</td>
                 </tr>
               ))}
             </tbody>
           </Table>
         ) : (
-          <p className="text-muted">No contacts found for this item.</p>
+          <p className="text-center text-muted mt-3">
+            😕 No contacts found for this item.
+          </p>
         )}
       </Modal.Body>
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
+      <Modal.Footer className="bg-light border-top-0">
+        <Button variant="outline-primary" onClick={onClose}>
           Close
         </Button>
       </Modal.Footer>
