@@ -3,8 +3,10 @@
 import Header from "@/app/components/Header"
 import Footer from "@/app/components/Footer"
 import OtherBanner from "@/app/components/OtherBanner"
+import { useRouter } from 'next/navigation'
 
 const Checkout = () => {
+  const router = useRouter()
   return (
     <>
       <Header />
@@ -101,7 +103,7 @@ const Checkout = () => {
                   </select>
                 </div>
 
-                <button className="btn btn-primary w-100 py-2 fw-semibold rounded-3">
+                <button className="btn btn-primary w-100 py-2 fw-semibold rounded-3"  onClick={() => router.push('/payment')}>
                   Place Order
                 </button>
               </div>

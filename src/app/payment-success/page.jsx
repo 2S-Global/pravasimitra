@@ -19,7 +19,8 @@ const PaymentSuccess = () => {
             <img
               src="/assets/icon-success.png"
               alt="Success"
-              style={{ width: 80, marginBottom: 20 }}
+              className="d-block mx-auto mb-4"
+              style={{ width: 80 }}
             />
             <h2 className="fw-bold text-success mb-2">Payment Successful!</h2>
             <p className="text-muted mb-4">Thank you for your purchase. Your order has been placed successfully.</p>
