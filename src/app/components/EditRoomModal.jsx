@@ -1,14 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form,Row ,Col } from "react-bootstrap";
+import { Modal, Button, Form,Row,Col } from "react-bootstrap";
 
-const EditItemModal = ({ show, onClose, itemData, onSave }) => {
+const EditRoomModal = ({ show, onClose, itemData, onSave }) => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
     description: "",
     images: [],
-    category: "",
+    propertyType:"",
+    roomSize:""
   });
 
   const [existingImages, setExistingImages] = useState([]);
@@ -20,13 +21,12 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
         title: itemData.title || "",
         price: itemData.price || "",
         description: itemData.description || "",
-        category: itemData.category || "", // ✅ updated here
         images: [],
+        propertyType:itemData.propertyType,
+        roomSize:itemData.roomSize
       });
       setExistingImages(itemData.images || []);
       setImagePreviews([]);
-      console.log("Incoming category:", itemData.category);
-
     }
   }, [itemData]);
 
@@ -65,12 +65,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
     e.preventDefault();
     const { title, price, description, images } = formData;
 
-    if (
-      !title ||
-      !price ||
-      !description ||
-      (images.length === 0 && existingImages.length === 0)
-    ) {
+    if (!title || !price || !description || (images.length === 0 && existingImages.length === 0)) {
       alert("Please fill all fields and have at least one image.");
       return;
     }
@@ -119,9 +114,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
         closeButton
         style={{ background: "#f8f9fa", borderBottom: "1px solid #dee2e6" }}
       >
-        <Modal.Title className="fw-semibold text-primary">
-          ✏️ Edit Item
-        </Modal.Title>
+        <Modal.Title className="fw-semibold text-primary">✏️ Edit Property</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -136,51 +129,53 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
               placeholder="Enter item title"
             />
           </Form.Group>
-          <Row className="mb-4">
-            <Col md={6}>
-              <Form.Group >
-                <Form.Label className="fw-semibold">Category</Form.Label>
+
+        <Row className="mb-4">
+            <Col md={4}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Property Type</Form.Label>
                 <Form.Select
-                  name="category"
-                  value={formData.category}
+                  name="propertyType"
+                  value={formData.propertyType}
                   onChange={handleChange}
                   className="rounded-3 shadow-sm"
                 >
                   <option value="">Select</option>
-                  <option value="home-furniture">Home Furniture</option>
-                  <option value="furniture">Office Furniture</option>
-                  <option value="electronics">Electronics</option>
-                  <option value="clothing">Clothing</option>
-                  <option value="vehicles">Vehicles</option>
-                  <option value="households">HouseHolds</option>
+                  <option value="Rent">Rent</option>
+                  <option value="Lease">Lease</option>
+                  <option value="Sell">Sell</option>
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col md={6}>
-              <Form.Group >
+
+            <Col md={4}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Room Size</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="roomSize"
+                  value={formData.roomSize}
+                  onChange={handleChange}
+                  placeholder="e.g. 950 sq.ft"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+
+            <Col md={4}>
+              <Form.Group>
                 <Form.Label className="fw-semibold">Price</Form.Label>
                 <Form.Control
                   type="text"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  placeholder="Enter item price"
+                  placeholder="e.g. 4999"
+                  className="rounded-3 shadow-sm"
                 />
               </Form.Group>
             </Col>
           </Row>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">Description</Form.Label>
-            <Form.Control
-              as="textarea"
-              name="description"
-              rows={3}
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Enter item description"
-            />
-          </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label className="fw-semibold">Upload New Images</Form.Label>
@@ -209,12 +204,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
                         borderRadius: "12px",
                       }}
                     />
-                    <Button
-                      variant="light"
-                      size="sm"
-                      style={closeBtnStyle}
-                      onClick={() => handleRemoveImage(idx, true)}
-                    >
+                    <Button variant="light" size="sm" style={closeBtnStyle} onClick={() => handleRemoveImage(idx, true)}>
                       ×
                     </Button>
                   </div>
@@ -239,12 +229,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
                         borderRadius: "12px",
                       }}
                     />
-                    <Button
-                      variant="light"
-                      size="sm"
-                      style={closeBtnStyle}
-                      onClick={() => handleRemoveImage(idx, false)}
-                    >
+                    <Button variant="light" size="sm" style={closeBtnStyle} onClick={() => handleRemoveImage(idx, false)}>
                       ×
                     </Button>
                   </div>
@@ -253,23 +238,24 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
             </>
           )}
 
-          <div className="text-end">
-            <Button
-              type="submit"
-              className="mt-4 px-4 py-2 fw-medium rounded-pill"
-              style={{
-                background: "#c12020",
-                color: "#fff",
-                border: "none",
-              }}
-            >
-              Submit
-            </Button>
-          </div>
+      <div className="text-end">
+  <Button
+    type="submit"
+    className="mt-4 px-4 py-2 fw-medium rounded-pill"
+    style={{
+      background: "#c12020",
+      color: "#fff",
+      border: "none",
+    }}
+  >
+    Submit
+  </Button>
+</div>
+
         </Form>
       </Modal.Body>
     </Modal>
   );
 };
 
-export default EditItemModal;
+export default EditRoomModal;

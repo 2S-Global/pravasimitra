@@ -53,7 +53,7 @@ const CardPayment = () => {
                       <span>Amount</span>
                       <span className="fw-bold">₹26,500</span>
                     </div>
-                    <button type="submit" className="btn btn-success w-100 fw-semibold py-2 rounded-pill mt-2"   onClick={() => router.push('/payment-success')}>
+                    <button type="submit" className="btn btn-danger w-100 fw-semibold py-2 rounded-pill mt-2"   onClick={() => router.push('/payment-success')}>
                       Pay Now
                     </button>
                   </div>

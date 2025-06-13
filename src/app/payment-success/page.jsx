@@ -33,7 +33,7 @@ const PaymentSuccess = () => {
             </div>
 
             <div className="d-flex justify-content-center gap-3">
-              <button className="btn btn-outline-primary rounded-pill px-4" onClick={() => router.push('/orders')}>
+              <button className="btn btn-outline-danger rounded-pill px-4" onClick={() => router.push('/orders')}>
                 View My Orders
               </button>
               <button className="btn btn-success rounded-pill px-4" onClick={() => router.push('/')}>

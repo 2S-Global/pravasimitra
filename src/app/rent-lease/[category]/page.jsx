@@ -58,7 +58,7 @@ const ListHomes = () => {
                 {categories.map((cat, idx) => (
                   <button
                     key={idx}
-                    className="btn btn-outline-secondary btn-sm text-nowrap"
+                    className="btn btn-outline-danger btn-sm text-nowrap"
                     style={{
                       whiteSpace: 'nowrap',
                       borderRadius: '20px',

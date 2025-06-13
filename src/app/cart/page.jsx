@@ -119,7 +119,7 @@ const Cart = () => {
                     <span>₹{totalAmount.toLocaleString()}</span>
                   </p>
                   <button
-                    className="btn btn-primary w-100 mt-3"
+                    className="btn btn-danger w-100 mt-3"
                     onClick={() => router.push('/checkout')}
                   >
                     Proceed to Checkout

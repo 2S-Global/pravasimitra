@@ -125,7 +125,7 @@ const JobCategory = () => {
                     <button
                       key={cat}
                       className={`btn btn-sm rounded-pill px-4 py-2 fw-semibold 
-                        ${(selectedCategory === cat || (cat === "All" && selectedCategory === "")) ? 'btn-primary' : 'btn-outline-primary'} 
+                        ${(selectedCategory === cat || (cat === "All" && selectedCategory === "")) ? 'btn-danger' : 'btn-outline-danger'} 
                         shadow-sm`}
                       onClick={() => {
                         setSelectedCategory(cat === "All" ? "" : cat)

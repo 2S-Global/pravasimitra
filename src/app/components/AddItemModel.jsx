@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Col, Row } from "react-bootstrap";
 
 const AddItemModal = ({ show, onClose }) => {
   const [formData, setFormData] = useState({
@@ -78,7 +78,7 @@ const AddItemModal = ({ show, onClose }) => {
           className="p-3"
         >
           <Form.Group className="mb-4">
-            <Form.Label className="fw-medium">Item Title</Form.Label>
+            <Form.Label className="fw-semibold">Title</Form.Label>
             <Form.Control
               type="text"
               name="title"
@@ -88,21 +88,43 @@ const AddItemModal = ({ show, onClose }) => {
               className="rounded-3 shadow-sm"
             />
           </Form.Group>
+          <Row className="mb-4">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Category</Form.Label>
+                <Form.Select
+                  name="propertyType"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="rounded-3 shadow-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="home-furniture">Home Furniture</option>
+                  <option value="furniture">Office Furniture</option>
+                  <option value="electronics">Electronics</option>
+                  <option value="clothing">Clothing</option>
+                  <option value="vehicles">Vehicles</option>
+                  <option value="households">HouseHolds</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
 
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Price ($)</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  placeholder="e.g. 4999"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
           <Form.Group className="mb-4">
-            <Form.Label className="fw-medium">Price (₹)</Form.Label>
-            <Form.Control
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              placeholder="e.g. 4999"
-              className="rounded-3 shadow-sm"
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-4">
-            <Form.Label className="fw-medium">Description</Form.Label>
+            <Form.Label className="fw-semibold">Description</Form.Label>
             <Form.Control
               as="textarea"
               name="description"
@@ -115,7 +137,7 @@ const AddItemModal = ({ show, onClose }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="fw-medium">Upload Images</Form.Label>
+            <Form.Label className="fw-semibold">Upload Images</Form.Label>
             <Form.Control
               type="file"
               name="images[]"
@@ -176,7 +198,7 @@ const AddItemModal = ({ show, onClose }) => {
               }}
               className="px-4 py-2 fw-medium rounded-pill"
             >
-          Submit
+              Submit
             </Button>
           </div>
         </Form>
