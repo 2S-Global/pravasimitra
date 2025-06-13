@@ -124,7 +124,7 @@ const JobCategory = () => {
                   {allCategories.map(cat => (
                     <button
                       key={cat}
-                      className={`btn btn-sm rounded-pill px-4 py-2 fw-semibold 
+                      className={`btn btn-sm  px-4 py-2  
                         ${(selectedCategory === cat || (cat === "All" && selectedCategory === "")) ? 'btn-danger' : 'btn-outline-danger'} 
                         shadow-sm`}
                       onClick={() => {

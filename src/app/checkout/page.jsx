@@ -110,7 +110,7 @@ const Checkout = () => {
                   </select>
                 </div>
 
-                <button className="btn btn-danger w-100 py-2 fw-semibold rounded-3"  onClick={() => router.push('/payment')}>
+                <button className="btn btn-danger w-100 py-2 fw-semibold rounded-3 mt-4"  onClick={() => router.push('/payment')}>
                   Place Order
                 </button>
               </div>

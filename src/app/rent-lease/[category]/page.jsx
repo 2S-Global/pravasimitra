@@ -61,11 +61,11 @@ const ListHomes = () => {
                     className="btn btn-outline-danger btn-sm text-nowrap"
                     style={{
                       whiteSpace: 'nowrap',
-                      borderRadius: '20px',
+                   
                       padding: '6px 16px',
-                      backgroundColor: cat.toLowerCase() === category ? '#c12020' : '',
+                      backgroundColor: cat.toLowerCase() === category ? '#dc3545' : '',
                       color: cat.toLowerCase() === category ? '#fff' : '',
-                      borderColor: cat.toLowerCase() === category ? '#c12020' : ''
+                      borderColor: cat.toLowerCase() === category ? '#dc3545' : ''
                     }}
                     onClick={() => router.push(`/rent-lease/${cat.toLowerCase()}`)}
                   >
