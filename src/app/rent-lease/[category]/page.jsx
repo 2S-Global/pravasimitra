@@ -16,9 +16,9 @@ const ListHomes = () => {
   const categories = ["All", "Rent", "Lease", "Purchase"]
 
   const subcategories = {
-    Rent: ["Home", "Apartments", "Townhouses"],
-    Lease: ["Home", "Apartments", "Townhouses"],
-    Purchase: ["Home", "Apartments", "Townhouses"]
+    Rent: ["Rooms", "Apartments", "Villa"],
+    Lease: ["Rooms", "Apartments", "Villa"],
+    Purchase: ["Rooms", "Apartments", "Villa"]
   }
 
   const properties = [
