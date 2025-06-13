@@ -50,6 +50,13 @@ const Checkout = () => {
                 <h5 className="fw-semibold mb-3">Shipping Information</h5>
                 <form>
                   <div className="row g-3">
+
+
+                    <div className="col-12">
+                      <label className="form-label">PIN Code</label>
+                      <input type="text" className="form-control" placeholder="12345" />
+                    </div>
+
                     <div className="col-md-6">
                       <label className="form-label">First Name</label>
                       <input type="text" className="form-control" placeholder="Jane" />

@@ -18,6 +18,11 @@ const JobCategory = () => {
       title: "Wood Bed With Side Storage",
       desc: "Buy Sofa Online 2+1+1+ Center table / Black",
       image: "/assets/buy-sell/bed1.webp",
+      images: [
+        "/assets/buy-sell/bed1.webp",
+        "/assets/buy-sell/bed2.jpg",
+        "/assets/buy-sell/bed3.jpg"
+      ],
       category: "Home Furniture",
       subCategory: "Bed"
     },
@@ -25,6 +30,10 @@ const JobCategory = () => {
       title: "Luxury Wood Bed with Storage",
       desc: "Short description of the product goes here.",
       image: "/assets/buy-sell/bed2.jpg",
+      images: [
+        "/assets/buy-sell/bed2.jpg",
+        "/assets/buy-sell/bed3.jpg"
+      ],
       category: "Home Furniture",
       subCategory: "Bed"
     },
@@ -32,6 +41,7 @@ const JobCategory = () => {
       title: "Wooden Sofa Set - Solid Sheesham",
       desc: "Buy Sofa Online 2+1+1+ Center table / Black",
       image: "/assets/buy-sell/sofa1.jpg",
+      images: ["/assets/buy-sell/sofa1.jpg"],
       category: "Home Furniture",
       subCategory: "Sofa"
     },
@@ -39,6 +49,10 @@ const JobCategory = () => {
       title: "WOODEN SOFA SET (Teak)",
       desc: "Short description of the product goes here.",
       image: "/assets/buy-sell/sofa2.jpg",
+      images: [
+        "/assets/buy-sell/sofa2.jpg",
+        "/assets/buy-sell/sofa4.jpg"
+      ],
       category: "Office Furniture",
       subCategory: "Sofa"
     },
@@ -46,6 +60,10 @@ const JobCategory = () => {
       title: "L Shape Sofa Modern Sofa Set Design",
       desc: "Short description of the product goes here.",
       image: "/assets/buy-sell/sofa3.webp",
+      images: [
+        "/assets/buy-sell/sofa3.webp",
+        "/assets/buy-sell/sofa4.jpg"
+      ],
       category: "Office Furniture",
       subCategory: "L-Sofa"
     },
@@ -53,12 +71,17 @@ const JobCategory = () => {
       title: "Buy Luxury Sofas Online",
       desc: "Short description of the product goes here.",
       image: "/assets/buy-sell/sofa4.jpg",
+      images: [
+        "/assets/buy-sell/sofa4.jpg",
+        "/assets/buy-sell/sofa3.webp"
+      ],
       category: "Electronics",
       subCategory: "Smart TV"
     }
   ]
 
   const allCategories = [
+    "All",
     "Home Furniture",
     "Office Furniture",
     "Electronics",
@@ -78,8 +101,8 @@ const JobCategory = () => {
 
   const filteredItems = allItems.filter(item =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedCategory === "" || item.category === selectedCategory) &&
-    (selectedSubCategory === "" || item.subCategory === selectedSubCategory)
+    (selectedCategory === "" || selectedCategory === "All" || item.category === selectedCategory) &&
+    (selectedSubCategory === "" || selectedSubCategory === "All" || item.subCategory === selectedSubCategory)
   )
 
   return (
@@ -102,16 +125,11 @@ const JobCategory = () => {
                     <button
                       key={cat}
                       className={`btn btn-sm rounded-pill px-4 py-2 fw-semibold 
-                        ${selectedCategory === cat ? 'btn-primary' : 'btn-outline-primary'} 
+                        ${(selectedCategory === cat || (cat === "All" && selectedCategory === "")) ? 'btn-primary' : 'btn-outline-primary'} 
                         shadow-sm`}
                       onClick={() => {
-                        if (selectedCategory === cat) {
-                          setSelectedCategory("")
-                          setSelectedSubCategory("")
-                        } else {
-                          setSelectedCategory(cat)
-                          setSelectedSubCategory("")
-                        }
+                        setSelectedCategory(cat === "All" ? "" : cat)
+                        setSelectedSubCategory("")
                       }}
                     >
                       {cat}
@@ -149,9 +167,17 @@ const JobCategory = () => {
               </div>
 
               {/* 📁 Sub Category Filter */}
-              {selectedCategory && subCategories[selectedCategory] && (
+              {selectedCategory && selectedCategory !== "All" && subCategories[selectedCategory] && (
                 <div className="mb-4 text-center">
                   <div className="d-flex flex-wrap justify-content-center gap-2">
+                    <button
+                      className={`btn btn-sm rounded-pill px-4 py-2 fw-semibold 
+                        ${selectedSubCategory === "" ? 'btn-success' : 'btn-outline-success'} 
+                        shadow-sm`}
+                      onClick={() => setSelectedSubCategory("")}
+                    >
+                      All
+                    </button>
                     {subCategories[selectedCategory].map(sub => (
                       <button
                         key={sub}
@@ -177,13 +203,18 @@ const JobCategory = () => {
                   ) : (
                     filteredItems.map((item, index) => (
                       <div className="col-md-4" key={index}>
-                        <div className="card h-100 shadow-sm border-0">
+                        <div className="card h-100 shadow-sm border-0 position-relative">
                           <img
                             src={item.image}
                             className="card-img-top"
                             alt={item.title}
                             style={{ height: '250px', objectFit: 'cover' }}
                           />
+                          {item.images && item.images.length > 1 && (
+                            <span className="badge bg-dark position-absolute top-0 end-0 m-2" style={{padding:"7px"}}>
+                              {item.images.length} More Photos
+                            </span>
+                          )}
                           <div className="card-body text-center">
                             <h5 className="card-title">{item.title}</h5>
                             <p className="card-text text-muted">City | State</p>

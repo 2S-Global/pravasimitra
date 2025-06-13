@@ -128,11 +128,11 @@ const ProductDetails = () => {
                     Description
                   </button>
                 </li>
-                <li className="nav-item" role="presentation">
+{/*                 <li className="nav-item" role="presentation">
                   <button className="nav-link" id="reviews-tab" data-bs-toggle="pill" data-bs-target="#reviews" type="button" role="tab">
                     Reviews (112)
                   </button>
-                </li>
+                </li> */}
               </ul>
               <div className="tab-content border rounded p-4 shadow-sm bg-light" id="productTabContent">
                 <div className="tab-pane fade show active" id="desc" role="tabpanel">

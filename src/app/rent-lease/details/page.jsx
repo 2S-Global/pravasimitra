@@ -112,9 +112,9 @@ const RentLeaseDetails = () => {
                   <li className="nav-item" role="presentation">
                     <button className="nav-link active" id="desc-tab" data-bs-toggle="tab" data-bs-target="#desc" type="button" role="tab">Description</button>
                   </li>
-                  <li className="nav-item" role="presentation">
+{/*                   <li className="nav-item" role="presentation">
                     <button className="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews (12)</button>
-                  </li>
+                  </li> */}
                 </ul>
 
                 <div className="tab-content border rounded p-4 bg-white">
