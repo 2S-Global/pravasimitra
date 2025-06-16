@@ -26,13 +26,13 @@ const Sidebar = () => {
           </li>
 
           <li>
-            <Link href="#">
+            <Link href="/user/profile-image">
               <i className="fa fa-image" /> Change Profile Image
             </Link>
           </li>
 
           <li>
-            <Link href="#">
+            <Link href="/user/change-password">
               <i className="fa fa-lock" /> Change Password
             </Link>
           </li>
