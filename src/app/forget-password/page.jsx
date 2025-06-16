@@ -1,27 +1,27 @@
-'use-client';
+// app/login/page.js
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import OtherBanner from '@/app/components/OtherBanner';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Login | Pravasi Mitra',
+  title: 'Forget Password | Pravasi Mitra',
   description: 'Login to your account securely using your mobile number and password.',
   keywords: ['login', 'account', 'user', 'authentication'],
   openGraph: {
-    title: 'Login - Pravasi Mitra',
+    title: 'Foeget Password - Pravasi Mitra',
     description: 'Access your account through a secure login page.',
     type: 'website',
   },
 };
 
-const Login = () => {
+const FoegetPassword = () => {
   return (
     <>
       <Header />
-      {/* <OtherBanner page_title="Login" /> */}
+      {/* <OtherBanner page_title="Forget Password" /> */}
 
-      <section className="vh-100" style={{ backgroundColor: "#fff" }}>
+       <section className="vh-100" style={{ backgroundColor: "#fff" }}>
   <div className="container py-5 h-100">
     <div className="row d-flex justify-content-center align-items-center h-100">
       <div className="col col-xl-10">
@@ -49,16 +49,13 @@ const Login = () => {
                     className="fw-normal mb-3 pb-3"
                     style={{ letterSpacing: 1 }}
                   >
-                    Sign into your account
+                    Reset your account
                   </h5>
                   <div data-mdb-input-init="" className="form-outline mb-4">
                     <input type="email" id="form2Example17" className="form-control form-control-lg"  placeholder='Email Address'  />
                     
                   </div>
-                  <div data-mdb-input-init="" className="form-outline mb-4">
-                    <input type="password" id="form2Example27" className="form-control form-control-lg"  placeholder='Password'  />
-                   
-                  </div>
+
                   <div className="pt-1 mb-4">
                     <button
                       data-mdb-button-init=""
@@ -69,21 +66,16 @@ const Login = () => {
                       Login
                     </button>
                   </div>
-                  <Link className="small text-muted" href="./forget-password">
+                  <a className="small text-muted" href="/forget-password">
                     Forgot password?
-                  </Link>
+                  </a>
                   <p className="mb-5 pb-lg-2" style={{ color: "#393f81" }}>
                     Don't have an account?{" "}
-                    <a href="#!" style={{ color: "#393f81" }}>
+                    <a href="/register" style={{ color: "#393f81" }}>
                       Register here
                     </a>
                   </p>
-                  <a href="#!" className="small text-muted">
-                    Terms of use.
-                  </a>
-                  <a href="#!" className="small text-muted">
-                    Privacy policy
-                  </a>
+                 
                 </form>
               </div>
             </div>
@@ -94,11 +86,9 @@ const Login = () => {
   </div>
 </section>
 
-
-
       <Footer />
     </>
   );
 };
 
-export default Login;
+export default FoegetPassword;

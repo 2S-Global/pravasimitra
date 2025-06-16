@@ -14,13 +14,13 @@ const Sidebar = () => {
 
         <ul className="nav nav-pills nav-stacked">
           <li className="active">
-            <Link href="/dashboard">
+            <Link href="/user/dashboard">
               <i className="fa fa-tachometer-alt" /> Dashboard
             </Link>
           </li>
 
           <li>
-            <Link href="/my-account">
+            <Link href="/user/my-account">
               <i className="fa fa-user-cog" /> Manage Profile
             </Link>
           </li>

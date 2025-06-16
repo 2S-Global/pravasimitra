@@ -69,7 +69,7 @@ const Header = () => {
                   <li className="tm-navigation-dropdown"><Link href="/blogs">Blogs</Link></li>
                   <li><Link href="/faq">FAQ</Link></li>
                   <li><Link href="/contact-us">Contact</Link></li>
-                  <li><Link href="/user/login">Login</Link></li>
+                  <li><Link href="/login">Login</Link></li>
                 </ul>
               </nav>
 
@@ -107,10 +107,10 @@ const Header = () => {
                     <li><Link className="dropdown-item" href="/buy-sell/buysell-category">Buy/Sell</Link></li>
                     <li><Link className="dropdown-item" href="/rent-lease/rentlease-category">Rent & Lease</Link></li>
                     <li><Link className="dropdown-item" href="/marketplace/marketplace-category">MarketPlace</Link></li>
-                    <li><Link className="dropdown-item" href="/orders">Orders</Link></li>
-                    <li><Link className="dropdown-item" href="/buy-sell/list">Manage Buy/Sell</Link></li>
-                    <li><Link className="dropdown-item" href="/rent-lease/list">Manage Rent/Lease</Link></li>
-                    <li><Link className="dropdown-item" href="/marketplace/list">Manage MarketPlace</Link></li>
+                    <li><Link className="dropdown-item" href="/user/orders">Orders</Link></li>
+                    <li><Link className="dropdown-item" href="/user/buy-sell/list">Manage Buy/Sell</Link></li>
+                    <li><Link className="dropdown-item" href="/user/rent-lease/list">Manage Rent/Lease</Link></li>
+                    <li><Link className="dropdown-item" href="/user/marketplace/list">Manage MarketPlace</Link></li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><Link className="dropdown-item text-danger" href="/logout">Logout</Link></li>
                   </ul>

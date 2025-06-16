@@ -58,7 +58,7 @@ const Register = () => {
                       </button>
                     </div>
                     <div className="tm-form-field">
-                      <Link href="/user/login">Returning User Login</Link>
+                      <Link href="/login">Returning User Login</Link>
                     </div>
                   </div>
                 </form>
