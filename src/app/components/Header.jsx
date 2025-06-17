@@ -102,7 +102,7 @@ const Header = () => {
                     />
                   </button>
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                    <li><Link className="dropdown-item" href="/dashboard">Dashboard</Link></li>
+                    <li><Link className="dropdown-item" href="/user/dashboard">Dashboard</Link></li>
                     <li><Link className="dropdown-item" href="/user/my-account">Profile</Link></li>
                     <li><Link className="dropdown-item" href="/buy-sell/buysell-category">Buy/Sell</Link></li>
                     <li><Link className="dropdown-item" href="/rent-lease/rentlease-category">Rent & Lease</Link></li>
