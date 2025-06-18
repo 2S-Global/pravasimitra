@@ -1,6 +1,6 @@
-import { withAuth } from "../../../../lib/withAuth";
+import { withAuth } from "../../../../../lib/withAuth";
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
+import { connectDB } from "../../../../../lib/db";
 import User from "../../../../../models/User";
 
 //Fetch user profile (GET)
