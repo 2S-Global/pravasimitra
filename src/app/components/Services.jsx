@@ -10,8 +10,7 @@ const Services = () =>{
         <div className="tm-section-title text-center">
           <h2>Services We Provide</h2>
           <p style={{ textAlign: "justify" }}>
-            We offer a range of essential services, including passport renewal,
-            emergency assistance, and legal support.
+           Pravasi Mitra is your comprehensive friend away from home, simplifying life abroad for migrants. We provide vital inter-community services designed to foster connection and support.
           </p>
         </div>
       </div>
