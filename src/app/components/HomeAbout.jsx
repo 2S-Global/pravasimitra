@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 const sliderImages = [
   "/assets/blog/IMG-2.jpg",
-  "/assets/blog/IMG-3.jpg",
+  "/assets/blog/IMG-9.jpg",
   "/assets/blog/IMG-7.jpg",
   "/assets/blog/IMG-10.jpg",
 ];
