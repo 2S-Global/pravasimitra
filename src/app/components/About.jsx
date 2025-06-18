@@ -49,15 +49,31 @@ const HomeAbout = () => {
               </p>
               <p style={{ fontWeight:"bold" }}>Join the Pravasi Mitra community today and experience the difference of having a true "friend" (Mitra) by your side, wherever your journey takes you.</p>
 
-              <h3>Vision & Mission</h3>
-              <ul>
-                <li>
-                  <span>Vision:</span> To build a global network of empowered and connected migrants, fostering a sense of belonging, security, and prosperity for everyone living away from their homeland.
-                </li>
-                <li>
-                  <span>Mission:</span> To be the indispensable companion for every migrant, providing a comprehensive and supportive ecosystem that bridges distances and simplifies life abroad through a pioneering website and mobile application.
-                </li>
-              </ul>
+      <div className="container">
+  <h3 className="text-center mb-4">Vision & Mission</h3>
+  <div className="row">
+    {/* Vision Block */}
+    <div className="col-md-6 mb-4">
+      <div className="p-4 border rounded shadow-sm h-100">
+        <h5 className="mb-3 text-primary">Vision</h5>
+        <p style={{ textAlign: "justify" }}>
+          To build a global network of empowered and connected migrants, fostering a sense of belonging, security, and prosperity for everyone living away from their homeland.
+        </p>
+      </div>
+    </div>
+
+    {/* Mission Block */}
+    <div className="col-md-6 mb-4">
+      <div className="p-4 border rounded shadow-sm h-100">
+        <h5 className="mb-3 text-success">Mission</h5>
+        <p style={{ textAlign: "justify" }}>
+          To be the indispensable companion for every migrant, providing a comprehensive and supportive ecosystem that bridges distances and simplifies life abroad through a pioneering website and mobile application.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
             </div>
           </div>
         </div>
