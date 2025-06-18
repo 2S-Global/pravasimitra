@@ -40,7 +40,8 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
 
-    isDel: { type: Number, default: false },
+  isDel: { type: Boolean, default: false }
+
   },
   { timestamps: true }
 );

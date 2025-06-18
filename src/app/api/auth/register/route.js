@@ -20,7 +20,7 @@ export async function POST(req) {
     if (existingUser) {
       return NextResponse.json(
         { msg: "Email or Mobile Number already registered" },
-        { status: 400 }
+        { status: 200 }
       );
     }
 
@@ -30,6 +30,7 @@ export async function POST(req) {
       email,
       mobile,
       password: HashedPassword,
+  
     });
 
     await newUser.save();
