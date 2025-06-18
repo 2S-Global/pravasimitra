@@ -16,22 +16,22 @@ const HomeAbout = () => {
   const [current, setCurrent] = useState(0);
 
   // Auto play every 3 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % sliderImages.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrent((prev) => (prev + 1) % sliderImages.length);
+  //   }, 3000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
-  const handlePrev = () => {
-    setCurrent(
-      (prev) => (prev - 1 + sliderImages.length) % sliderImages.length
-    );
-  };
+  // const handlePrev = () => {
+  //   setCurrent(
+  //     (prev) => (prev - 1 + sliderImages.length) % sliderImages.length
+  //   );
+  // };
 
-  const handleNext = () => {
-    setCurrent((prev) => (prev + 1) % sliderImages.length);
-  };
+  // const handleNext = () => {
+  //   setCurrent((prev) => (prev + 1) % sliderImages.length);
+  // };
 
   return (
     <>
