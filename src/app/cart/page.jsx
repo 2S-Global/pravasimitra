@@ -13,14 +13,14 @@ const Cart = () => {
     {
       id: 1,
       name: "Office Chair",
-      image: "/assets/images/officefrniture.png",
+      image: "https://m.media-amazon.com/images/I/818hqgJuNoL._SL1500_.jpg",
       quantity: 1,
       price: 2500,
     },
     {
       id: 2,
       name: "LED TV",
-      image: "/assets/images/electronicsgoods.png",
+      image: "https://m.media-amazon.com/images/I/81XdceRvZaL._SL1500_.jpg",
       quantity: 2,
       price: 12000,
     },

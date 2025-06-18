@@ -17,8 +17,7 @@ const Contact = () =>{
             </span>
             <h5>Address</h5>
             <p style={{ textAlign: "left" }}>
-              205 , AI Safa Hermitage Building Karama,
-              <br /> P.O Box 128644, Dubai ,UAE
+              971 US Highway 202N STE N Branchburg NJ 08876
             </p>
           </div>
         </div>
@@ -47,8 +46,8 @@ const Contact = () =>{
             <h5>Email Address</h5>
             <p>
               Email:{" "}
-              <a href="mailto:support@probashi.services">
-                support@probashi.services
+              <a href="mailto:info@pravasimitra.us">
+               info@pravasimitra.us
               </a>
             </p>
           </div>

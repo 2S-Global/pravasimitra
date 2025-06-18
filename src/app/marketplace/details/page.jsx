@@ -4,23 +4,21 @@ import { useState } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
-import { useRouter } from 'next/navigation';
-
+import { useRouter } from "next/navigation";
 
 const ProductDetails = () => {
-    const router = useRouter();
+  const router = useRouter();
   const images = [
-    "/assets/marketplace/how-to-make-hyderabadi-mutton-biryani.jpg",
-    "/assets/marketplace/how-to-make-hyderabadi-mutton-biryani.jpg",
-    "/assets/marketplace/how-to-make-hyderabadi-mutton-biryani.jpg",
-    "/assets/marketplace/how-to-make-hyderabadi-mutton-biryani.jpg",
-    "/assets/marketplace/how-to-make-hyderabadi-mutton-biryani.jpg",
+    "/assets/marketplace/hi-kolkata.webp",
+    "https://thumbs.dreamstime.com/z/selective-focus-illish-hilsa-fish-cooking-mustard-seed-famous-india-bangladesh-hilsa-fish-oily-species-318939598.jpg?ct=jpeg",
+    "https://thumbs.dreamstime.com/z/sorshe-illish-hilsa-fish-cooking-mustard-seed-famous-bengali-food-cooked-green-chili-poppy-seeds-over-white-299291513.jpg?ct=jpeg",
+    "https://thumbs.dreamstime.com/z/illish-succulent-fish-distinct-taste-popular-bengali-cuisine-often-cooked-mustard-sauce-selective-focus-hilsa-314659423.jpg?ct=jpeg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKRRQa7Lr27aCcFRMN4HxS45HLTORjIdQ0Fg&s",
   ];
 
   const [selectedImage, setSelectedImage] = useState(images[0]);
 
   return (
-    
     <>
       <Header />
       <OtherBanner
@@ -104,7 +102,7 @@ const ProductDetails = () => {
 
             {/* Product Details */}
             <div className="col-md-6">
-              <h2 className="fw-bold mb-2">Hyderabadi Mutton Biryani</h2>
+              <h2 className="fw-bold mb-2">Bhapa Ilish</h2>
               <p className="text-secondary mb-1">
                 Category: <strong className="text-dark">Cooked Food</strong>
               </p>
@@ -115,12 +113,13 @@ const ProductDetails = () => {
               </div>
               <h3 className="text-primary fw-bold mb-4">$149.00</h3>
               <p className="text-muted mb-4">
-                Hyderabadi Mutton Biryani is a rich and flavorful dish from
-                Hyderabad, India. Made with tender marinated mutton, fragrant
-                basmati rice, and a blend of aromatic spices, it's cooked in the
-                traditional dum style. This iconic biryani is known for its
-                royal taste, vibrant aroma, and irresistible, spicy-savoury
-                goodness.
+                Bhapa Ilish is prepared by marinating fresh hilsa fillets in a
+                paste of mustard seeds, green chilies, turmeric, salt, and
+                mustard oil. The marinated fish is then wrapped in banana leaves
+                or placed in a sealed container and steamed to perfection. The
+                result is a melt-in-the-mouth dish with a pungent mustard aroma,
+                a slightly spicy kick, and the rich, buttery taste of hilsa
+                shining through.
               </p>
 
               <div className="d-flex gap-2">
@@ -182,12 +181,15 @@ const ProductDetails = () => {
                   role="tabpanel"
                 >
                   <p className="text-muted">
-                    Hyderabadi Mutton Biryani is a rich and flavorful dish from
-                    Hyderabad, India. Made with tender marinated mutton,
-                    fragrant basmati rice, and a blend of aromatic spices, it's
-                    cooked in the traditional dum style. This iconic biryani is
-                    known for its royal taste, vibrant aroma, and irresistible,
-                    spicy-savoury goodness.
+                    Bhapa Ilish is a signature Bengali dish where Hilsa fish is
+                    gently steamed in a creamy mustard and green chili paste,
+                    enriched with a splash of mustard oil. This slow steaming
+                    process enhances the natural flavors of the fish while
+                    infusing it with the bold, tangy taste of mustard. Each bite
+                    offers a perfect balance of heat, sharpness, and richness,
+                    with the soft, flaky hilsa melting in the mouth. Simple yet
+                    deeply flavorful, Bhapa Ilish is a true celebration of
+                    Bengal’s culinary heritage.
                   </p>
                 </div>
                 <div className="tab-pane fade" id="reviews" role="tabpanel">

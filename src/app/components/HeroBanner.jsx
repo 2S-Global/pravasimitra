@@ -27,18 +27,17 @@ return(
       <div className="row">
         <div className="col-lg-7 col-md-8">
           <div className="heroslider-content">
-            <h1
+            <h2
               className="wow fadeInUp tm-animated-text"
               data-in-effect="rollIn"
               data-out-effect="fadeOutDown"
               data-out-shuffle="true"
-              data-wow-delay="0.5s"
+              data-wow-delay="0.5s" style={{ fontWeight:"bold" }}
             >
-              We are Providing Best Service
-            </h1>
+            YOUR GLOBAL COMMUNITY, CONNECTED
+            </h2>
             <p className="wow fadeInUp" data-wow-delay="0.7s">
-              Business plan draws on a wide range of knowledge from many
-              different business disciplines
+              Find support, connect with your community, and access vital services – wherever you are in the world.
             </p>
             <Link
               href="/about-us"

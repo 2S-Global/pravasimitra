@@ -16,12 +16,12 @@ const MarketPlaceCategory = () => {
   }
 
   const categories = [
-     { id: 1, label: "Rent Home", image: "/assets/images/rent.png" },
+     { id: 1, label: "Rent Room", image: "/assets/images/rent.png" },
      { id: 2, label: "Rent Apartments", image: "/assets/images/RentApartments.png" },
-     { id: 3, label: "Rent Townhouses", image: "/assets/images/RentTownhouses.png" },
-     { id: 4, label: "Lease Home", image: "/assets/images/Lease.png" },
+     { id: 3, label: "Rent Villa", image: "/assets/images/RentTownhouses.png" },
+     { id: 4, label: "Lease Room", image: "/assets/images/Lease.png" },
      { id: 5, label: "Lease Apartments", image: "/assets/images/LeaseApartments.png" },
-     { id: 6, label: "Lease Townhouses", image: "/assets/images/LeaseTownhouses.png" },
+     { id: 6, label: "Lease Villa", image: "/assets/images/LeaseTownhouses.png" },
   ]
 
   return (

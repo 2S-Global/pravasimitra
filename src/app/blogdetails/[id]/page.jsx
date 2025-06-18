@@ -1,60 +1,36 @@
-'use client'
-import Header from "@/app/components/Header"
-import Footer from "@/app/components/Footer"
-import OtherBanner from "@/app/components/OtherBanner"
-import { useState } from "react";
+// app/blogs/[id]/page.js
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import OtherBanner from "../../components/OtherBanner";
+import { blogs } from "@/lib/blogsData";
 
+export default function BlogDetails({ params }) {
+  const blog = blogs.find((b) => b.id === parseInt(params.id));
 
-const BlogDetails = ({param}) =>{
+  if (!blog) return <div>Blog not found</div>;
 
-const {id}=param;
-
-const [blogDetails, setblogDetails]=useState(null)
-
-
-    return(
-<>
-<Header />
-<OtherBanner page_title="About Us" />
-
-
-<div className="tm-section about-us-area bg-white tm-padding-section">
-    <div className="container">
-      <div className="row">
-        <div className="col-lg-6 order-2 order-lg-1">
-          <div className="about-content">
-            <h2>Welcome to our company</h2>
-            {/* <h6>Lorem ipsum dolor sit amet consectetur adipisicing elitsed do eiusmod ncididunt ametfh consectetur.</h6> */}
-            <p style={{ textAlign: "justify" }}>
-              PravasiMitra specializes in consular services, remittance
-              solutions, and buy/sell transactions, providing trusted expertise
-              and efficient service delivery. We ensure seamless processes and
-              client satisfaction, making us your preferred partner for all your
-              service needs.
-            </p>
-            
+  return (
+    <>
+      <Header />
+      <OtherBanner page_title={blog.title} />
+      <div className="tm-section bg-white tm-padding-section">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-10 offset-lg-1">
+              <h2>{blog.title}</h2>
+              {/* <p><strong>Author:</strong> {blog.userId} | <strong>Date:</strong> {blog.date}</p> */}
+              {blog.description.split("\n\n").map((para, index) => (
+                <p
+                  key={index}
+                  style={{ textAlign: "justify", marginBottom: "1em" }}
+                  dangerouslySetInnerHTML={{ __html: para.trim() }}
+                />
+              ))}
+            </div>
           </div>
         </div>
-        {/*     <style>
-		.tm-service2-icon{
-		color: white;
-		}
-		</style> */}
-        <div className="col-lg-5 order-1 order-lg-2 offset-1 slider-new">
-
-        </div>
       </div>
-    </div>
-  </div>
-
-
-
-
-<Footer />
-</>
-
-    )
-
+      <Footer />
+    </>
+  );
 }
-
-export default BlogDetails

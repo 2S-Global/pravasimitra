@@ -1,16 +1,16 @@
-// ✅ Make this a Server Component (default in App Router)
+// ✅ Server Component — no "use client"
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import OtherBanner from '../components/OtherBanner';
 import Blogs from '../components/Blogs';
-import { fetchBlogs } from '@/lib/api';
+import { blogs } from "../../lib/blogsData";
 
-export default async function BlogsList() {
-  const blogs = await fetchBlogs(); // Server-side fetch
-
+export default function BlogsList() {
+  //  console.log("Blogs data:", blogs);
   return (
     <>
+
       <Header />
       <OtherBanner page_title="Blogs List" />
       <Blogs blogs={blogs} />

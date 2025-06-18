@@ -7,13 +7,13 @@ import OtherBanner from "@/app/components/OtherBanner"
 
 const ProductDetails = () => {
   const images = [
-  "/assets/buy-sell/sofa3.webp",
-  "/assets/buy-sell/sofa5.webp",
-  "/assets/buy-sell/sofa3.webp",
-  "/assets/buy-sell/sofa3.webp",
-  "/assets/buy-sell/sofa5.webp",
-  "/assets/buy-sell/sofa5.webp",
-  "/assets/buy-sell/sofa5.webp"
+  "https://m.media-amazon.com/images/I/81XyzQdrIzL._SL1500_.jpg",
+  "https://m.media-amazon.com/images/I/61G8u5hZGWL._SL1500_.jpg",
+  "https://m.media-amazon.com/images/I/61poLzUc02L._SL1500_.jpg",
+  "https://m.media-amazon.com/images/I/61M3pnVHYFL._SL1500_.jpg",
+  "https://m.media-amazon.com/images/I/6134eBUxIvL._SL1500_.jpg",
+  "https://m.media-amazon.com/images/I/61c3FkwHznL._SL1500_.jpg",
+
   ]
 
   const [selectedImage, setSelectedImage] = useState(images[0])
@@ -95,7 +95,7 @@ const ProductDetails = () => {
 
             {/* Product Details */}
             <div className="col-md-6">
-              <h2 className="fw-bold mb-2">L Shape Sofa Modern Sofa Set Design</h2>
+              <h2 className="fw-bold mb-2">Wood Bed With Side Storage</h2>
               <p className="text-secondary mb-1">Category: <strong className="text-dark">Furniture</strong></p>
               <div className="d-flex align-items-center mb-3">
                 <span className="badge bg-success me-2">In Stock</span>
@@ -103,9 +103,10 @@ const ProductDetails = () => {
                 <small className="ms-2 text-muted">(112 reviews)</small>
               </div>
               <h3 className="text-primary fw-bold mb-4">$149.00</h3>
-              <p className="text-muted mb-4">
-                Upgrade your living space with this modern L-shaped sofa set, combining style and comfort. Its sleek design fits perfectly in any corner.
-              </p>
+           <p className="text-muted mb-4">
+  Maximize your bedroom space with this elegant wood bed featuring built-in side storage. Its timeless design blends functionality with classic charm.
+</p>
+
 
               <div className="d-flex gap-2">
                 <button className="btn btn-primary px-4" style={{ background: '#c12020', border: '#c12020' }}>

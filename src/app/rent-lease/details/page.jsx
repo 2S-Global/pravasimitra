@@ -6,11 +6,14 @@ import OtherBanner from "@/app/components/OtherBanner"
 
 const RentLeaseDetails = () => {
   const images = [
-    "/assets/rent-lease/2.jpg",
-    "/assets/rent-lease/3.jpg",
-    "/assets/rent-lease/4.jpg",
-    "/assets/rent-lease/5.jpg",
-    "/assets/rent-lease/6.jpg"
+    "https://lid.zoocdn.com/u/1200/900/6a618a847a92bcb165bc77b7d9567f3b1e0e1b91.jpg:p",
+    "https://lid.zoocdn.com/u/1200/900/2960a330eea12120776a10898e76a7d85394cc74.jpg:p",
+    "https://lid.zoocdn.com/u/1200/900/dc36795b6e1c231e5a1749eeb7a2f68774a80d38.jpg:p",
+    "https://lid.zoocdn.com/u/1200/900/8b33bfb7401e957d4b99595a593fdd364ce9f5a4.jpg:p",
+    "https://lid.zoocdn.com/u/1200/900/f2d9e42799a66420fa042631968cf43d72fd974a.jpg:p",
+    "https://lid.zoocdn.com/u/1200/900/ea59d5b5275176b5348e0cab38ad3fd9ee03ff55.jpg:p",
+    "https://lid.zoocdn.com/u/1200/900/6102c01fe431e928c8332575916a65504ec16297.jpg:p",
+    "https://lid.zoocdn.com/u/1200/900/3876b4bef80347f8949a4bca7a100e85602a9c10.jpg:p",
   ]
   const [activeIndex, setActiveIndex] = useState(0)
 

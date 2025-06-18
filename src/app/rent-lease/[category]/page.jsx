@@ -26,7 +26,7 @@ const ListHomes = () => {
       title: "3 Bedroom House For Rent - E3 4QH",
       desc: "Robert Alan Homes - Hackney & Barnet Estate Agent.",
       price: "$49.99",
-      image: "/assets/rent-lease/1.jpg",
+      image: "https://lid.zoocdn.com/u/1200/900/6a618a847a92bcb165bc77b7d9567f3b1e0e1b91.jpg:p",
       imagesCount: 3
     },
     {

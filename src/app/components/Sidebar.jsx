@@ -6,10 +6,10 @@ const Sidebar = () => {
       <div className="panel">
         <div className="user-heading round">
           <a href="#">
-            <img src="https://bootdey.com/img/Content/avatar/avatar3.png" alt="Profile" />
+            <img src="https://media.istockphoto.com/id/1136413215/photo/young-man-at-street-market.jpg?s=612x612&w=0&k=20&c=obnaR5III0jRxHKd4ZPl3LRC2pI792KbHYR2eBzKKe8=" alt="Profile" />
           </a>
-          <h1>Camila Smith</h1>
-          <p>deydey@theEmail.com</p>
+          <h1>Abhishek Dey</h1>
+          <p>abhishek@gmail.com</p>
         </div>
 
         <ul className="nav nav-pills nav-stacked">

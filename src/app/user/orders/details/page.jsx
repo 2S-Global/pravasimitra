@@ -15,13 +15,13 @@ const OrderDetails = () => {
     status: "Delivered",
     paymentMethod: "Credit Card",
     billing: {
-      name: "John Doe",
+      name: "Abhishek Dey",
       address: "123 Park Street, Kolkata, India",
       phone: "+91 9876543210",
-      email: "john@example.com",
+      email: "abhishek.dey@gmail.com",
     },
     shipping: {
-      name: "John Doe",
+      name: "Abhishek Dey",
       address: "123 Park Street, Kolkata, India",
       phone: "+91 9876543210",
     },
@@ -30,13 +30,13 @@ const OrderDetails = () => {
         name: "Office Chair",
         quantity: 1,
         price: 2500,
-        image: "/assets/images/officefrniture.png",
+        image: "https://m.media-amazon.com/images/I/818hqgJuNoL._SL1500_.jpg",
       },
       {
         name: "LED TV",
         quantity: 2,
         price: 12000,
-        image: "/assets/images/electronicsgoods.png",
+        image: "https://m.media-amazon.com/images/I/81XdceRvZaL._SL1500_.jpg",
       },
     ],
   }

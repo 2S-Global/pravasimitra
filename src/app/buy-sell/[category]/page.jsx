@@ -17,11 +17,11 @@ const JobCategory = () => {
     {
       title: "Wood Bed With Side Storage",
       desc: "Buy Sofa Online 2+1+1+ Center table / Black",
-      image: "/assets/buy-sell/bed1.webp",
+      image: "https://m.media-amazon.com/images/I/81XyzQdrIzL._SL1500_.jpg",
       images: [
-        "/assets/buy-sell/bed1.webp",
-        "/assets/buy-sell/bed2.jpg",
-        "/assets/buy-sell/bed3.jpg"
+        "https://m.media-amazon.com/images/I/81XyzQdrIzL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/81XyzQdrIzL._SL1500_.jpg",
+        "https://m.media-amazon.com/images/I/81XyzQdrIzL._SL1500_.jpg"
       ],
       category: "Home Furniture",
       subCategory: "Bed"
