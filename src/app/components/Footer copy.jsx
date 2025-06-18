@@ -1,5 +1,3 @@
-import styles from './Footer.module.css';
-
 const Footer = () => {
   return (
     <footer
@@ -8,22 +6,19 @@ const Footer = () => {
       data-black-overlay={9}
     >
       {/* Footer Widgets */}
-      <div className={`footer-toparea ${styles.tmPaddingSection}`} >
+      <div className="footer-toparea tm-padding-section">
         <div className="container">
           <div className="row widgets footer-widgets">
-            <div className="col-lg-6 col-md-6 col-12">
+            <div className="col-lg-3 col-md-6 col-12">
               {/* Single Widget (Widget Info) */}
-              <div className="single-widget widget-info row">
-                <div className="col-lg-4 col-md-4 col-12">
+              <div className="single-widget widget-info">
                 <a href="/" className="widget-info-logo">
                   <img
                     src="/assets/images/logo/logo-dark.png"
                     alt="footer logo"
-                    style={{ maxWidth: "80%" }}
+                    style={{ maxWidth: "50%" }}
                   />
                 </a>
-                </div >
-                    <div className="col-lg-8 col-md-8 col-12">
                 <p style={{ textAlign: "justify" }}>
                   Pravasi Mitra is a website and mobile app acting as a
                   comprehensive "friend" for migrants abroad. It offers vital
@@ -33,7 +28,6 @@ const Footer = () => {
                   from home, fostering connection and support for global
                   migrants.
                 </p>
-                </div>
                 <ul className="widget-info-social">
                   <li>
                     <a href="#">
@@ -89,10 +83,10 @@ const Footer = () => {
               </div>
               {/*// Single Widget (Widget Contact) */}
             </div>
-         {/* <div className="col-lg-3 col-md-6 col-12">
-
+         <div className="col-lg-3 col-md-6 col-12">
+  {/* Single Widget (Widget Menu) */}
   <div className="single-widget widget-recentpost">
-    <h5 className="widget-title">Menu</h5>
+    <h5 className="widget-title">Menus</h5>
     <ul>
       <li>
         <a href="/about-us">About Us</a>
@@ -108,8 +102,8 @@ const Footer = () => {
       </li>
     </ul>
   </div>
-
-</div> */}
+  {/*// Single Widget (Widget Menu) */}
+</div>
 
             <div className="col-lg-3 col-md-6 col-12">
               {/* Single Widget (Widget Newsletter) */}
