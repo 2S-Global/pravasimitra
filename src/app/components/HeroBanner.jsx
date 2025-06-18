@@ -1,6 +1,9 @@
 import Link from "next/link";
+
 const HeroBanner = () =>{
 
+
+  
 return(
 
 <div className="heroslider-area">
