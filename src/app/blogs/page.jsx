@@ -12,7 +12,7 @@ export default function BlogsList() {
     <>
 
       <Header />
-      <OtherBanner page_title="Blogs List" />
+      <OtherBanner page_title="Blogs List" banner_image="/assets/banner/Banner7.jpg"/>
       <Blogs blogs={blogs} />
       <Footer />
     </>

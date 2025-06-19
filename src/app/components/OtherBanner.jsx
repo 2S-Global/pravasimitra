@@ -8,7 +8,9 @@ const OtherBanner = ({ page_title, banner_image }) => {
         backgroundImage: `url(${banner_image || "/assets/images/bg/breadcrumb-bg-2.jpg"})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundRepeat: "no-repeat"
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center top"
+
       }}
     >
       <div className="container">

@@ -10,7 +10,7 @@ const AboutUs = () =>{
     return(
 <>
 <Header />
-<OtherBanner page_title="About Us" />
+<OtherBanner page_title="About Us" banner_image="/assets/banner/Banner6.jpg"/>
 <About />
 <Footer />
 </>

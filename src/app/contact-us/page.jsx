@@ -9,7 +9,7 @@ const ContactUs = () =>{
     return(
 <>
 <Header />
-<OtherBanner page_title="Contact Us" />
+<OtherBanner page_title="Contact Us" banner_image="/assets/banner/Banner9.jpg"/>
 <Contact />
 <Footer />
 </>

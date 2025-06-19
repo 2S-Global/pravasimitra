@@ -9,7 +9,7 @@ const FAQ = () =>{
     return(
 <>
 <Header />
-<OtherBanner page_title="FAQ" />
+<OtherBanner page_title="FAQ" banner_image="/assets/banner/Banner8.jpg"/>
 <Faqs />
 <Footer />
 </>
