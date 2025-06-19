@@ -2,6 +2,7 @@ import { connectDB } from "../../../../../lib/db";
 import User from "../../../../../models/User";
 import { signToken } from "../../../../../lib/auth";
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 
 export async function POST(req) {
   await connectDB();
@@ -10,7 +11,7 @@ export async function POST(req) {
  const user=await User.findOne(
   {$or:[{email:identifier},{mobile:identifier}],
   isDel:false}
-).lean()
+).select('+password').lean()
 
   if(!user){
     return NextResponse.json({msg:"Invalid Email or Mobile Number"},{status:200})
@@ -31,6 +32,7 @@ const res = NextResponse.json({ msg: `Welcome ${user.name}` });
   res.cookies.set("token",token,{
     httpOnly:true,
     secure:false,
+    sameSite: "strict",
     path:"/",
     maxAge:7*24*60*60
 
