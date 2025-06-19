@@ -3,7 +3,7 @@ import { connectDB } from '../../../../../lib/db';
 import Product from '../../../../../models/Product';
 import ProductCategory from '../../../../../models/ProductCategory';
 
-// Get all products
+// GET all products (optionally filter by categoryId)
 export async function GET(req) {
   try {
     await connectDB();
@@ -24,7 +24,7 @@ export async function GET(req) {
     console.error('Error fetching products:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-};
+}
 
 // POST - Create a new product
 export async function POST(req) {
@@ -56,7 +56,7 @@ export async function POST(req) {
 
     const newProduct = await Product.create({
       title,
-      image: gallery[0],   // First image as main display image
+      image: gallery[0],   // First image used as main image
       gallery,
       price,
       city,
@@ -71,4 +71,4 @@ export async function POST(req) {
     console.error("Error adding product:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-};
+}
