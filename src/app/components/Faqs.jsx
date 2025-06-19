@@ -12,29 +12,29 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 const faqs = [
   {
     question:
-      "বাংলাদেশ কনস্যুলেট জেনারেল, দুবাই হতে কোন কোন ধরনের পাসপোর্ট সেবা প্রদান করা হয়?",
+      "What is Pravasi Mitra?",
     answer:
-      "বাংলাদেশ কনস্যুলেট জেনারেল, দুবাই হতে ইলেকট্রনিক পাসপোর্ট (ই-পাসপোর্ট) এবং মেশিন রিডেবল পাসপোর্ট (এমআরপি) সেবা প্রদান করা হয়...",
+      "Pravasi Mitra is a global platform designed for migrants to buy, sell, rent, lease, or advertise products and services. It connects individuals across countries, making community support and transactions seamless and secure.",
   },
   {
-    question: "ই-পাসপোর্টের জন্য কিভাবে আবেদন করতে হয়?",
+    question: "What kind of products or services can I list?",
     answer:
-      "www.epassport.gov.bd ওয়েবসাইটে রেজিস্ট্রেশন করে ই-পাসপোর্টের আবেদন করা যাবে...",
+      "You can list properties (for sale or rent), vehicles, electronic items, household goods, job opportunities, and community services such as transport, food, tuition, etc., as long as they comply with our terms.",
   },
   {
     question:
-      "ই-পাসপোর্ট আবেদনের সাথে কোন কোন কাগজপত্র/দলিলাদি দাখিল করতে হয়?",
+      "How is my data and communication protected?",
     answer:
-      "জাতীয় পরিচয়পত্র এবং/বা অনলাইন জন্ম নিবন্ধন সনদ, পেশা প্রমাণপত্র, এমিরেটস আইডি ইত্যাদি জমা দিতে হয়।",
+      "We use secure encryption and privacy measures. Your personal details are never shared publicly, and messages are routed through our secure system.",
   },
   {
-    question: "নবজাতকের পাসপোর্টের আবেদন করতে কী কী দলিল লাগে?",
-    answer: "নবজাতকের জন্মসনদ, ছবি, এবং পিতামাতার পাসপোর্টের কপি লাগবে।",
+    question: "How do I contact a seller or buyer?",
+    answer: "Click on any listing to view the seller’s contact options (like phone, chat, or email). You must be logged in to access some features.",
   },
   {
-    question: "ই-পাসপোর্টের আবেদন ফরম কিভাবে পূরণ করতে হয়? ই-মেইল কি দরকার?",
+    question: " Can I list property for rent or lease abroad?",
     answer:
-      "একটি ই-মেইল ব্যবহার করে রেজিস্ট্রেশন করতে হবে এবং আবেদন ফরম অনলাইনে পূরণ করতে হবে।",
+      "Yes, you can list properties in any country. Ensure that you include clear details, rental terms, and any legal requirements relevant to that location.",
   },
 ];
 
@@ -48,9 +48,9 @@ const Faqs = () => {
               <h2 style={{ fontWeight: 600, fontSize: "2rem" }}>
                 Frequently Asked Questions
               </h2>
-              <p style={{ color: "#666" }}>
+              {/* <p style={{ color: "#666" }}>
                 আমাদের প্রায়শই জিজ্ঞাসিত প্রশ্নাবলী পড়ুন
-              </p>
+              </p> */}
             </div>
           </div>
 
