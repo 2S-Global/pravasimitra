@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import User from "../../../../../models/User";
 
-//Fetch user profile (GET)
+//Fetch user profile (GET) 
 export const GET = withAuth(async (req, user) => {
   try {
     await connectDB();
