@@ -6,7 +6,7 @@ const ProductCategorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    icon: {
+    image: {
       type: String,
     },
     is_del: {
