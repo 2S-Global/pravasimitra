@@ -37,7 +37,7 @@ const Sidebar = () => {
             </Link>
           </li>
 
-          <li>
+          {/* <li>
             <Link href="#">
               <i className="fa fa-shield-alt" /> Privacy Settings
             </Link>
@@ -47,7 +47,7 @@ const Sidebar = () => {
             <Link href="#">
               <i className="fa fa-user-shield" /> Two-Step Authentication
             </Link>
-          </li>
+          </li> */}
 
           <li>
             <Link href="#">
