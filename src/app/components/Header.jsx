@@ -112,7 +112,7 @@ const Header = () => {
                     <li><Link className="dropdown-item" href="/user/rent-lease/list">Manage Rent/Lease</Link></li>
                     <li><Link className="dropdown-item" href="/user/marketplace/list">Manage MarketPlace</Link></li>
                     <li><hr className="dropdown-divider" /></li>
-                    <li><Link className="dropdown-item text-danger" href="/logout">Logout</Link></li>
+                    <li><Link className="dropdown-item text-danger" href="/login">Logout</Link></li>
                   </ul>
                 </div>
               </div>

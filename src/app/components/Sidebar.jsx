@@ -50,7 +50,7 @@ const Sidebar = () => {
           </li> */}
 
           <li>
-            <Link href="#">
+            <Link href="/login">
               <i className="fa fa-sign-out-alt" /> Logout
             </Link>
           </li>
