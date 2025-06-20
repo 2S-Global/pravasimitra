@@ -18,21 +18,31 @@ export default function Loader() {
       <img
         src="/assets/images/logo/Logo 7.png"
         alt="Loading..."
+        className="pulse"
         style={{
           width: "80px",
           height: "80px",
-          animation: "spin 1s linear infinite",
         }}
       />
 
       <style jsx>{`
-        @keyframes spin {
+        @keyframes pulse {
           0% {
-            transform: rotate(0deg);
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.1);
+            opacity: 0.7;
           }
           100% {
-            transform: rotate(360deg);
+            transform: scale(1);
+            opacity: 1;
           }
+        }
+
+        .pulse {
+          animation: pulse 1.0s ease-in-out infinite;
         }
       `}</style>
     </div>
