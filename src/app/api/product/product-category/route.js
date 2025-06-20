@@ -5,15 +5,23 @@ import formidable from "formidable";
 import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
+import { Readable } from "stream";
 
-// Disable Next.js body parser for file uploads
+// To disable Next.js body parsing
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
-// GET all product categories (not soft-deleted)
+// 📦 Convert the Next.js Web Request to Node.js stream
+async function getReadableStreamFromRequest(request) {
+  const buffer = await request.arrayBuffer();
+  const readable = Readable.from(Buffer.from(buffer));
+  return readable;
+}
+
+// 🟢 GET all product categories (not soft-deleted)
 export async function GET() {
   try {
     await connectDB();
@@ -44,32 +52,39 @@ export async function GET() {
   }
 }
 
-// POST - Create a new product category with image upload
+// 🟡 POST: Create new product category with image
 export async function POST(req) {
   await connectDB();
 
   const form = formidable({ multiples: false, keepExtensions: true });
 
-  return new Promise((resolve, reject) => {
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        console.error("Form parse error:", err);
-        reject(
-          NextResponse.json({ error: "Error parsing form data" }, { status: 500 })
-        );
-        return;
-      }
+  return new Promise(async (resolve, reject) => {
+    try {
+      const stream = await getReadableStreamFromRequest(req);
 
-      try {
+      form.parse(stream, async (err, fields, files) => {
+        if (err) {
+          console.error("Form parse error:", err);
+          reject(
+            NextResponse.json({ error: "Error parsing form data" }, { status: 500 })
+          );
+          return;
+        }
+
         const name = fields.name;
         let imageName = "";
 
-        // Handle image file
         if (files.image) {
           const image = files.image[0];
           const ext = path.extname(image.originalFilename);
           imageName = `${uuidv4()}${ext}`;
-          const uploadPath = path.join(process.cwd(), "public", "buy-sell", "product_category", imageName);
+          const uploadPath = path.join(
+            process.cwd(),
+            "public",
+            "buy-sell",
+            "product_category",
+            imageName
+          );
 
           await fs.promises.mkdir(path.dirname(uploadPath), { recursive: true });
           await fs.promises.rename(image.filepath, uploadPath);
@@ -90,18 +105,18 @@ export async function POST(req) {
             { status: 201 }
           )
         );
-      } catch (error) {
-        console.error("Upload error:", error);
-        reject(
-          NextResponse.json(
-            {
-              error: "Failed to create product category",
-              details: error.message,
-            },
-            { status: 500 }
-          )
-        );
-      }
-    });
+      });
+    } catch (error) {
+      console.error("Unhandled error:", error);
+      reject(
+        NextResponse.json(
+          {
+            error: "Unhandled error during upload",
+            details: error.message,
+          },
+          { status: 500 }
+        )
+      );
+    }
   });
 }
