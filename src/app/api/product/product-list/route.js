@@ -64,7 +64,7 @@ export async function POST(req) {
       const imageName = `prd_${random}${ext}`;
 
       const buffer = Buffer.from(await file.arrayBuffer());
-      const uploadDir = path.join(process.cwd(), "public", "buy-sell", "products");
+      const uploadDir = path.join(process.cwd(), "public", "assets", "buy-sell", "products");
       await fs.promises.mkdir(uploadDir, { recursive: true });
 
       const filePath = path.join(uploadDir, imageName);

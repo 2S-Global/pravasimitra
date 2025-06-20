@@ -56,6 +56,7 @@ export async function POST(req) {
       const uploadDir = path.join(
         process.cwd(),
         "public",
+        "assets",
         "buy-sell",
         "product_category"
       );
