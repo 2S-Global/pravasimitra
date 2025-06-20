@@ -43,7 +43,6 @@ export async function POST(req) {
     const shortDesc = formData.get('shortDesc');
     const galleryFiles = formData.getAll('gallery');
 
-    // Validation
     if (!title || !price || !categoryId || !galleryFiles.length) {
       return NextResponse.json(
         { error: "title, price, categoryId, and at least one gallery image are required" },
@@ -51,13 +50,11 @@ export async function POST(req) {
       );
     }
 
-    // Validate category ID
     const category = await ProductCategory.findById(categoryId);
     if (!category) {
       return NextResponse.json({ error: "Invalid categoryId" }, { status: 400 });
     }
 
-    // Upload images
     const uploadedImageNames = [];
     for (const file of galleryFiles) {
       if (!file || !file.name) continue;
