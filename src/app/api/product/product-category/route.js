@@ -3,7 +3,6 @@ import ProductCategory from "../../../../../models/ProductCategory";
 import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
-import { v4 as uuidv4 } from "uuid";
 
 // 🟢 GET all product categories (not soft-deleted)
 export async function GET() {

@@ -1,26 +1,23 @@
+import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import Product from "../../../../../models/Product";
-import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 
-export async function GET(req) {
+export async function POST(req) {
   try {
     await connectDB();
 
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("id");
+    const formData = await req.formData();
+    const id = formData.get("id");
 
-    // Validate productId
-    if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
-      return NextResponse.json({ error: "Invalid or missing product ID" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
     }
 
-    const product = await Product.findById(productId)
-      .populate("category", "name image")
-      .select("-__v")
+    const product = await Product.findById(id)
+      .populate("category", "name")
       .lean();
 
-    if (!product || product.is_del) {
+    if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
@@ -28,6 +25,6 @@ export async function GET(req) {
 
   } catch (error) {
     console.error("Error fetching product details:", error);
-    return NextResponse.json({ error: "Internal Server Error", details: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

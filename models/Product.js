@@ -29,6 +29,9 @@ const ProductSchema = new mongoose.Schema(
     shortDesc: {
       type: String,
     },
+    description: {
+      type: String,
+    },
     is_del: {
       type: Boolean,
       default: false,
