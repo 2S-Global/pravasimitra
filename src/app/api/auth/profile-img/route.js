@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
 import { IncomingForm } from "formidable";
+import { Readable } from "stream";
 
 // ============ [GET] User Profile ============ //
 export const GET = withAuth(async (req, user) => {
@@ -18,7 +19,7 @@ export const GET = withAuth(async (req, user) => {
       return NextResponse.json({ msg: "Invalid User Id" }, { status: 200 });
     }
 
-    const existingUser = await User.findById(userId).select("-__v").lean();
+    const existingUser = await User.findById(userId).select("image").lean();
 
     if (!existingUser) {
       return NextResponse.json({ msg: "User Not Found" }, { status: 200 });
@@ -26,7 +27,7 @@ export const GET = withAuth(async (req, user) => {
     return NextResponse.json(
       {
         msg: "User Fetched Succesfully",
-        status: existingUser,
+        image: existingUser,
       },
       {
         status: 200,
@@ -48,69 +49,96 @@ export const config = {
   },
 };
 
+async function readFormDataFileStream(req) {
+  const boundary = req.headers.get("content-type")?.split("boundary=")?.[1];
+  if (!boundary) throw new Error("Invalid multipart form boundary");
+
+  const formData = await req.formData();
+  const file = formData.get("image");
+
+  if (!file || typeof file === "string") {
+    throw new Error("No image file found in form data");
+  }
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  return {
+    buffer,
+    filename: file.name,
+    type: file.type,
+  };
+}
 
 export const PUT = withAuth(async (req, user) => {
   await connectDB();
-
   const userId = user?.id;
+
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
   }
 
-  // Parse multipart/form-data using formidable
-  const form = new IncomingForm();
-  form.uploadDir = "/tmp"; // Temp location
-  form.keepExtensions = true;
+  let fileData;
+  try {
+    fileData = await readFormDataFileStream(req);
+  } catch (err) {
+    console.error("Image parsing error:", err);
+    return NextResponse.json(
+      { error: "Image parsing failed" },
+      { status: 400 }
+    );
+  }
 
-  return new Promise((resolve, reject) => {
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        console.error("Formidable error:", err);
-        return resolve(NextResponse.json({ error: "Image parsing failed" }, { status: 400 }));
-      }
+  const { buffer, filename, type } = fileData;
 
-      const file = files.image;
-      if (!file) {
-        return resolve(NextResponse.json({ error: "No image uploaded" }, { status: 400 }));
-      }
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (!allowedTypes.includes(type)) {
+    return NextResponse.json(
+      { error: "Only JPG, PNG, and WEBP allowed" },
+      { status: 400 }
+    );
+  }
 
-      // ✅ File type validation
-      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-      if (!allowedTypes.includes(file.mimetype)) {
-        return resolve(NextResponse.json({ error: "Only JPG, PNG, and WEBP allowed" }, { status: 200 }));
-      }
+  const ext = path.extname(filename);
+  const newFileName = `${userId}_${Date.now()}${ext}`;
+  const uploadDir = path.join(
+    process.cwd(),
+    "public/assets/images/profile-img"
+  );
 
-      const newFileName = `${userId}_${Date.now()}${path.extname(file.originalFilename)}`;
-      const destination = path.join(process.cwd(), "public/assets/images/profile-img", newFileName);
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
 
-      fs.rename(file.filepath, destination, async (err) => {
-        if (err) {
-          console.error("File saving error:", err);
-          return resolve(NextResponse.json({ error: "Failed to save image" }, { status: 500 }));
-        }
+  const filePath = path.join(uploadDir, newFileName);
 
-        try {
-          const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            { $set: { image: newFileName } },
-            { new: true, runValidators: true }
-          ).select("-__v").lean();
+  try {
+    fs.writeFileSync(filePath, buffer);
+  } catch (err) {
+    console.error("Failed to save file:", err);
+    return NextResponse.json(
+      { error: "Failed to save image" },
+      { status: 500 }
+    );
+  }
 
-          if (!updatedUser) {
-            return resolve(NextResponse.json({ error: "User not found" }, { status: 200 }));
-          }
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: { image: newFileName } },
+      { new: true }
+    )
+      .select("image -_id")
+      .lean();
 
-          return resolve(
-            NextResponse.json(
-              { msg: "Profile image updated successfully", user: updatedUser },
-              { status: 200 }
-            )
-          );
-        } catch (error) {
-          console.error("MongoDB error:", error);
-          return resolve(NextResponse.json({ error: "DB update failed" }, { status: 500 }));
-        }
-      });
+    if (!updatedUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      msg: "Profile image updated successfully",
+      user: updatedUser,
     });
-  });
+  } catch (err) {
+    console.error("MongoDB update error:", err);
+    return NextResponse.json({ error: "DB update failed" }, { status: 500 });
+  }
 });

@@ -25,8 +25,8 @@ const Footer = () => {
                 </div >
                     <div className="col-lg-8 col-md-8 col-12">
                 <p style={{ textAlign: "justify",lineHeight:"2.4" }}>
-                  Pravasi Mitra is a website and mobile app acting as a
-                  comprehensive "friend" for migrants abroad. It offers vital
+                  Pravasi Mitra is a platfrom and mobile app acting as a
+                  comprehensive "companion" for migrants abroad. It offers vital
                   inter-community services like secure remittance, a dynamic
                   marketplace for buying/selling/renting, and various other
                   community-based resources. Its goal is to simplify life away
