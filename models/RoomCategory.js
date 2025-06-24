@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const RLcategorySchema = new mongoose.Schema(
+const RoomCategorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -9,7 +9,7 @@ const RLcategorySchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    is_del: {
+    isDel: {
       type: Boolean,
       default: false,
     },
@@ -17,5 +17,5 @@ const RLcategorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.RLcategory ||
-  mongoose.model("RLcategory", RLcategorySchema);
+export default mongoose.models.RoomCategory ||
+  mongoose.model("RoomCategory", RoomCategorySchema);

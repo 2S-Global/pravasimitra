@@ -138,7 +138,7 @@ export const PUT = withAuth(async (req, user) => {
       user: updatedUser,
     });
   } catch (err) {
-    console.error("MongoDB update error:", err);
+  
     return NextResponse.json({ error: "DB update failed" }, { status: 500 });
   }
 });
