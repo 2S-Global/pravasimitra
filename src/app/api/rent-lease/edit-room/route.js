@@ -6,6 +6,7 @@ import RoomItem from "../../../../../models/Room";
 import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
+import { decodeObjectId } from "../../../../../lib/idCodec";
 
 export const config = {
   api: {
@@ -53,10 +54,16 @@ async function parseFormData(req) {
 export const GET = withAuth(async (req, user) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+  let id = searchParams.get("id");
 
   if (!id)
     return NextResponse.json({ error: "Missing item ID" }, { status: 400 });
+
+  try {
+    id = decodeObjectId(id); 
+  } catch {
+    return NextResponse.json({ error: "Invalid encoded ID" }, { status: 400 });
+  }
 
   try {
     const item = await RoomItem.findOne({ _id: id, createdBy: user.id })
@@ -102,8 +109,16 @@ export const PATCH = withAuth(async (req, user) => {
     existingImages,
   } = data;
 
+
   if (!id) {
     return NextResponse.json({ msg: "Missing item Id" }, { status: 200 });
+  }
+
+   let decodedId;
+  try {
+    decodedId = decodeObjectId(id);
+  } catch {
+    return NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 });
   }
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
@@ -111,7 +126,7 @@ export const PATCH = withAuth(async (req, user) => {
 
   const uploadDir = path.join(process.cwd(), "public/assets/images/rent-items");
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-  
+
   for (const file of newImages) {
     if (!allowedTypes.includes(file.mime)) {
       return NextResponse.json(
@@ -135,7 +150,7 @@ export const PATCH = withAuth(async (req, user) => {
 
   try {
     const updated = await RoomItem.findByIdAndUpdate(
-      { _id: id, createdBy: user.id },
+      { _id: decodedId, createdBy: user.id },
       {
         $set: {
           title,
@@ -150,9 +165,15 @@ export const PATCH = withAuth(async (req, user) => {
     );
 
     if (!updated) {
-      return NextResponse.json({ error: "Item not found or unauthorized" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Item not found or unauthorized" },
+        { status: 404 }
+      );
     }
-     return NextResponse.json({ msg: "Item updated successfully", item: updated }, { status: 200 });
+    return NextResponse.json(
+      { msg: "Item updated successfully", item: updated },
+      { status: 200 }
+    );
   } catch (err) {
     return NextResponse.json({ msg: "Update failed" }, { status: 500 });
   }

@@ -6,7 +6,7 @@ import RoomItem from "../../../../../models/Room";
 import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
-
+import { encodeObjectId } from "../../../../../lib/idCodec";
 export const GET =withAuth (async function (req,user) {
   await connectDB();
     const userId = user?.id;
@@ -18,7 +18,17 @@ export const GET =withAuth (async function (req,user) {
       .populate("createdBy","name")
       .lean();
 
-    return NextResponse.json({ items }, { status: 200 });
+      if(!items || items.length===0){
+          return NextResponse.json({msg:"No Items Found",items:[]},{status:200})
+      }
+
+      const updatedItems=items.map(item=>({
+        ...item,
+        id:encodeObjectId(item._id),
+        _id: undefined
+      }))
+
+    return NextResponse.json({ items: updatedItems }, { status: 200 });
   } catch (err) {
     console.error("DB fetch failed:", err);
     return NextResponse.json({ error: "Failed to fetch rent items" }, { status: 500 });

@@ -90,21 +90,5 @@ export const POST=withAuth(async function (req,user) {
   }
 })
 
-// ✅ GET - Fetch rent items
-export const GET =withAuth (async function (req,user) {
-  await connectDB();
-    const userId = user?.id;
-  try {
-    const items = await RoomItem.find({ isDel: false,createdBy:userId })
-      .sort({ createdAt: -1 })
-      .select("-__v -isDel")
-      .populate("propertyType","name")
-      .populate("createdBy","name")
-      .lean();
 
-    return NextResponse.json({ items }, { status: 200 });
-  } catch (err) {
-    console.error("DB fetch failed:", err);
-    return NextResponse.json({ error: "Failed to fetch rent items" }, { status: 500 });
-  }
-})
+
