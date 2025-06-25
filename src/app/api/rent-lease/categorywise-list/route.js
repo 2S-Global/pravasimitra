@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import RoomItem from "../../../../../models/Room";
-import { decodeObjectId } from "../../../../../lib/idCodec";
+import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 
 export const GET = async (req) => {
   await connectDB();
@@ -20,8 +20,11 @@ export const GET = async (req) => {
   try {
     const categoryId = decodeObjectId(propertyTypeEncoded);
 
-
-    if (!categoryId || typeof categoryId !== "object" || !categoryId._bsontype) {
+    if (
+      !categoryId ||
+      typeof categoryId !== "object" ||
+      !categoryId._bsontype
+    ) {
       throw new Error("Invalid ObjectId");
     }
 
@@ -47,7 +50,13 @@ export const GET = async (req) => {
       );
     }
 
-    return NextResponse.json({ itemList: items }, { status: 200 });
+    const updatedItems = items.map((item) => ({
+      ...item,
+      id: encodeObjectId(item._id),
+      _id: undefined,
+    }));
+
+    return NextResponse.json({ itemList: updatedItems }, { status: 200 });
   } catch (err) {
     console.error("Fetch failed:", err);
     return NextResponse.json(
