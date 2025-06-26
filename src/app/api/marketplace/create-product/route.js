@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 import {connectDB} from "../../../../../lib/db";
-import RoomItem from "../../../../../models/Room";
+import MarketProduct from "../../../../../models/MarketProduct";
 import { withAuth } from "../../../../../lib/withAuth";
-import RoomCategory from "../../../../../models/RoomCategory";
+import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 export const config = {
@@ -16,8 +16,7 @@ async function parseFormData(req) {
   const form = await req.formData();
 
   const title = form.get("title");
-  const propertyType = form.get("propertyType");
-  const roomSize = form.get("roomSize");
+  const category = form.get("category");
   const price = form.get("price");
   const description = form.get("description") || "";
   const files = form.getAll("images");
@@ -36,7 +35,7 @@ async function parseFormData(req) {
     })
   );
 
-  return { title, propertyType, roomSize, price, description, images };
+  return { title, category, price, description, images };
 }
 
 export const POST=withAuth(async function (req,user) {
@@ -52,7 +51,7 @@ export const POST=withAuth(async function (req,user) {
   const allowedTypes = ["image/jpeg", "image/png", "image/webp","image/avif"];
   const savedFilenames = [];
 
-  const uploadDir = path.join(process.cwd(), "public/assets/images/rent-items");
+  const uploadDir = path.join(process.cwd(), "public/assets/images/e-marketplace");
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of data.images) {
@@ -72,19 +71,19 @@ export const POST=withAuth(async function (req,user) {
     }
   }
 
-      let decodedCategoryId;
+
+    let decodedCategoryId;
   try {
-    decodedCategoryId = decodeObjectId(data.propertyType); // ✅ decode encrypted ObjectId
+    decodedCategoryId = decodeObjectId(data.category); 
   } catch (error) {
     return NextResponse.json({ error: "Invalid category ID" }, { status: 400 });
   }
 
   try {
-    const newItem = await RoomItem.create({
+    const newItem = await MarketProduct.create({
       title: data.title,
       images: savedFilenames,
-      propertyType: decodedCategoryId,
-      roomSize: data.roomSize,
+      category: decodedCategoryId,
       price: parseFloat(data.price),
       description: data.description,
       createdBy:userId
