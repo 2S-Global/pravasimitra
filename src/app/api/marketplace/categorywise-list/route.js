@@ -6,7 +6,7 @@ import MarketProduct from "../../../../../models/MarketProduct";
 
 /**
  * @description Get all MarketProduct items for a given category ID (only those not marked as deleted)
- * @route GET /api/e-marketplace/item-list
+ * @route GET /api/marketplace/categorywise-list
  * @queryparam {string} id - Encoded category ID
  * @success {object} 200 - Returns an array of MarketProduct items with encoded IDs
  * @error {object} 400 - Missing or invalid category ID
@@ -17,12 +17,13 @@ import MarketProduct from "../../../../../models/MarketProduct";
 
 export const GET = async (req) => {
   await connectDB();
+  
   const { searchParams } = new URL(req.url);
   const category = searchParams.get("id");
 
   if (!category) {
     return NextResponse.json(
-      { error: "Missing propertyType ID in query" },
+      { error: "Missing Category ID in query" },
       { status: 400 }
     );
   }
@@ -31,7 +32,7 @@ export const GET = async (req) => {
 
   try {
     const categoryId = decodeObjectId(category);
-    console.log(categoryId);
+    // console.log(categoryId);                               
 
     if (
       !categoryId ||

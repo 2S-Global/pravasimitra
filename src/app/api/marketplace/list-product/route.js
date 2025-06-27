@@ -12,7 +12,7 @@ import { encodeObjectId } from "../../../../../lib/idCodec";
 /**
  * @description Get all MarketProduct items created by the authenticated user
  *
- * @route GET /api/e-marketplace/my-items
+ * @route GET /api/marketplace/list-product
  * @auth Required
  * @success {object} 200 - Returns the list of items with populated category and creator info
  * @error {object} 200 - No Items Found (returns empty array)

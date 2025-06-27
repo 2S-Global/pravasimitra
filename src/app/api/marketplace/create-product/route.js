@@ -41,7 +41,7 @@ async function parseFormData(req) {
 
 /**
  * @description Create a new MarketProduct item with images (only for authenticated users)
- * @route POST /api/e-marketplace/add-item
+ * @route POST /api/marketplace/create-product
  * @formdata {string} title - Product title
  * @formdata {string} category - Encoded category ID
  * @formdata {number} price - Product price

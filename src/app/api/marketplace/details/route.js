@@ -2,21 +2,22 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
-import RoomItem from "../../../../../models/Room";
+import MarketProduct from "../../../../../models/MarketProduct";
 import { withAuth } from "../../../../../lib/withAuth";
-import RoomCategory from "../../../../../models/RoomCategory";
+import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId,encodeObjectId } from "../../../../../lib/idCodec";
 
 
 /**
- * @description Get a single RoomItem by its encoded ID
- * @route GET /api/rent-lease/details
- * @queryparam {string} id - Encoded RoomItem ID
- * @success {object} 200 - Returns the RoomItem data with encoded ID
+ * @description Get a single Item by its encoded ID
+ * @route GET /api/marketplace/details
+ * @queryparam {string} id - Encoded Item ID
+ * @success {object} 200 - Returns the Item data with encoded ID
  * @error {object} 400 - Missing or invalid ID in query
  * @error {object} 404 - Item not found
  */
+
 
 export const GET = async (req) => {
   await connectDB();
@@ -25,17 +26,17 @@ export const GET = async (req) => {
 
   if (!encodedId) {
     return NextResponse.json(
-      { error: "Missing RoomItem ID in query" },
+      { error: "Missing Item ID in query" },
       { status: 400 }
     );
   }
 
   try {
-    const decodedId = decodeObjectId(encodedId); // 👈 decode the RoomItem MongoDB _id
+    const decodedId = decodeObjectId(encodedId); 
 
-    const item = await RoomItem.findOne({ _id: decodedId, isDel: false })
+    const item = await MarketProduct.findOne({ _id: decodedId, isDel: false })
       .select("-__v -isDel")
-      .populate("propertyType", "name")
+      .populate("category", "name")
       .lean();
 
     if (!item) {
@@ -44,7 +45,7 @@ export const GET = async (req) => {
 
     const updatedItem = {
       ...item,
-      id: encodeObjectId(item._id), // 👈 encode it back for frontend
+      id: encodeObjectId(item._id), 
     };
     delete updatedItem._id;
 

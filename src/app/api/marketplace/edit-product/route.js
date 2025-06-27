@@ -64,14 +64,14 @@ async function parseFormData(req) {
 /**
  * @description Handle single MarketProduct item fetch and update (only for authenticated users)
  *
- * @route GET /api/e-marketplace/edit-item
+ * @route GET /api/marketplace/edit-product
  * @queryparam {string} id - Encoded MarketProduct ID
  * @success {object} 200 - Returns the MarketProduct data
  * @error {object} 400 - Missing or invalid ID
  * @error {object} 404 - Item not found or unauthorized
  * @error {object} 500 - Server error
  *
- * @route PATCH /api/e-marketplace/edit-item
+ * @route PATCH /api/marketplace/edit-product
  * @formdata {string} id - Encoded MarketProduct ID
  * @formdata {string} title - Product title
  * @formdata {string} category - Encoded category ID
