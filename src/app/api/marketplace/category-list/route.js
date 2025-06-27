@@ -8,6 +8,13 @@ import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { encodeObjectId } from "../../../../../lib/idCodec";
 
+/**
+ * @description Get all MarketCategory items that are not marked as deleted
+ * @route GET /api/e-marketplace/category-list
+ * @success {object} 200 - Returns an array of category objects with encoded IDs
+ * @error {object} 500 - Database query failed or server error
+ */
+
 export const GET = async (req) => {
   await connectDB();
 

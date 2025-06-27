@@ -38,6 +38,21 @@ async function parseFormData(req) {
   return { title, category, price, description, images };
 }
 
+
+/**
+ * @description Create a new MarketProduct item with images (only for authenticated users)
+ * @route POST /api/e-marketplace/add-item
+ * @formdata {string} title - Product title
+ * @formdata {string} category - Encoded category ID
+ * @formdata {number} price - Product price
+ * @formdata {string} description - Product description (optional)
+ * @formdata {File[]} images - One or more image files
+ * @success {object} 200 - Item created successfully
+ * @error {object} 400 - Invalid form data or category ID
+ * @error {object} 500 - Image upload or database insertion failure
+ */
+
+
 export const POST=withAuth(async function (req,user) {
   await connectDB();
     const userId = user?.id;

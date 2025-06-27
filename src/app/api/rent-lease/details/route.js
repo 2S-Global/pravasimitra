@@ -8,6 +8,16 @@ import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId,encodeObjectId } from "../../../../../lib/idCodec";
 
+
+/**
+ * @description Get a single RoomItem by its encoded ID
+ * @route GET /api/rent-lease/get-item
+ * @queryparam {string} id - Encoded RoomItem ID
+ * @success {object} 200 - Returns the RoomItem data with encoded ID
+ * @error {object} 400 - Missing or invalid ID in query
+ * @error {object} 404 - Item not found
+ */
+
 export const GET = async (req) => {
   await connectDB();
   const { searchParams } = new URL(req.url);

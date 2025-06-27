@@ -7,6 +7,18 @@ import { withAuth } from "../../../../../lib/withAuth";
 import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { encodeObjectId } from "../../../../../lib/idCodec";
+
+
+/**
+ * @description Get all MarketProduct items created by the authenticated user
+ *
+ * @route GET /api/e-marketplace/my-items
+ * @auth Required
+ * @success {object} 200 - Returns the list of items with populated category and creator info
+ * @error {object} 200 - No Items Found (returns empty array)
+ * @error {object} 500 - Failed to fetch items from the database
+ */
+
 export const GET =withAuth (async function (req,user) {
   await connectDB();
     const userId = user?.id;

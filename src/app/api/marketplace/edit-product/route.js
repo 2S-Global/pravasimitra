@@ -2,15 +2,11 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
-import RoomItem from "../../../../../models/Room";
+import MarketProduct from "../../../../../models/MarketProduct";
 import { withAuth } from "../../../../../lib/withAuth";
-import RoomCategory from "../../../../../models/RoomCategory";
+import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId } from "../../../../../lib/idCodec";
-
-
-
-
 
 export const config = {
   api: {
@@ -23,13 +19,23 @@ async function parseFormData(req) {
 
   const id = form.get("id");
   const title = form.get("title");
-  const propertyType = form.get("propertyType");
-  const roomSize = form.get("roomSize");
+  const category = form.get("category");
   const price = form.get("price");
-  const description = form.get("description");
+  const description = form.get("description") || "";
   const files = form.getAll("images");
   const existingImageRaw = form.get("existingImageRaw");
-  const existingImages = existingImageRaw ? JSON.parse(existingImageRaw) : [];
+  
+  let existingImages = [];
+  if (existingImageRaw) {
+    try {
+      existingImages = JSON.parse(existingImageRaw);
+    } catch {
+      existingImages = existingImageRaw
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+  }
 
   const images = await Promise.all(
     files.map(async (file) => {
@@ -46,8 +52,7 @@ async function parseFormData(req) {
   return {
     id,
     title,
-    propertyType,
-    roomSize,
+    category,
     price,
     description,
     newImages: images.filter(Boolean),
@@ -57,13 +62,27 @@ async function parseFormData(req) {
 
 
 /**
- * @description Get a single RoomItem by its encoded ID (only if created by the authenticated user)
- * @route GET /api/rent-lease/edit-item
- * @queryparam {string} id - Encoded RoomItem ID
- * @success {object} 200 - Returns the RoomItem data
+ * @description Handle single MarketProduct item fetch and update (only for authenticated users)
+ *
+ * @route GET /api/e-marketplace/edit-item
+ * @queryparam {string} id - Encoded MarketProduct ID
+ * @success {object} 200 - Returns the MarketProduct data
  * @error {object} 400 - Missing or invalid ID
  * @error {object} 404 - Item not found or unauthorized
  * @error {object} 500 - Server error
+ *
+ * @route PATCH /api/e-marketplace/edit-item
+ * @formdata {string} id - Encoded MarketProduct ID
+ * @formdata {string} title - Product title
+ * @formdata {string} category - Encoded category ID
+ * @formdata {number} price - Product price
+ * @formdata {string} description - Product description (optional)
+ * @formdata {string} existingImageRaw - JSON array or comma-separated list of existing image filenames
+ * @formdata {File[]} images - New image files to upload
+ * @success {object} 200 - Item updated successfully
+ * @error {object} 400 - Invalid form data or ID
+ * @error {object} 404 - Item not found or unauthorized
+ * @error {object} 500 - Image upload or database update failure
  */
 
 export const GET = withAuth(async (req, user) => {
@@ -75,14 +94,15 @@ export const GET = withAuth(async (req, user) => {
     return NextResponse.json({ error: "Missing item ID" }, { status: 400 });
 
   try {
-    id = decodeObjectId(id); 
+    id = decodeObjectId(id);
+  
   } catch {
     return NextResponse.json({ error: "Invalid encoded ID" }, { status: 400 });
   }
 
   try {
-    const item = await RoomItem.findOne({ _id: id, createdBy: user.id })
-      .populate("propertyType", "name")
+    const item = await MarketProduct.findOne({ _id: id, createdBy: user.id })
+      .populate("category", "name")
       .populate("createdBy", "name")
       .lean();
 
@@ -103,18 +123,6 @@ export const GET = withAuth(async (req, user) => {
   }
 });
 
-
-/**
- * @description Update an existing RoomItem (including replacing/adding images)
- * @route PATCH /api/rent-lease/edit-item
- * @body {multipart/form-data} - Fields: id, title, propertyType, roomSize, price, description, images[], existingImageRaw (JSON array or comma-separated string)
- * @success {object} 200 - Item updated successfully with new image and field data
- * @error {object} 400 - Invalid form data or encoded ID
- * @error {object} 404 - Item not found or unauthorized
- * @error {object} 500 - Server error (e.g. file system or database issues)
- */
-
-
 export const PATCH = withAuth(async (req, user) => {
   await connectDB();
 
@@ -125,25 +133,19 @@ export const PATCH = withAuth(async (req, user) => {
     return NextResponse.json({ msg: "Invalid Form Data" }, { status: 400 });
   }
 
-  const {
-    id,
-    title,
-    propertyType,
-    roomSize,
-    price,
-    description,
-    newImages,
-    existingImages,
-  } = data;
+  const { id, title, category, price, description, newImages, existingImages } =
+    data;
 
+    console.log(data);
 
   if (!id) {
     return NextResponse.json({ msg: "Missing item Id" }, { status: 200 });
   }
 
-   let decodedId;
+  let decodedId;
   try {
     decodedId = decodeObjectId(id);
+   
   } catch {
     return NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 });
   }
@@ -151,7 +153,10 @@ export const PATCH = withAuth(async (req, user) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
   const savedFilenames = [...existingImages];
 
-  const uploadDir = path.join(process.cwd(), "public/assets/images/rent-items");
+  const uploadDir = path.join(
+    process.cwd(),
+    "public/assets/images/e-marketplace"
+  );
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of newImages) {
@@ -175,14 +180,14 @@ export const PATCH = withAuth(async (req, user) => {
     }
   }
 
+
   try {
-    const updated = await RoomItem.findByIdAndUpdate(
+    const updated = await MarketProduct.findByIdAndUpdate(
       { _id: decodedId, createdBy: user.id },
       {
         $set: {
           title,
-          propertyType,
-          roomSize,
+          category,
           price: parseFloat(price),
           description,
           images: savedFilenames,

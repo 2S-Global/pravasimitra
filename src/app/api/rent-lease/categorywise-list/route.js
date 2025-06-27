@@ -3,6 +3,15 @@ import { connectDB } from "../../../../../lib/db";
 import RoomItem from "../../../../../models/Room";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 
+/**
+ * @description Get all room items for a given property type ID
+ * @route GET /api/rent-lease/item-list
+ * @queryparam {string} id - Encoded propertyType ID (required)
+ * @success {object} 200 - Room items fetched successfully
+ * @error {object} 400 - Missing or invalid propertyType ID
+ * @error {object} 500 - Failed to fetch items from the database
+ */
+
 export const GET = async (req) => {
   await connectDB();
   const { searchParams } = new URL(req.url);

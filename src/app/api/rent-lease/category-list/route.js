@@ -8,6 +8,14 @@ import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import { encodeObjectId } from "../../../../../lib/idCodec";
 
+
+/**
+ * @description Get all room categories from the database
+ * @route GET /api/rent-lease/category-list
+ * @success {object} 200 - Room Categories fetched successfully
+ * @error {object} 500 - Failed to fetch categories
+ */
+
 export const GET = async (req) => {
   await connectDB();
 

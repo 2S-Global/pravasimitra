@@ -4,6 +4,18 @@ import RoomItem from "../../../../../models/Room";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 
+
+
+/**
+ * @description Soft-delete a room item by marking it as isDel=true
+ * @route PATCH /api/rent-lease/delete-item
+ * @auth Required
+ * @bodyparam {string} id - Encoded ID of the item to delete
+ * @success {object} 200 - Item deleted successfully
+ * @error {object} 400 - Missing or invalid ID
+ * @error {object} 500 - Invalid JSON or server error
+ */
+
 export const PATCH = withAuth(async (req, user) => {
   await connectDB();
 

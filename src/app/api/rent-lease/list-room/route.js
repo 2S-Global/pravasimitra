@@ -7,6 +7,15 @@ import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import { encodeObjectId } from "../../../../../lib/idCodec";
+
+
+/**
+ * @description Get all RoomItems created by the authenticated user (excluding deleted)
+ * @route GET /api/rent-lease/my-items
+ * @success {object} 200 - Returns an array of RoomItems with encoded IDs
+ * @error {object} 500 - Database query failed or server error
+ */
+
 export const GET =withAuth (async function (req,user) {
   await connectDB();
     const userId = user?.id;

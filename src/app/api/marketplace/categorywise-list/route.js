@@ -2,13 +2,25 @@ import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import MarketCategory from "../../../../../models/Room";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
-import RoomItem from "../../../../../models/Room";
+import MarketProduct from "../../../../../models/MarketProduct";
+
+/**
+ * @description Get all MarketProduct items for a given category ID (only those not marked as deleted)
+ * @route GET /api/e-marketplace/item-list
+ * @queryparam {string} id - Encoded category ID
+ * @success {object} 200 - Returns an array of MarketProduct items with encoded IDs
+ * @error {object} 400 - Missing or invalid category ID
+ * @error {object} 500 - Database query failed or server error
+ */
+
+
+
 export const GET = async (req) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
-  const propertyTypeEncoded = searchParams.get("id");
+  const category = searchParams.get("id");
 
-  if (!propertyTypeEncoded) {
+  if (!category) {
     return NextResponse.json(
       { error: "Missing propertyType ID in query" },
       { status: 400 }
@@ -18,7 +30,8 @@ export const GET = async (req) => {
   let query = { isDel: false };
 
   try {
-    const categoryId = decodeObjectId(propertyTypeEncoded);
+    const categoryId = decodeObjectId(category);
+    console.log(categoryId);
 
     if (
       !categoryId ||
@@ -28,7 +41,7 @@ export const GET = async (req) => {
       throw new Error("Invalid ObjectId");
     }
 
-    query.propertyType = categoryId;
+    query.category = categoryId;
   } catch (err) {
     console.error("ID decoding failed:", err.message);
     return NextResponse.json(
@@ -38,9 +51,9 @@ export const GET = async (req) => {
   }
 
   try {
-    const items = await RoomItem.find(query)
+    const items = await MarketProduct.find(query)
       .select("-__v -isDel")
-      .populate("propertyType", "name")
+      .populate("category", "name")
       .lean();
 
     if (!items.length) {

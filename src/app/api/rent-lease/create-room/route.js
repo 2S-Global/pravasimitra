@@ -7,6 +7,23 @@ import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId } from "../../../../../lib/idCodec";
+
+
+/**
+ * @description Create a new room listing with images
+ * @route POST /api/rent-lease/add-item
+ * @bodyparam {string} title - Room title
+ * @bodyparam {string} propertyType - Encoded property type ID (required)
+ * @bodyparam {string} roomSize - Room size
+ * @bodyparam {string} price - Price
+ * @bodyparam {string} description - Description (optional)
+ * @bodyparam {File[]} images - Images (JPG, PNG, WEBP, AVIF)
+ * @success {object} 200 - Item saved successfully
+ * @error {object} 400 - Invalid input or decoding failure
+ * @error {object} 500 - Image upload or database insert failed
+ */
+
+
 export const config = {
   api: { bodyParser: false },
 };
