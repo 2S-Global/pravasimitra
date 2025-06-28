@@ -2,6 +2,12 @@ import bcrypt from "bcryptjs";
 import { connectDB } from "../../../../../lib/db";
 import User from "../../../../../models/User";
 import { NextResponse } from "next/server";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+// OPTIONS for CORS
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 export async function POST(req) {
   await connectDB();
@@ -10,7 +16,9 @@ export async function POST(req) {
     const { name, email, mobile, password } = await req.json();
 
     if (!name || !email || !mobile || !password) {
-      return NextResponse.json({ msg: "All Fields Are Mandatory" });
+      return addCorsHeaders(
+        NextResponse.json({ msg: "All Fields Are Mandatory" })
+      );
     }
 
     const existingUser = await User.findOne({
@@ -18,9 +26,11 @@ export async function POST(req) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { msg: "Email or Mobile Number already registered" },
-        { status: 200 }
+      return addCorsHeaders(
+        NextResponse.json(
+          { msg: "Email or Mobile Number already registered" },
+          { status: 200 }
+        )
       );
     }
 
@@ -30,16 +40,16 @@ export async function POST(req) {
       email,
       mobile,
       password: HashedPassword,
-  
     });
 
     await newUser.save();
 
-    return NextResponse.json(
-      { msg: "Registered Successfully" },
-      { status: 200 }
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Registered Successfully" }, { status: 200 })
     );
   } catch (error) {
-    return NextResponse.json({ msg: "Server Error" }, { status: 500 });
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Server Error" }, { status: 500 })
+    );
   }
 }

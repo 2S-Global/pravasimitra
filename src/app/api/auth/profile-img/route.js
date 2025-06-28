@@ -5,44 +5,50 @@ import User from "../../../../../models/User";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
-import { IncomingForm } from "formidable";
-import { Readable } from "stream";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+// ============ [OPTIONS] for CORS ============ //
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 // ============ [GET] User Profile ============ //
 export const GET = withAuth(async (req, user) => {
   try {
     await connectDB();
-
     const userId = user?.id;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return NextResponse.json({ msg: "Invalid User Id" }, { status: 200 });
+      return addCorsHeaders(
+        NextResponse.json({ msg: "Invalid User Id" }, { status: 200 })
+      );
     }
 
     const existingUser = await User.findById(userId).select("image").lean();
 
     if (!existingUser) {
-      return NextResponse.json({ msg: "User Not Found" }, { status: 200 });
+      return addCorsHeaders(
+        NextResponse.json({ msg: "User Not Found" }, { status: 200 })
+      );
     }
-    return NextResponse.json(
-      {
-        msg: "User Fetched Succesfully",
-        image: existingUser,
-      },
-      {
-        status: 200,
-      }
+
+    return addCorsHeaders(
+      NextResponse.json(
+        {
+          msg: "User Fetched Successfully",
+          image: existingUser,
+        },
+        { status: 200 }
+      )
     );
   } catch (error) {
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
+    return addCorsHeaders(
+      NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     );
   }
 });
 
 // ============ [PUT] Update Profile ============ //
-
 export const config = {
   api: {
     bodyParser: false,
@@ -73,7 +79,9 @@ export const PUT = withAuth(async (req, user) => {
   const userId = user?.id;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid user ID" }, { status: 400 })
+    );
   }
 
   let fileData;
@@ -81,9 +89,8 @@ export const PUT = withAuth(async (req, user) => {
     fileData = await readFormDataFileStream(req);
   } catch (err) {
     console.error("Image parsing error:", err);
-    return NextResponse.json(
-      { error: "Image parsing failed" },
-      { status: 400 }
+    return addCorsHeaders(
+      NextResponse.json({ error: "Image parsing failed" }, { status: 400 })
     );
   }
 
@@ -91,18 +98,14 @@ export const PUT = withAuth(async (req, user) => {
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
   if (!allowedTypes.includes(type)) {
-    return NextResponse.json(
-      { error: "Only JPG, PNG, and WEBP allowed" },
-      { status: 400 }
+    return addCorsHeaders(
+      NextResponse.json({ error: "Only JPG, PNG, and WEBP allowed" }, { status: 400 })
     );
   }
 
   const ext = path.extname(filename);
   const newFileName = `${userId}_${Date.now()}${ext}`;
-  const uploadDir = path.join(
-    process.cwd(),
-    "public/assets/images/profile-img"
-  );
+  const uploadDir = path.join(process.cwd(), "public/assets/images/profile-img");
 
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -114,9 +117,8 @@ export const PUT = withAuth(async (req, user) => {
     fs.writeFileSync(filePath, buffer);
   } catch (err) {
     console.error("Failed to save file:", err);
-    return NextResponse.json(
-      { error: "Failed to save image" },
-      { status: 500 }
+    return addCorsHeaders(
+      NextResponse.json({ error: "Failed to save image" }, { status: 500 })
     );
   }
 
@@ -130,15 +132,20 @@ export const PUT = withAuth(async (req, user) => {
       .lean();
 
     if (!updatedUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return addCorsHeaders(
+        NextResponse.json({ error: "User not found" }, { status: 404 })
+      );
     }
 
-    return NextResponse.json({
-      msg: "Profile image updated successfully",
-      user: updatedUser,
-    });
+    return addCorsHeaders(
+      NextResponse.json({
+        msg: "Profile image updated successfully",
+        user: updatedUser,
+      })
+    );
   } catch (err) {
-  
-    return NextResponse.json({ error: "DB update failed" }, { status: 500 });
+    return addCorsHeaders(
+      NextResponse.json({ error: "DB update failed" }, { status: 500 })
+    );
   }
 });

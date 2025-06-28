@@ -16,7 +16,7 @@ import { encodeObjectId } from "../../../../../lib/idCodec";
  * @error {object} 500 - Database query failed or server error
  */
 
-export const GET =withAuth (async function (req,user) {
+export const GET = withAuth (async function (req,user) {
   await connectDB();
     const userId = user?.id;
   try {

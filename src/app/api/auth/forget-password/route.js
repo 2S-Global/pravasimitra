@@ -3,6 +3,11 @@ import mongoose from 'mongoose';
 import nodemailer from 'nodemailer';
 import bcrypt from 'bcryptjs';
 import User from "../../../../../models/User";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 const connectDB = async () => {
   if (mongoose.connections[0].readyState) return;
@@ -34,7 +39,7 @@ const sendNewPasswordEmail = async (toEmail, newPassword) => {
       <p>You requested a password reset.</p>
       <p>Your new auto-generated password is:</p>
       <h3>${newPassword}</h3>
-      <p>Please log in using this password. You can change it.</p>
+      <p>Please log in using this password. You can change it after login.</p>
     `,
   };
 
@@ -48,16 +53,16 @@ export async function POST(req) {
     const { email } = await req.json();
 
     if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+      return addCorsHeaders(NextResponse.json({ error: 'Email is required' }, { status: 400 }));
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return NextResponse.json({ error: 'No user with this email' }, { status: 404 });
+      return addCorsHeaders(NextResponse.json({ error: 'No user with this email' }, { status: 404 }));
     }
-
-    // Generate new password
+    
+    //Generate new password
     const newPassword = generatePassword();
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -67,9 +72,9 @@ export async function POST(req) {
     // Send new password via email
     await sendNewPasswordEmail(email, newPassword);
 
-    return NextResponse.json({ message: 'New password sent to your email' });
+    return addCorsHeaders(NextResponse.json({ message: 'New password sent to your email' }));
   } catch (error) {
     console.error('Auto password reset error:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    return addCorsHeaders(NextResponse.json({ error: 'Server error' }, { status: 500 }));
   }
 }
