@@ -51,5 +51,5 @@ export async function POST(req) {
     maxAge: 7 * 24 * 60 * 60
   });
 
-  return addCorsHeaders(res);
+  // return addCorsHeaders(res);
 }
