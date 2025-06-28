@@ -25,7 +25,8 @@ export async function POST(req) {
 
   const token=signToken({
     id:user._id,
-    name:user.name
+    name:user.name,
+    email:user.email
   })
 
 const res = NextResponse.json({ msg: `Welcome ${user.name}` });

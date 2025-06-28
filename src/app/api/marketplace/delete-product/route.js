@@ -4,8 +4,6 @@ import MarketProduct from "../../../../../models/MarketProduct";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 
-
-
 /**
  * @description Soft-delete a  item by marking it as isDel=true
  * @route PATCH /api/marketplace/delete-product
@@ -15,6 +13,8 @@ import { decodeObjectId } from "../../../../../lib/idCodec";
  * @error {object} 400 - Missing or invalid ID
  * @error {object} 500 - Invalid JSON or server error
  */
+
+
 
 export const PATCH = withAuth(async (req, user) => {
   await connectDB();
@@ -56,3 +56,4 @@ export const PATCH = withAuth(async (req, user) => {
         { status: 404 }
       );
 });
+
