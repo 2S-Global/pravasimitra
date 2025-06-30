@@ -40,16 +40,16 @@ export async function POST(req) {
 
   const res = NextResponse.json({
     msg: `Welcome ${user.name}`,
-    user
+    user,
+    token 
   });
 
-  res.cookies.set("token", token, {
-    httpOnly: true,
-sameSite: "none",
-secure: false, 
-    path: "/",
-    maxAge: 7 * 24 * 60 * 60
-  });
-
+res.cookies.set("token", token, {
+  httpOnly: true,
+  sameSite: "none",
+  secure: true,    // ✅ must be true with SameSite=None
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60
+});
   return addCorsHeaders(res);
 }
