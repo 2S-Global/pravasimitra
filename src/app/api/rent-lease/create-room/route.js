@@ -7,7 +7,7 @@ import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId } from "../../../../../lib/idCodec";
-
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 /**
  * @description Create a new room listing with images
@@ -23,6 +23,9 @@ import { decodeObjectId } from "../../../../../lib/idCodec";
  * @error {object} 500 - Image upload or database insert failed
  */
 
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 export const config = {
   api: { bodyParser: false },
@@ -63,7 +66,7 @@ export const POST=withAuth(async function (req,user) {
   try {
     data = await parseFormData(req);
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
+    return addCorsHeaders(NextResponse.json({ error: err.message }, { status: 400 }));
   }
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp","image/avif"];
@@ -74,7 +77,7 @@ export const POST=withAuth(async function (req,user) {
 
   for (const file of data.images) {
     if (!allowedTypes.includes(file.mime)) {
-      return NextResponse.json({ error: "Only JPG, PNG, WEBP allowed" }, { status: 200 });
+      return addCorsHeaders(NextResponse.json({ error: "Only JPG, PNG, WEBP allowed" }, { status: 200 }));
     }
 
     const newFilename = `${Date.now()}_${file.filename}`;
@@ -85,7 +88,7 @@ export const POST=withAuth(async function (req,user) {
       savedFilenames.push(newFilename);
     } catch (err) {
       console.error("Image save failed:", err);
-      return NextResponse.json({ error: "Image upload failed" }, { status: 500 });
+      return addCorsHeaders(NextResponse.json({ error: "Image upload failed" }, { status: 500 }));
     }
   }
 
@@ -93,7 +96,7 @@ export const POST=withAuth(async function (req,user) {
   try {
     decodedCategoryId = decodeObjectId(data.propertyType); // ✅ decode encrypted ObjectId
   } catch (error) {
-    return NextResponse.json({ error: "Invalid category ID" }, { status: 400 });
+    return addCorsHeaders(NextResponse.json({ error: "Invalid category ID" }, { status: 400 }));
   }
 
   try {
@@ -107,10 +110,10 @@ export const POST=withAuth(async function (req,user) {
       createdBy:userId
     });
 
-    return NextResponse.json({ msg: "Successfully Saved it", item: newItem }, { status: 200 });
+    return addCorsHeaders(NextResponse.json({ msg: "Successfully Saved it", item: newItem }, { status: 200 }));
   } catch (err) {
     console.error("DB insert failed:", err);
-    return NextResponse.json({ error: "Database insert failed" }, { status: 500 });
+    return addCorsHeaders(NextResponse.json({ error: "Database insert failed" }, { status: 500 }));
   }
 })
 

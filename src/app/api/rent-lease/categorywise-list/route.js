@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import RoomItem from "../../../../../models/Room";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 /**
  * @description Get all room items for a given property type ID
@@ -12,16 +13,20 @@ import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
  * @error {object} 500 - Failed to fetch items from the database
  */
 
+export async function OPTIONS() {
+  return optionsResponse();
+}
+
 export const GET = async (req) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
   const propertyTypeEncoded = searchParams.get("id");
 
   if (!propertyTypeEncoded) {
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { error: "Missing propertyType ID in query" },
       { status: 400 }
-    );
+    ));
   }
 
   let query = { isDel: false };
@@ -40,10 +45,10 @@ export const GET = async (req) => {
     query.propertyType = categoryId;
   } catch (err) {
     console.error("ID decoding failed:", err.message);
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { error: "Invalid propertyType ID" },
       { status: 400 }
-    );
+    ));
   }
 
   try {
@@ -53,10 +58,10 @@ export const GET = async (req) => {
       .lean();
 
     if (!items.length) {
-      return NextResponse.json(
+      return addCorsHeaders(NextResponse.json(
         { msg: "No items available", itemList: [] },
         { status: 200 }
-      );
+      ));
     }
 
     const updatedItems = items.map((item) => ({
@@ -65,12 +70,12 @@ export const GET = async (req) => {
       _id: undefined,
     }));
 
-    return NextResponse.json({ itemList: updatedItems }, { status: 200 });
+    return addCorsHeaders(NextResponse.json({ itemList: updatedItems }, { status: 200 }));
   } catch (err) {
     console.error("Fetch failed:", err);
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { error: "Failed to fetch items" },
       { status: 500 }
-    );
+    ));
   }
 };

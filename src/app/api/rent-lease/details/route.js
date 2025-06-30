@@ -7,7 +7,7 @@ import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId,encodeObjectId } from "../../../../../lib/idCodec";
-
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 /**
  * @description Get a single RoomItem by its encoded ID
@@ -18,16 +18,20 @@ import { decodeObjectId,encodeObjectId } from "../../../../../lib/idCodec";
  * @error {object} 404 - Item not found
  */
 
+export async function OPTIONS() {
+  return optionsResponse();
+}
+
 export const GET = async (req) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
   const encodedId = searchParams.get("id");
 
   if (!encodedId) {
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { error: "Missing RoomItem ID in query" },
       { status: 400 }
-    );
+    ));
   }
 
   try {
@@ -39,7 +43,7 @@ export const GET = async (req) => {
       .lean();
 
     if (!item) {
-      return NextResponse.json({ msg: "Item not found" }, { status: 404 });
+      return addCorsHeaders(NextResponse.json({ msg: "Item not found" }, { status: 404 }));
     }
 
     const updatedItem = {
@@ -48,12 +52,12 @@ export const GET = async (req) => {
     };
     delete updatedItem._id;
 
-    return NextResponse.json({ item: updatedItem }, { status: 200 });
+    return addCorsHeaders(NextResponse.json({ item: updatedItem }, { status: 200 }));
   } catch (err) {
     console.error("Fetch failed:", err);
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { error: "Invalid or malformed RoomItem ID" },
       { status: 400 }
-    );
+    ));
   }
 };
