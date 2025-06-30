@@ -31,12 +31,16 @@ export const GET = withAuth(async (req, user) => {
         NextResponse.json({ msg: "User Not Found" }, { status: 200 })
       );
     }
+    const imageUrl = existingUser.image
+      ? `/assets/images/profile-img/${existingUser.image}`
+      : '/assets/images/default-user.png';
+
 
     return addCorsHeaders(
       NextResponse.json(
         {
           msg: "User Fetched Successfully",
-          image: existingUser,
+          image: imageUrl,
         },
         { status: 200 }
       )
