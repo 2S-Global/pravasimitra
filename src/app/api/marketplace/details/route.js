@@ -11,7 +11,7 @@ import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 
 /**
- * @description Get a single Item by its encoded ID
+ * @description Get a single Item by its encoded ID  ss
  * @route GET /api/marketplace/details
  * @queryparam {string} id - Encoded Item ID
  * @success {object} 200 - Returns the Item data with encoded ID
