@@ -22,10 +22,20 @@ export const GET = withAuth(async (req, user) => {
       );
     }
 
+    const imageUrl = existingUser.image
+  ? `/assets/images/profile-img/${existingUser.image}`
+  : '/assets/images/default-user.png';
+
+// ✅ Build the user object with new image path
+const userToReturn = {
+  ...existingUser,
+  image: imageUrl
+};
+
     return addCorsHeaders(
       NextResponse.json({
         msg: "User fetched successfully",
-        user: existingUser,
+        user: userToReturn,
       })
     );
 
