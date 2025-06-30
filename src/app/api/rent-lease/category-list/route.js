@@ -7,7 +7,7 @@ import RoomItem from "../../../../../models/Room";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import { encodeObjectId } from "../../../../../lib/idCodec";
-
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 /**
  * @description Get all room categories from the database
@@ -15,6 +15,10 @@ import { encodeObjectId } from "../../../../../lib/idCodec";
  * @success {object} 200 - Room Categories fetched successfully
  * @error {object} 500 - Failed to fetch categories
  */
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 export const GET = async (req) => {
   await connectDB();
@@ -27,16 +31,16 @@ export const GET = async (req) => {
     }));
 
     if (!categories || categories.length === 0) {
-      return NextResponse.json(
+      return addCorsHeaders(NextResponse.json(
         { msg: "No Items Found", categories: [] },
         { status: 200 }
-      );
+      ));
     }
-    return NextResponse.json({ categories: categories }, { status: 200 });
+    return addCorsHeaders(NextResponse.json({ categories: categories }, { status: 200 }));
   } catch (err) {
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { error: "Failed to fetch categories" },
       { status: 500 }
-    );
+    ));
   }
 };

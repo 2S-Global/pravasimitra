@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import Product from "../../../../../models/Product";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 export async function POST(req) {
   try {
@@ -10,7 +15,7 @@ export async function POST(req) {
     const id = formData.get("id");
 
     if (!id) {
-      return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
+      return addCorsHeaders(NextResponse.json({ error: "Product ID is required" }, { status: 400 }));
     }
 
     const product = await Product.findById(id)
@@ -18,13 +23,13 @@ export async function POST(req) {
       .lean();
 
     if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      return addCorsHeaders(NextResponse.json({ error: "Product not found" }, { status: 404 }));
     }
 
-    return NextResponse.json({ product }, { status: 200 });
+    return addCorsHeaders(NextResponse.json({ product }, { status: 200 }));
 
   } catch (error) {
     console.error("Error fetching product details:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return addCorsHeaders(NextResponse.json({ error: "Internal Server Error" }, { status: 500 }));
   }
 }

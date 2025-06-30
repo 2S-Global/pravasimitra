@@ -7,6 +7,7 @@ import { withAuth } from "../../../../../lib/withAuth";
 import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { encodeObjectId } from "../../../../../lib/idCodec";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 
 /**
@@ -18,6 +19,10 @@ import { encodeObjectId } from "../../../../../lib/idCodec";
  * @error {object} 200 - No Items Found (returns empty array)
  * @error {object} 500 - Failed to fetch items from the database
  */
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 export const GET =withAuth (async function (req,user) {
   await connectDB();
@@ -31,7 +36,7 @@ export const GET =withAuth (async function (req,user) {
       .lean();
 
       if(!items || items.length===0){
-          return NextResponse.json({msg:"No Items Found",items:[]},{status:200})
+          return addCorsHeaders(NextResponse.json({msg:"No Items Found",items:[]},{status:200}))
       }
 
       const updatedItems=items.map(item=>({
@@ -40,9 +45,9 @@ export const GET =withAuth (async function (req,user) {
         _id: undefined
       }))
 
-    return NextResponse.json({ items: updatedItems }, { status: 200 });
+    return addCorsHeaders(NextResponse.json({ items: updatedItems }, { status: 200 }));
   } catch (err) {
     console.error("DB fetch failed:", err);
-    return NextResponse.json({ error: "Failed to fetch rent items" }, { status: 500 });
+    return addCorsHeaders(NextResponse.json({ error: "Failed to fetch rent items" }, { status: 500 }));
   }
 })

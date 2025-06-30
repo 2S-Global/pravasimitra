@@ -4,6 +4,11 @@ import Product from '../../../../../models/Product';
 import ProductCategory from '../../../../../models/ProductCategory';
 import path from 'path';
 import fs from 'fs';
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 // GET all products
 export async function GET(req) {
@@ -20,11 +25,11 @@ export async function GET(req) {
       .select('-__v')
       .lean();
 
-    return NextResponse.json({ products });
+    return addCorsHeaders(NextResponse.json({ products }));
 
   } catch (error) {
     console.error('Error fetching products:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return addCorsHeaders(NextResponse.json({ error: 'Internal Server Error' }, { status: 500 }));
   }
 }
 
@@ -44,15 +49,15 @@ export async function POST(req) {
     const galleryFiles = formData.getAll('gallery');
 
     if (!title || !price || !categoryId || !galleryFiles.length) {
-      return NextResponse.json(
+      return addCorsHeaders(NextResponse.json(
         { error: "title, price, categoryId, and at least one gallery image are required" },
         { status: 400 }
-      );
+      ));
     }
 
     const category = await ProductCategory.findById(categoryId);
     if (!category) {
-      return NextResponse.json({ error: "Invalid categoryId" }, { status: 400 });
+      return addCorsHeaders(NextResponse.json({ error: "Invalid categoryId" }, { status: 400 }));
     }
 
     const uploadedImageNames = [];
@@ -84,13 +89,13 @@ export async function POST(req) {
       shortDesc,
     });
 
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { msg: "Product added successfully", product: newProduct },
       { status: 201 }
-    );
+    ));
 
   } catch (error) {
     console.error("Error adding product:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return addCorsHeaders(NextResponse.json({ error: "Internal Server Error" }, { status: 500 }));
   }
 }

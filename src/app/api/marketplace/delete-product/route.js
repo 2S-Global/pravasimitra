@@ -3,6 +3,8 @@ import { connectDB } from "../../../../../lib/db";
 import MarketProduct from "../../../../../models/MarketProduct";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
 
 /**
  * @description Soft-delete a  item by marking it as isDel=true
@@ -14,7 +16,9 @@ import { decodeObjectId } from "../../../../../lib/idCodec";
  * @error {object} 500 - Invalid JSON or server error
  */
 
-
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 export const PATCH = withAuth(async (req, user) => {
   await connectDB();
@@ -24,20 +28,20 @@ export const PATCH = withAuth(async (req, user) => {
   try {
     data = await req.json();
   } catch {
-    return NextResponse.json({ msg: "Invalid JSON" }, { status: 500 });
+    return addCorsHeaders(NextResponse.json({ msg: "Invalid JSON" }, { status: 500 }));
   }
 
   const { id } = data;
 
   if (!id) {
-    return NextResponse.json({ msg: "Missing Id" }, { status: 400 });
+    return addCorsHeaders(NextResponse.json({ msg: "Missing Id" }, { status: 400 }));
   }
 
   let decodeId;
   try {
     decodeId = decodeObjectId(id);
   } catch (err) {
-    return NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 });
+    return addCorsHeaders(NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 }));
   }
 
   const deleted = await MarketProduct.findByIdAndUpdate(
@@ -47,13 +51,13 @@ export const PATCH = withAuth(async (req, user) => {
   );
 
   return deleted
-    ? NextResponse.json(
+    ? addCorsHeaders(NextResponse.json(
         { msg: "Item deleted Successfully", item: deleted },
         { status: 200 }
-      )
-    : NextResponse.json(
+      ))
+    : addCorsHeaders(NextResponse.json(
         { msg: "Item not found or unauthorized" },
         { status: 404 }
-      );
+      ));
 });
 

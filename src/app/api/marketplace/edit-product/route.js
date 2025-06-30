@@ -7,6 +7,11 @@ import { withAuth } from "../../../../../lib/withAuth";
 import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId } from "../../../../../lib/idCodec";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 export const config = {
   api: {
@@ -91,13 +96,13 @@ export const GET = withAuth(async (req, user) => {
   let id = searchParams.get("id");
 
   if (!id)
-    return NextResponse.json({ error: "Missing item ID" }, { status: 400 });
+    return addCorsHeaders(NextResponse.json({ error: "Missing item ID" }, { status: 400 }));
 
   try {
     id = decodeObjectId(id);
   
   } catch {
-    return NextResponse.json({ error: "Invalid encoded ID" }, { status: 400 });
+    return addCorsHeaders(NextResponse.json({ error: "Invalid encoded ID" }, { status: 400 }));
   }
 
   try {
@@ -107,19 +112,19 @@ export const GET = withAuth(async (req, user) => {
       .lean();
 
     if (!item) {
-      return NextResponse.json(
+      return addCorsHeaders(NextResponse.json(
         { error: "Item not found or unauthorized" },
         { status: 404 }
-      );
+      ));
     }
 
-    return NextResponse.json({ item }, { status: 200 });
+    return addCorsHeaders(NextResponse.json({ item }, { status: 200 }));
   } catch (err) {
     console.error("GET single item error:", err);
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { error: "Failed to fetch item" },
       { status: 500 }
-    );
+    ));
   }
 });
 
@@ -130,7 +135,7 @@ export const PATCH = withAuth(async (req, user) => {
   try {
     data = await parseFormData(req);
   } catch (err) {
-    return NextResponse.json({ msg: "Invalid Form Data" }, { status: 400 });
+    return addCorsHeaders(NextResponse.json({ msg: "Invalid Form Data" }, { status: 400 }));
   }
 
   const { id, title, category, price, description, newImages, existingImages } =
@@ -139,7 +144,7 @@ export const PATCH = withAuth(async (req, user) => {
     console.log(data);
 
   if (!id) {
-    return NextResponse.json({ msg: "Missing item Id" }, { status: 200 });
+    return addCorsHeaders(NextResponse.json({ msg: "Missing item Id" }, { status: 200 }));
   }
 
   let decodedId;
@@ -147,7 +152,7 @@ export const PATCH = withAuth(async (req, user) => {
     decodedId = decodeObjectId(id);
    
   } catch {
-    return NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 });
+    return addCorsHeaders(NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 }));
   }
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
@@ -161,10 +166,10 @@ export const PATCH = withAuth(async (req, user) => {
 
   for (const file of newImages) {
     if (!allowedTypes.includes(file.mime)) {
-      return NextResponse.json(
+      return addCorsHeaders(NextResponse.json(
         { msg: "Only JPG,PNG,AVIF,WEBP Allowed" },
         { status: 200 }
-      );
+      ));
     }
     const newFilename = `${Date.now()}_${file.filename}`;
     const savePath = path.join(uploadDir, newFilename);
@@ -173,10 +178,10 @@ export const PATCH = withAuth(async (req, user) => {
       fs.writeFileSync(savePath, file.buffer);
       savedFilenames.push(newFilename);
     } catch (err) {
-      return NextResponse.json(
+      return addCorsHeaders(NextResponse.json(
         { error: "Image upload failed" },
         { status: 500 }
-      );
+      ));
     }
   }
 
@@ -197,16 +202,16 @@ export const PATCH = withAuth(async (req, user) => {
     );
 
     if (!updated) {
-      return NextResponse.json(
+      return addCorsHeaders(NextResponse.json(
         { error: "Item not found or unauthorized" },
         { status: 404 }
-      );
+      ));
     }
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { msg: "Item updated successfully", item: updated },
       { status: 200 }
-    );
+    ));
   } catch (err) {
-    return NextResponse.json({ msg: "Update failed" }, { status: 500 });
+    return addCorsHeaders(NextResponse.json({ msg: "Update failed" }, { status: 500 }));
   }
 });

@@ -3,6 +3,11 @@ import ProductCategory from "../../../../../models/ProductCategory";
 import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 // 🟢 GET all product categories (not soft-deleted)
 export async function GET() {
@@ -14,24 +19,24 @@ export async function GET() {
       .lean();
 
     if (!categories || categories.length === 0) {
-      return NextResponse.json(
+      return addCorsHeaders(NextResponse.json(
         { msg: "No product categories found" },
         { status: 404 }
-      );
+      ));
     }
 
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       { msg: "Product categories fetched successfully", categories },
       { status: 200 }
-    );
+    ));
   } catch (error) {
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       {
         error: "Failed to fetch product categories",
         details: error.message,
       },
       { status: 500 }
-    );
+    ));
   }
 }
 
@@ -74,21 +79,21 @@ export async function POST(req) {
       is_del: false,
     });
 
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       {
         msg: "Product category created successfully",
         category: newCategory,
       },
       { status: 201 }
-    );
+    ));
   } catch (error) {
     console.error("Error in POST:", error);
-    return NextResponse.json(
+    return addCorsHeaders(NextResponse.json(
       {
         error: "Failed to create product category",
         details: error.message,
       },
       { status: 500 }
-    );
+    ));
   }
 }

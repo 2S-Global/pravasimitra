@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
-import {connectDB} from "../../../../../lib/db";
+import { connectDB } from "../../../../../lib/db";
 import MarketProduct from "../../../../../models/MarketProduct";
 import { withAuth } from "../../../../../lib/withAuth";
-import MarketCategory from "../../../../../models/MarketCategory";
-import User from "../../../../../models/User";
 import { decodeObjectId } from "../../../../../lib/idCodec";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+// Handle preflight CORS
+export async function OPTIONS() {
+  return optionsResponse();
+}
+
 export const config = {
   api: { bodyParser: false },
 };
-
 
 async function parseFormData(req) {
   const form = await req.formData();
@@ -20,8 +24,6 @@ async function parseFormData(req) {
   const price = form.get("price");
   const description = form.get("description") || "";
   const files = form.getAll("images");
-
-
 
   const images = await Promise.all(
     files.map(async (file) => {
@@ -38,40 +40,36 @@ async function parseFormData(req) {
   return { title, category, price, description, images };
 }
 
-
-/**
- * @description Create a new MarketProduct item with images (only for authenticated users)
- * @route POST /api/marketplace/create-product
- * @formdata {string} title - Product title
- * @formdata {string} category - Encoded category ID
- * @formdata {number} price - Product price
- * @formdata {string} description - Product description (optional)
- * @formdata {File[]} images - One or more image files
- * @success {object} 200 - Item created successfully
- * @error {object} 400 - Invalid form data or category ID
- * @error {object} 500 - Image upload or database insertion failure
- */
-
-
-export const POST=withAuth(async function (req,user) {
+export const POST = withAuth(async function (req, user) {
   await connectDB();
-    const userId = user?.id;
+  const userId = user?.id;
+
   let data;
   try {
     data = await parseFormData(req);
   } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
+    return addCorsHeaders(
+      NextResponse.json({ error: err.message }, { status: 400 })
+    );
   }
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp","image/avif"];
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
   const savedFilenames = [];
 
-  const uploadDir = path.join(process.cwd(), "public/assets/images/e-marketplace");
+  const uploadDir = path.join(
+    process.cwd(),
+    "public/assets/images/e-marketplace"
+  );
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of data.images) {
     if (!allowedTypes.includes(file.mime)) {
-      return NextResponse.json({ error: "Only JPG, PNG, WEBP allowed" }, { status: 200 });
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "Only JPG, PNG, WEBP allowed" },
+          { status: 200 }
+        )
+      );
     }
 
     const newFilename = `${Date.now()}_${file.filename}`;
@@ -82,16 +80,19 @@ export const POST=withAuth(async function (req,user) {
       savedFilenames.push(newFilename);
     } catch (err) {
       console.error("Image save failed:", err);
-      return NextResponse.json({ error: "Image upload failed" }, { status: 500 });
+      return addCorsHeaders(
+        NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+      );
     }
   }
 
-
-    let decodedCategoryId;
+  let decodedCategoryId;
   try {
-    decodedCategoryId = decodeObjectId(data.category); 
+    decodedCategoryId = decodeObjectId(data.category);
   } catch (error) {
-    return NextResponse.json({ error: "Invalid category ID" }, { status: 400 });
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid category ID" }, { status: 400 })
+    );
   }
 
   try {
@@ -101,15 +102,16 @@ export const POST=withAuth(async function (req,user) {
       category: decodedCategoryId,
       price: parseFloat(data.price),
       description: data.description,
-      createdBy:userId
+      createdBy: userId,
     });
 
-    return NextResponse.json({ msg: "Successfully Saved it", item: newItem }, { status: 200 });
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Successfully Saved it", item: newItem }, { status: 200 })
+    );
   } catch (err) {
     console.error("DB insert failed:", err);
-    return NextResponse.json({ error: "Database insert failed" }, { status: 500 });
+    return addCorsHeaders(
+      NextResponse.json({ error: "Database insert failed" }, { status: 500 })
+    );
   }
-})
-
-
-
+});
