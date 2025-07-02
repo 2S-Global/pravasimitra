@@ -28,7 +28,7 @@ export const GET = withAuth (async function (req,user) {
       .lean();
 
       if(!items || items.length===0){
-          return NextResponse.json({msg:"No Items Found",items:[]},{status:200})
+          return NextResponse.json({ msg: "No Items Found", items: [] }, { status: 200 });
       }
 
       const updatedItems=items.map(item=>({

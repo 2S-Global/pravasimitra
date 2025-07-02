@@ -23,14 +23,14 @@ export const GET = withAuth(async (req, user) => {
     }
 
     const imageUrl = existingUser.image
-  ? `/assets/images/profile-img/${existingUser.image}`
-  : '/assets/images/default-user.png';
+      ? `/assets/images/profile-img/${existingUser.image}`
+      : "/assets/images/default-user.png";
 
-// ✅ Build the user object with new image path
-const userToReturn = {
-  ...existingUser,
-  image: imageUrl
-};
+    // Build the user object with new image path
+    const userToReturn = {
+      ...existingUser,
+      image: imageUrl,
+    };
 
     return addCorsHeaders(
       NextResponse.json({
@@ -38,7 +38,6 @@ const userToReturn = {
         user: userToReturn,
       })
     );
-
   } catch (error) {
     console.error("Error fetching user:", error);
     return addCorsHeaders(
@@ -58,7 +57,9 @@ export const PUT = withAuth(async (req, user) => {
       userId,
       { $set: body },
       { new: true, runValidators: true }
-    ).select("-__v").lean();
+    )
+      .select("-__v")
+      .lean();
 
     if (!updatedUser) {
       return addCorsHeaders(
@@ -72,7 +73,6 @@ export const PUT = withAuth(async (req, user) => {
         user: updatedUser,
       })
     );
-
   } catch (error) {
     console.error("Error updating user:", error);
     return addCorsHeaders(

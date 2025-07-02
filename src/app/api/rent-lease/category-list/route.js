@@ -3,7 +3,6 @@ import path from "path";
 import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
 import RoomItem from "../../../../../models/Room";
-
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import { encodeObjectId } from "../../../../../lib/idCodec";
