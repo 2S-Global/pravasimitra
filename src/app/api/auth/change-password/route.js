@@ -36,8 +36,7 @@ export const POST = withAuth(async (req, user) => {
       );
     }
 
-    const existingUser = await User.findById(user.id).select('+password')
-    console.log(existingUser);
+    const existingUser = await User.findById(user.id).select('+password');
     if (!existingUser) {
       return addCorsHeaders(
         NextResponse.json({ error: 'User not found.' }, { status: 404 })

@@ -11,10 +11,7 @@ export async function OPTIONS() {
 
 const connectDB = async () => {
   if (mongoose.connections[0].readyState) return;
-  await mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await mongoose.connect(MONGO_URI);
 };
 
 // Generate Random password
@@ -22,29 +19,29 @@ const generatePassword = () => {
   return Math.random().toString(36).slice(-8) + '@' + Math.floor(100 + Math.random() * 900);
 };
 
-const sendNewPasswordEmail = async (toEmail, newPassword) => {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+// const sendNewPasswordEmail = async (toEmail, newPassword) => {
+//   const transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASS,
+//     },
+//   });
 
-  const mailOptions = {
-    from: `"Support" <${process.env.EMAIL_USER}>`,
-    to: toEmail,
-    subject: 'Your New Password',
-    html: `
-      <p>You requested a password reset.</p>
-      <p>Your new auto-generated password is:</p>
-      <h3>${newPassword}</h3>
-      <p>Please log in using this password. You can change it after login.</p>
-    `,
-  };
+//   const mailOptions = {
+//     from: `"Support" <${process.env.EMAIL_USER}>`,
+//     to: toEmail,
+//     subject: 'Your New Password',
+//     html: `
+//       <p>You requested a password reset.</p>
+//       <p>Your new auto-generated password is:</p>
+//       <h3>${newPassword}</h3>
+//       <p>Please log in using this password. You can change it after login.</p>
+//     `,
+//   };
 
-  await transporter.sendMail(mailOptions);
-};
+//   await transporter.sendMail(mailOptions);
+// };
 
 export async function POST(req) {
   await connectDB();
@@ -70,7 +67,7 @@ export async function POST(req) {
     await user.save();
 
     // Send new password via email
-    await sendNewPasswordEmail(email, newPassword);
+    //await sendNewPasswordEmail(email, newPassword);
 
     return addCorsHeaders(NextResponse.json({ message: 'New password sent to your email' }));
   } catch (error) {
