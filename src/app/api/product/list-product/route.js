@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import Product from "../../../../../models/Product";
+import User from "../../../../../models/User";
+import { ProductCategory } from "../../../../../models/ProductCategory";
 import { withAuth } from "../../../../../lib/withAuth";
 import { encodeObjectId } from "../../../../../lib/idCodec";
 
