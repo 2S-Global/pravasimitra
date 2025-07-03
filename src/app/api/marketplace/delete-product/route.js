@@ -11,7 +11,7 @@ import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
  * @route PATCH /api/marketplace/delete-product
  * @auth Required
  * @bodyparam {string} id - Encoded ID of the item to delete
- * @success {object} 200 - Item deleted successfully
+ * @success {object} 200 - Item deleted successfullys
  * @error {object} 400 - Missing or invalid ID
  * @error {object} 500 - Invalid JSON or server error
  */

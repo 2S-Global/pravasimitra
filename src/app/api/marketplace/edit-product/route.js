@@ -81,7 +81,7 @@ async function parseFormData(req) {
  * @formdata {string} title - Product title
  * @formdata {string} category - Encoded category ID
  * @formdata {number} price - Product price
- * @formdata {string} description - Product description (optional)
+ * @formdata {string} description - Product description (optional)s
  * @formdata {string} existingImageRaw - JSON array or comma-separated list of existing image filenames
  * @formdata {File[]} images - New image files to upload
  * @success {object} 200 - Item updated successfully
