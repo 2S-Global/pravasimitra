@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
@@ -6,8 +7,18 @@ export async function OPTIONS() {
 }
 
 export async function POST() {
-  const res = NextResponse.json({ msg: "Logged out" });
-  res.cookies.set("token", "", { maxAge: 0 });
+  const cookieStore = cookies();
+
+  // Clear the 'token' cookie by setting it to empty and expired
+  cookieStore.set("token", "", {
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+    path: "/",
+    expires: new Date(0),
+    maxAge: 0,
+  });
+
+  const res = NextResponse.json({ message: "Logged out successfully" }, { status: 200 });
   return addCorsHeaders(res);
 }
- 
