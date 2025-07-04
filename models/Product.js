@@ -29,6 +29,10 @@ const ProductSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     is_del: {
       type: Boolean,
       default: false,
