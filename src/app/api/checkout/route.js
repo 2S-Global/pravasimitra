@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "../../../../../lib/db";
-import Address from "../../../../../models/Address";
-import { withAuth } from "../../../../../lib/withAuth";
-import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+import { connectDB } from "../../../../lib/db";
+import Address from "../../../../models/Address";
+import { withAuth } from "../../../../lib/withAuth";
+import { addCorsHeaders, optionsResponse } from "../../../../lib/cors";
+import Cart from "../../../../models/Cart";
+import Order from "../../../../models/Order";
 
 export async function OPTIONS() {
   return optionsResponse();
 }
+
 
 export const POST = withAuth(async (req, user) => {
   await connectDB();
@@ -20,12 +23,12 @@ export const POST = withAuth(async (req, user) => {
     );
   }
 
-  const { billing, shipping } = data;
+  const { billing, shipping, paymentMethod } = data;
 
-  if (!billing || !shipping) {
+  if (!billing || !shipping || !paymentMethod) {
     return addCorsHeaders(
       NextResponse.json(
-        { error: "Billing or shipping info missing" },
+        { error: "Billing, shipping, or payment method missing" },
         { status: 400 }
       )
     );
@@ -37,21 +40,46 @@ export const POST = withAuth(async (req, user) => {
       billing,
       shipping,
     });
+    const savedAddress = await newAddress.save();
 
-    const saved = await newAddress.save();
+    const cart = await Cart.findOne({ userId: user.id });
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return addCorsHeaders(
+        NextResponse.json({ error: "Cart is empty" }, { status: 400 })
+      );
+    }
+
+    let status = "pending";
+    if (paymentMethod.toLowerCase() === "cash") {
+      status = "confirmed";
+    }
+
+    const newOrder = new Order({
+      userId: user.id,
+      addressId: savedAddress._id,
+      paymentMethod,
+      status,
+      items: cart.items,
+    });
+    const savedOrder = await newOrder.save();
+
+    if (paymentMethod.toLowerCase() === "cash") {
+      await Cart.deleteOne({ userId: user.id });
+    }
 
     return addCorsHeaders(
       NextResponse.json(
         {
-          message: "Address saved successfully",
-          addressId: saved._id,
-          address: saved,
+          message: "Order created successfully",
+          orderId: savedOrder._id,
+          addressId: savedAddress._id,
+          order: savedOrder,
         },
         { status: 200 }
       )
     );
   } catch (err) {
-    console.error("Error saving address:", err);
+    console.error("Error saving address or order:", err);
     return addCorsHeaders(
       NextResponse.json({ error: "Server error" }, { status: 500 })
     );

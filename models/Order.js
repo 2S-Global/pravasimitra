@@ -1,27 +1,44 @@
 import mongoose from "mongoose";
 
-const orderItemSchema = new mongoose.Schema({
-  productId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "MarketProduct",
-    required: true
+const orderItemSchema = new mongoose.Schema(
+  {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MarketProduct",
+      required: true,
+    },
+    quantity: Number,
+    price: Number,
   },
-  quantity: Number,
-  price: Number
-}, { _id: true });
+  { _id: true }
+);
 
-const orderSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
-  addressId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Address",
+const orderSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    addressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+    },
 
+    paymentMethod: {
+      type: String,
+      enum: ["cash", "online"],
+
+    },
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "paid", "cancelled"],
+      default: "pending",
+
+    },
+    items: [orderItemSchema],
   },
-  items: [orderItemSchema]
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 export default mongoose.models.Order || mongoose.model("Order", orderSchema);
