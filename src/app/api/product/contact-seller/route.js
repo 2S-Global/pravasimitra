@@ -1,0 +1,69 @@
+import { NextResponse } from "next/server";
+import { connectDB } from "../../../../../lib/db";
+import ProductContact from "../../../../../models/ProductContact";
+import Product from "../../../../../models/Product";
+import User from "../../../../../models/User";
+import nodemailer from "nodemailer";
+import { withAuth } from "../../../../../lib/withAuth";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
+
+export const POST = withAuth(async (req, authUser) => {
+  await connectDB();
+  let data;
+
+  try {
+    data = await req.json();
+  } catch {
+    return addCorsHeaders(NextResponse.json({ error: "Invalid JSON" }, { status: 400 }));
+  }
+
+  const { productId, sellerId } = data;
+  const userId = authUser.id;
+
+  if (!productId || !sellerId) {
+    return addCorsHeaders(NextResponse.json({ error: "Missing fields" }, { status: 400 }));
+  }
+
+  try {
+    const [user, seller, product] = await Promise.all([
+      User.findById(userId),
+      User.findById(sellerId),
+      Product.findById(productId),
+    ]);
+
+    if (!user || !seller || !product) {
+      return addCorsHeaders(NextResponse.json({ error: "Invalid references" }, { status: 404 }));
+    }
+
+    await ProductContact.create({ userId, sellerId, productId });
+
+    // Send email to seller
+    // const transporter = nodemailer.createTransport({
+    //   service: "gmail",
+    //   auth: {
+    //     user: process.env.EMAIL_USER,
+    //     pass: process.env.EMAIL_PASS,
+    //   },
+    // });
+
+    // await transporter.sendMail({
+    //   from: `"${user.name}" <${process.env.EMAIL_USER}>`,
+    //   to: seller.email,
+    //   subject: `Inquiry: ${product.title}`,
+    //   html: `
+    //     <p>Hello ${seller.name},</p>
+    //     <p>${user.name} is interested in your product <b>${product.title}</b>.</p>
+    //     <p>You can reply at: <a href="mailto:${user.email}">${user.email}</a></p>
+    //   `,
+    // });
+
+    return addCorsHeaders(NextResponse.json({ msg: "Email sent successfully" }, { status: 200 }));
+  } catch (err) {
+    console.error("Contact error:", err);
+    return addCorsHeaders(NextResponse.json({ error: "Server error" }, { status: 500 }));
+  }
+});

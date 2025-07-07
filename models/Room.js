@@ -8,6 +8,9 @@ const RentItemSchema = new mongoose.Schema(
     images: {
       type: [String],
     },
+    icon: {
+      type: String,
+    },
     propertyType: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "RoomCategory",

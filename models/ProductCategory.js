@@ -9,6 +9,9 @@ const ProductCategorySchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    icon: {
+      type: String,
+    },
     is_del: {
       type: Boolean,
       default: false,

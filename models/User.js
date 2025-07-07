@@ -3,26 +3,27 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String },
-    image:{type:String},
+    image: { type: String },
     fatherName: {
       type: String,
     },
     motherName: {
       type: String,
     },
-     spouseName: {
+    spouseName: {
       type: String,
     },
     password: { type: String, select: false },
     email: { type: String },
-     dateOfBirth: {
+    phone: { type: String },
+    dateOfBirth: {
       type: Date,
     },
-        mobile: { type: String },
+    mobile: { type: String },
     gender: {
       type: String,
     },
-     passportNumber: {
+    passportNumber: {
       type: String,
     },
     passportExpiry: {
@@ -41,8 +42,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
 
-  isDel: { type: Boolean, default: false }
-
+    isDel: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
