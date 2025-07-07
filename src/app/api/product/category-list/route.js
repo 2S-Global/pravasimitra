@@ -15,7 +15,7 @@ export async function GET() {
   try {
     await connectDB();
 
-    const categoriesRaw = await ProductCategory.find({ is_del: false })
+    const categoriesRaw = await ProductCategory.find({ isDel: false })
       .sort({ createdAt: -1 })
       .lean();
 
