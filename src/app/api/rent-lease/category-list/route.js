@@ -24,22 +24,39 @@ export const GET = async (req) => {
 
   try {
     const categoryList = await RoomCategory.find({ isDel: false }).lean();
+
+    // const imageBaseUrl = `${process.env.IMAGE_URL}/room-category`;
+
+    // console.log(categoryList);
+
     const categories = categoryList.map((cat) => ({
       id: encodeObjectId(cat._id),
       name: cat.name,
+      // icon: cat.icon ? `${imageBaseUrl}/${cat.icon}` : "",
+      icon: cat.icon || "",
     }));
 
     if (!categories || categories.length === 0) {
-      return addCorsHeaders(NextResponse.json(
-        { msg: "No Items Found", categories: [] },
-        { status: 200 }
-      ));
+      return addCorsHeaders(
+        NextResponse.json(
+          { msg: "No Items Found", categories: [] },
+          { status: 200 }
+        )
+      );
     }
-    return addCorsHeaders(NextResponse.json({ categories: categories }, { status: 200 }));
+
+    return addCorsHeaders(
+      NextResponse.json(
+        { msg: "Categories fetched successfully", categories: categories },
+        { status: 200 }
+      )
+    );
   } catch (err) {
-    return addCorsHeaders(NextResponse.json(
-      { error: "Failed to fetch categories" },
-      { status: 500 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Failed to fetch categories" },
+        { status: 500 }
+      )
+    );
   }
 };
