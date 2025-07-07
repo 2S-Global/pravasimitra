@@ -29,6 +29,7 @@ export const GET = async (req) => {
     const categories = categoryList.map((cat) => ({
       id: encodeObjectId(cat._id),
       name: cat.name,
+      icon: cat.icon || "",
     }));
 
     if (!categories || categories.length === 0) {
@@ -41,7 +42,10 @@ export const GET = async (req) => {
     }
 
     return addCorsHeaders(
-      NextResponse.json({ categories: categories }, { status: 200 })
+      NextResponse.json(
+        { msg: "Marketplace categories fetched successfully", categories },
+        { status: 200 }
+      )
     );
   } catch (err) {
     return addCorsHeaders(
