@@ -31,6 +31,7 @@ export async function GET() {
       id: encodeObjectId(cat._id),
       name: cat.name,
       image: cat.image || "",
+      icon: cat.icon || "",
     }));
 
     return addCorsHeaders(NextResponse.json(
