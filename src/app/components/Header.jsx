@@ -11,18 +11,17 @@ const Header = () => {
   const setLoggedOut = useAuthStore((state) => state.setLoggedOut);
   const router = useRouter();
 
-  const handleLogout = async () => {
-    try {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
-
-    } catch (err) {
-      console.error("Logout error", err);
-    }
-    finally {
+const handleLogout = async () => {
+  try {
+    await axios.post("/api/auth/logout", {}, { withCredentials: true });
+  } catch (err) {
+    console.error("Logout error", err);
+  } finally {
     setLoggedOut();
-    router.push("/login");
+    router.replace("/login");
   }
-  };
+};
+
 
   return (
     <div id="wrapper" className="wrapper">

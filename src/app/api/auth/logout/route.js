@@ -12,9 +12,8 @@ const cookieStore = await cookies();
   // Clear the 'token' cookie by setting it to empty and expired
   cookieStore.set("token", "", {
     httpOnly: true,
-    // sameSite: "none",
-    // secure: true,
-      sameSite: "lax",
+    sameSite: "none",
+    secure: true,
     path: "/",
     expires: new Date(0),
     maxAge: 0,
