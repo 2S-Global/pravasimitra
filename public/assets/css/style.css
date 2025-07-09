@@ -2829,7 +2829,7 @@ button.tm-videobutton:hover span {
 }
 
 .header-icons ul li:first-child {
-  margin-left: 0;
+  margin-left: 7px;
 }
 
 .header-icons ul li:last-child {

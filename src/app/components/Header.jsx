@@ -1,8 +1,26 @@
-'use client'
+"use client";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuthStore } from "@/app/store/authStore";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const setLoggedOut = useAuthStore((state) => state.setLoggedOut);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      setLoggedOut();
+      router.push("/login");
+    } catch (err) {
+      console.error("Logout error", err);
+    }
+  };
+
   return (
     <div id="wrapper" className="wrapper">
       <div className="header">
@@ -64,12 +82,27 @@ const Header = () => {
 
               <nav className="tm-navigation">
                 <ul>
-                  <li><Link href="/">Home</Link></li>
-                  <li><Link href="/about-us">About</Link></li>
-                  <li className="tm-navigation-dropdown"><Link href="/blogs">Blogs</Link></li>
-                  <li><Link href="/faq">FAQ</Link></li>
-                  <li><Link href="/contact-us">Contact</Link></li>
-                  <li><Link href="/login">Login</Link></li>
+                  <li>
+                    <Link href="/">Home</Link>
+                  </li>
+                  <li>
+                    <Link href="/about-us">About</Link>
+                  </li>
+                  <li className="tm-navigation-dropdown">
+                    <Link href="/blogs">Blogs</Link>
+                  </li>
+                  <li>
+                    <Link href="/faq">FAQ</Link>
+                  </li>
+                  <li>
+                    <Link href="/contact-us">Contact</Link>
+                  </li>
+
+                  {!isLoggedIn && (
+                    <li>
+                      <Link href="/login">Login</Link>
+                    </li>
+                  )}
                 </ul>
               </nav>
 
@@ -92,27 +125,112 @@ const Header = () => {
                     id="userMenu"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
-                    style={{ background: 'transparent' }}
+                    style={{ background: "transparent" }}
                   >
                     <img
                       src="/assets/user.jpg"
                       alt="User"
                       className="rounded-circle"
-                      style={{ width: '40px', height: '40px' }}
+                      style={{ width: "40px", height: "40px" }}
                     />
                   </button>
-                  <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                    <li><Link className="dropdown-item" href="/user/dashboard">Dashboard</Link></li>
-                    <li><Link className="dropdown-item" href="/user/my-account">Profile</Link></li>
-                    <li><Link className="dropdown-item" href="/buy-sell/buysell-category">Buy/Sell</Link></li>
-                    <li><Link className="dropdown-item" href="/rent-lease/rentlease-category">Rent & Lease</Link></li>
-                    <li><Link className="dropdown-item" href="/marketplace/marketplace-category">MarketPlace</Link></li>
-                    <li><Link className="dropdown-item" href="/user/orders">Orders</Link></li>
-                    <li><Link className="dropdown-item" href="/user/buy-sell/list">Manage Buy/Sell</Link></li>
-                    <li><Link className="dropdown-item" href="/user/rent-lease/list">Manage Rent/Lease</Link></li>
-                    <li><Link className="dropdown-item" href="/user/marketplace/list">Manage MarketPlace</Link></li>
-                    <li><hr className="dropdown-divider" /></li>
-                    <li><Link className="dropdown-item text-danger" href="/login">Logout</Link></li>
+                  <ul
+                    className="dropdown-menu dropdown-menu-end"
+                    aria-labelledby="userMenu"
+                  >
+                    {isLoggedIn && (
+                      <>
+                        <li>
+                          <Link
+                            className="dropdown-item"
+                            href="/user/dashboard"
+                          >
+                            Dashboard
+                          </Link>
+                        </li>
+
+                        <li>
+                          <Link
+                            className="dropdown-item"
+                            href="/user/my-account"
+                          >
+                            Profile
+                          </Link>
+                        </li>
+                      </>
+                    )}
+                    <li>
+                      <Link
+                        className="dropdown-item"
+                        href="/buy-sell/buysell-category"
+                      >
+                        Buy/Sell
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className="dropdown-item"
+                        href="/rent-lease/rentlease-category"
+                      >
+                        Rent & Lease
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className="dropdown-item"
+                        href="/marketplace/marketplace-category"
+                      >
+                        MarketPlace
+                      </Link>
+                    </li>
+                    {isLoggedIn && (
+                      <>
+                        <li>
+                          <Link className="dropdown-item" href="/user/orders">
+                            Orders
+                          </Link>
+                        </li>
+
+                        <li>
+                          <Link
+                            className="dropdown-item"
+                            href="/user/buy-sell/list"
+                          >
+                            Manage Buy/Sell
+                          </Link>
+                        </li>
+
+                        <li>
+                          <Link
+                            className="dropdown-item"
+                            href="/user/rent-lease/list"
+                          >
+                            Manage Rent/Lease
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            className="dropdown-item"
+                            href="/user/marketplace/list"
+                          >
+                            Manage MarketPlace
+                          </Link>
+                        </li>
+                      </>
+                    )}
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+                    {isLoggedIn && (
+                      <li>
+                        <button
+                          onClick={handleLogout}
+                          className="dropdown-item"
+                        >
+                          Logout
+                        </button>
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>
@@ -137,7 +255,7 @@ const Header = () => {
         {/*// Header Bottom Area */}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

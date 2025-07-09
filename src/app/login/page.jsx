@@ -1,28 +1,60 @@
-"use-client";
+"use client";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
 import Link from "next/link";
-
-export const metadata = {
-  title: "Login | Pravasi Mitra",
-  description:
-    "Login to your account securely using your mobile number and password.",
-  keywords: ["login", "account", "user", "authentication"],
-  openGraph: {
-    title: "Login - Pravasi Mitra",
-    description: "Access your account through a secure login page.",
-    type: "website",
-  },
-};
+import axios from "axios";
+import { useState } from "react";
+import AlertService from "@/app/components/alertService";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/app/store/authStore";
 
 const Login = () => {
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const { setLoggedIn } = useAuthStore();
+  const handleLogin = async () => {
+    if (!identifier || !password) {
+      AlertService.error("Please fill in both email and password.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "/api/auth/login", // ✅ relative: works both locally and in production
+        { identifier, password },
+        { withCredentials: true }
+      );
+
+      AlertService.success(response.data.msg);
+      //  console.log("Cookies after login:", document.cookie);
+      setLoggedIn();
+      router.push("/user/dashboard");
+    } catch (err) {
+      console.error(err);
+      const errorMessage =
+        err?.response?.data?.msg || "Login failed. Please try again.";
+      AlertService.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Header />
       {/* <OtherBanner page_title="Login" /> */}
 
-      <section className="vh-100" style={{ backgroundColor: "#fff" }}>
+      <section
+        className="vh-100"
+        style={{ backgroundColor: "#fff", marginBottom: "100px" }}
+      >
         <div className="container py-5 h-100">
           <div className="row d-flex justify-content-center align-items-center h-100">
             <div className="col col-xl-10">
@@ -58,9 +90,10 @@ const Login = () => {
                         >
                           <input
                             type="email"
-                            id="form2Example17"
-                            className="form-control form-control-lg"
-                            placeholder="Email Address"
+                            className="form-control form-control-md"
+                            placeholder="Email Addresss"
+                            value={identifier}
+                            onChange={(e) => setIdentifier(e.target.value)}
                           />
                         </div>
                         <div
@@ -69,21 +102,45 @@ const Login = () => {
                         >
                           <input
                             type="password"
-                            id="form2Example27"
-                            className="form-control form-control-lg"
+                            className="form-control form-control-md"
                             placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                           />
                         </div>
-                        <div className="pt-1 mb-4">
+                        <div className="mb-4">
                           <button
-                            data-mdb-button-init=""
-                            data-mdb-ripple-init=""
-                            className="btn btn-dark btn-lg btn-block"
                             type="button"
+                            className="btn btn-lg"
+                            onClick={handleLogin}
+                            disabled={loading}
+                            style={{
+                              backgroundColor: "#FF2D1D",
+                              border: "none",
+                              color: "#fff",
+
+                              padding: "0.5rem 1rem",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              gap: "0.5rem",
+                            }}
                           >
-                            Login
+                            {loading ? (
+                              <>
+                                <span
+                                  className="spinner-border spinner-border-sm"
+                                  role="status"
+                                  aria-hidden="true"
+                                ></span>
+                                Logging in...
+                              </>
+                            ) : (
+                              <>Login</>
+                            )}
                           </button>
                         </div>
+
                         <Link
                           className="small text-muted"
                           href="./forget-password"
@@ -100,12 +157,12 @@ const Login = () => {
                           </a>
                         </p>
 
-                        <a href="#!" className="small text-muted">
+                        {/* <a href="#!" className="small text-muted">
                           Terms of use.
                         </a>
                         <a href="#!" className="small text-muted">
                           Privacy policy
-                        </a>
+                        </a> */}
                       </form>
                     </div>
                   </div>

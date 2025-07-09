@@ -7,7 +7,7 @@ export async function OPTIONS() {
 }
 
 export async function POST() {
-  const cookieStore = cookies();
+const cookieStore = await cookies();
 
   // Clear the 'token' cookie by setting it to empty and expired
   cookieStore.set("token", "", {

@@ -1,21 +1,31 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
 
-export function middleware(request) {
-  let response;
+const SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-  if (request.method === 'OPTIONS') {
-    response = new NextResponse(null, { status: 204 });
-  } else {
-    response = NextResponse.next();
+export async function middleware(req) {
+  const url = req.nextUrl;
+  const token = req.cookies.get('token')?.value;
+  console.log("✅ middleware.js loaded");
+
+
+  if (url.pathname.startsWith("/user")) {
+    if (!token) {
+        console.log("user");
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
+
+    try {
+      await jwtVerify(token, SECRET);
+      return NextResponse.next();
+    } catch {
+      return NextResponse.redirect(new URL("/login", req.url));
+    }
   }
 
-  // ⬇️ REPLACE with your actual frontend domain
-  const allowedOrigin = 'http://localhost:3000';
-
-  response.headers.set('Access-Control-Allow-Origin', allowedOrigin);
-  response.headers.set('Access-Control-Allow-Credentials', 'true');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  return response;
+  return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/user/:path*"],
+};

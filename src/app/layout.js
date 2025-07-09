@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import "./globals.css";
-
+import AuthHydrator from "./components/AuthHydrator";
 
 import LoadScriptOnRouteChange from "./components/LoadScriptOnRouteChange";
 import BootstrapClient from "./components/BootstrapClient";
@@ -34,6 +34,7 @@ export default function RootLayout({ children }) {
   <link rel="stylesheet" href="/assets/css/tm-customizer.css" />
   <link rel="stylesheet" href="/assets/css/custom.css" />
 
+<link rel="icon" href="/assets/images/logo/logo-dark.png" />
 
   </head>
   <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
@@ -41,7 +42,7 @@ export default function RootLayout({ children }) {
 {/*   <div className="tm-preloader">
   <span className="tm-preloader-box" />
   </div> */}
-
+<AuthHydrator />
   {children}
 
   </div>
