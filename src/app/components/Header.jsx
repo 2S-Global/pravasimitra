@@ -18,7 +18,7 @@ const handleLogout = async () => {
     console.error("Logout error", err);
   } finally {
     setLoggedOut();
-    router.replace("/login");
+ window.location.href = "/login";
   }
 };
 
