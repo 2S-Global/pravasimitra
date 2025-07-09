@@ -14,11 +14,14 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
-      setLoggedOut();
-      router.push("/login");
+
     } catch (err) {
       console.error("Logout error", err);
     }
+    finally {
+    setLoggedOut();
+    router.push("/login");
+  }
   };
 
   return (
