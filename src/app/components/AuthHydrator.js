@@ -1,4 +1,4 @@
-// src/app/components/AuthHydrator.js
+// app/components/AuthHydrator.js
 "use client";
 import { useEffect } from "react";
 import { useAuthStore } from "@/app/store/authStore";
