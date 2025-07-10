@@ -1,13 +1,14 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { jwtVerify } from "jose";
+
+const SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "https://pravasimitra.vercel.app",
-
 ];
 
-// Helper to decide if origin is allowed
 function getAllowedOrigin(origin) {
   return ALLOWED_ORIGINS.includes(origin) ? origin : "";
 }
@@ -16,16 +17,26 @@ export async function GET(req) {
   const origin = req.headers.get("origin");
   const cookieStore = cookies();
   const token = cookieStore.get("token");
-  const isLoggedIn = !!token;
+
+  let isLoggedIn = false;
+
+  if (token?.value) {
+    try {
+      await jwtVerify(token.value, SECRET);
+      isLoggedIn = true;
+    } catch {
+      isLoggedIn = false;
+    }
+  }
 
   const res = NextResponse.json({ isLoggedIn });
-  
-  // CORS headers
+
   const allowedOrigin = getAllowedOrigin(origin);
   if (allowedOrigin) {
     res.headers.set("Access-Control-Allow-Origin", allowedOrigin);
     res.headers.set("Access-Control-Allow-Credentials", "true");
   }
+
   return res;
 }
 
