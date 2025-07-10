@@ -30,7 +30,8 @@ export async function GET() {
     const categories = categoriesRaw.map((cat) => ({
       id: encodeObjectId(cat._id),
       name: cat.name,
-      image: cat.image || "",
+      // image: cat.image || "",
+      image: cat.image ? `${process.env.IMAGE_URL}/product-category/${cat.image}` : "",
       icon: cat.icon || "",
     }));
 

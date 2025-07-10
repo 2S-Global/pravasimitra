@@ -14,7 +14,7 @@ const roomContactSchema = new mongoose.Schema(
     },
     roomId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Room",
+      ref: "RoomItem",
       required: true,
     },
   },
