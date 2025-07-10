@@ -20,7 +20,7 @@ const handleLogout = async () => {
     setLoggedOut();
 setTimeout(() => {
   router.push("/login");
-}, 1000);
+}, 100);
   }
 };
 

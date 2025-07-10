@@ -7,10 +7,10 @@ export async function OPTIONS() {
 }
 
 export async function POST() {
-const cookieStore = await cookies();
+  // Get cookies from the headers
+  const res = NextResponse.json({ message: "Logged out successfully" }, { status: 200 });
 
-  // Clear the 'token' cookie by setting it to empty and expired
-  cookieStore.set("token", "", {
+  res.cookies.set("token", "", {
     httpOnly: true,
     sameSite: "none",
     secure: true,
@@ -19,6 +19,5 @@ const cookieStore = await cookies();
     maxAge: 0,
   });
 
-  const res = NextResponse.json({ message: "Logged out successfully" }, { status: 200 });
   return addCorsHeaders(res);
 }
