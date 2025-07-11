@@ -11,18 +11,17 @@ const Header = () => {
   const setLoggedOut = useAuthStore((state) => state.setLoggedOut);
   const router = useRouter();
 
-const handleLogout = async () => {
-  try {
-    await axios.post("/api/auth/logout", {}, { withCredentials: true });
-  } catch (err) {
-    console.error("Logout error", err);
-  } finally {
-    setLoggedOut();
-window.location.href = "/login";
-window.location.reload();
-  }
-};
-
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+    } catch (err) {
+      console.error("Logout error", err);
+    } finally {
+      setLoggedOut();
+      window.location.href = "/login";
+      window.location.reload();
+    }
+  };
 
   return (
     <div id="wrapper" className="wrapper">
@@ -73,12 +72,12 @@ window.location.reload();
         <div className="header-bottomarea">
           <div className="container">
             <div className="header-bottominner">
-              <div className="header-logo">
+              <div className="header-logo" style={{ width: "32%" }}>
                 <Link href="/">
                   <img
                     src="/assets/images/logo/logo-dark.png"
                     alt="logo"
-                    style={{ maxWidth: "10%" }}
+                    style={{ maxWidth: "19%" }}
                   />
                 </Link>
               </div>
@@ -90,6 +89,19 @@ window.location.reload();
                   </li>
                   <li>
                     <Link href="/about-us">About</Link>
+                  </li>
+                  <li>
+                    <Link href="/buy-sell/buysell-category"> Buy & Sell</Link>
+                  </li>
+                  <li>
+                    <Link href="/rent-lease/rentlease-category">
+                      Rent & Lease
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/marketplace/marketplace-category">
+                      MarketPlace
+                    </Link>
                   </li>
                   <li className="tm-navigation-dropdown">
                     <Link href="/blogs">Blogs</Link>
@@ -121,6 +133,9 @@ window.location.reload();
                 </div>
 
                 {/* User Dropdown */}
+
+                   {isLoggedIn && (
+                      <>
                 <div className="dropdown">
                   <button
                     className="btn btn-light border-0 dropdown-toggle d-flex align-items-center"
@@ -140,10 +155,10 @@ window.location.reload();
                   <ul
                     className="dropdown-menu dropdown-menu-end"
                     aria-labelledby="userMenu"
+                    
                   >
-                    {isLoggedIn && (
-                      <>
-                        <li>
+                 
+                        <li style={{ display:"block" }}>
                           <Link
                             className="dropdown-item"
                             href="/user/dashboard"
@@ -152,7 +167,7 @@ window.location.reload();
                           </Link>
                         </li>
 
-                        <li>
+                        <li style={{ display:"block" }}>
                           <Link
                             className="dropdown-item"
                             href="/user/my-account"
@@ -160,41 +175,16 @@ window.location.reload();
                             Profile
                           </Link>
                         </li>
-                      </>
-                    )}
-                    <li>
-                      <Link
-                        className="dropdown-item"
-                        href="/buy-sell/buysell-category"
-                      >
-                        Buy/Sell
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className="dropdown-item"
-                        href="/rent-lease/rentlease-category"
-                      >
-                        Rent & Lease
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        className="dropdown-item"
-                        href="/marketplace/marketplace-category"
-                      >
-                        MarketPlace
-                      </Link>
-                    </li>
-                    {isLoggedIn && (
-                      <>
-                        <li>
+                   
+                 
+               
+                        <li style={{ display:"block" }}>
                           <Link className="dropdown-item" href="/user/orders">
                             Orders
                           </Link>
                         </li>
 
-                        <li>
+                        <li style={{ display:"block" }}>
                           <Link
                             className="dropdown-item"
                             href="/user/buy-sell/list"
@@ -203,7 +193,7 @@ window.location.reload();
                           </Link>
                         </li>
 
-                        <li>
+                        <li style={{ display:"block" }}> 
                           <Link
                             className="dropdown-item"
                             href="/user/rent-lease/list"
@@ -211,7 +201,7 @@ window.location.reload();
                             Manage Rent/Lease
                           </Link>
                         </li>
-                        <li>
+                        <li style={{ display:"block" }}>
                           <Link
                             className="dropdown-item"
                             href="/user/marketplace/list"
@@ -219,12 +209,11 @@ window.location.reload();
                             Manage MarketPlace
                           </Link>
                         </li>
-                      </>
-                    )}
-                    <li>
+                   
+                    <li style={{ display:"block" }}>
                       <hr className="dropdown-divider" />
                     </li>
-                    {isLoggedIn && (
+              
                       <li>
                         <button
                           onClick={handleLogout}
@@ -233,9 +222,11 @@ window.location.reload();
                           Logout
                         </button>
                       </li>
-                    )}
+               
                   </ul>
                 </div>
+                   </>
+                    )}
               </div>
 
               <div className="header-searchbox">

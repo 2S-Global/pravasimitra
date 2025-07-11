@@ -20,7 +20,7 @@ export async function POST(req) {
   }).select('+password').lean();
 
   if (!user) {
-    const res = NextResponse.json({ msg: "Invalid Email or Mobile Number" }, { status: 200 });
+    const res = NextResponse.json({ msg: "Invalid Email" }, { status: 200 });
     return addCorsHeaders(res);
   }
 

@@ -19,39 +19,41 @@ const MarketPlaceCategory = () => {
         setLoading(true);
         const res = await axios.get("/api/product/category-list");
         setCategories(res.data.categories);
-            AlertService.success(res.data.msg);
+        // AlertService.success(res.data.msg);
       } catch (error) {
         console.error("Error fetching categories:", error);
       } finally {
         setLoading(false);
-    
       }
     };
     fetchCategories();
   }, []);
 
-  const handleClick = (categoryName,categoryId) => {
-    const slug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, "-"));
+  const handleClick = (categoryName, categoryId) => {
+    const slug = encodeURIComponent(
+      categoryName.toLowerCase().replace(/\s+/g, "-")
+    );
     router.push(`/buy-sell/${slug}/${categoryId}`);
   };
 
   return (
     <>
-         <Header />
-          <OtherBanner
-            page_title="Buy & Sell"
-            banner_image="/assets/images/bg/furniture_banner.jpg"
-          />
+      <Header />
+      <OtherBanner
+        page_title="Buy & Sell"
+        banner_image="/assets/images/bg/furniture_banner.jpg"
+      />
       {loading ? (
-        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "400px" }}>
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ minHeight: "400px" }}
+        >
           <div className="spinner-border text-primary" role="status">
             <span className="visually-hidden">Loading...</span>
           </div>
         </div>
       ) : (
         <>
-     
-
           <section className="tm-section bg-light py-5">
             <div className="container">
               <h2 className="text-center fw-bold mb-5">Explore Categories</h2>
@@ -72,11 +74,13 @@ const MarketPlaceCategory = () => {
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = "scale(1.03)";
-                        e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.15)";
+                        e.currentTarget.style.boxShadow =
+                          "0 8px 16px rgba(0,0,0,0.15)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = "scale(1)";
-                        e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.05)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 8px rgba(0,0,0,0.05)";
                       }}
                     >
                       <img

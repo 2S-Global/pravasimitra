@@ -1081,7 +1081,7 @@
       sasna.rippleJsActive();
       sasna.animatedHeadline();
       sasna.scrollToSection();
-      sasna.scrollSpyActive();
+      // sasna.scrollSpyActive();
     },
   };
 
