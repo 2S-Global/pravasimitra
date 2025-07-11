@@ -24,10 +24,12 @@ export const GET = async (req) => {
   const categoryEncoded = searchParams.get("id");
 
   if (!categoryEncoded) {
-    return addCorsHeaders(NextResponse.json(
-      { error: "Missing category ID in query" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Missing category ID in query" },
+        { status: 400 }
+      )
+    );
   }
 
   let query = { is_del: false };
@@ -35,17 +37,20 @@ export const GET = async (req) => {
   try {
     const categoryId = decodeObjectId(categoryEncoded);
 
-    if (!categoryId || typeof categoryId !== "object" || !categoryId._bsontype) {
+    if (
+      !categoryId ||
+      typeof categoryId !== "object" ||
+      !categoryId._bsontype
+    ) {
       throw new Error("Invalid ObjectId");
     }
 
     query.category = categoryId;
   } catch (err) {
     console.error("ID decoding failed:", err.message);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Invalid category ID" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid category ID" }, { status: 400 })
+    );
   }
 
   try {
@@ -55,24 +60,33 @@ export const GET = async (req) => {
       .lean();
 
     if (!products.length) {
-      return addCorsHeaders(NextResponse.json(
-        { msg: "No products available", productList: [] },
-        { status: 200 }
-      ));
+      return addCorsHeaders(
+        NextResponse.json(
+          { msg: "No products available", productList: [] },
+          { status: 200 }
+        )
+      );
     }
+
+    const baseImageUrl = `${process.env.IMAGE_URL}/product-items`;
 
     const updatedProducts = products.map((product) => ({
       ...product,
       id: encodeObjectId(product._id),
       _id: undefined,
+      image: product.image ? `${baseImageUrl}/${product.image}` : null,
+      gallery: Array.isArray(product.gallery)
+        ? product.gallery.map((img) => `${baseImageUrl}/${img}`)
+        : [],
     }));
 
-    return addCorsHeaders(NextResponse.json({ productList: updatedProducts }, { status: 200 }));
+    return addCorsHeaders(
+      NextResponse.json({ productList: updatedProducts }, { status: 200 })
+    );
   } catch (err) {
     console.error("Fetch failed:", err);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Failed to fetch products" },
-      { status: 500 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
+    );
   }
 };

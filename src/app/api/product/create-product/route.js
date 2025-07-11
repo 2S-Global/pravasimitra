@@ -40,7 +40,16 @@ async function parseFormData(req) {
     })
   );
 
-  return { title, category, city, state, price, shortDesc, description, images };
+  return {
+    title,
+    category,
+    city,
+    state,
+    price,
+    shortDesc,
+    description,
+    images,
+  };
 }
 
 export const POST = withAuth(async function (req, user) {
@@ -51,18 +60,28 @@ export const POST = withAuth(async function (req, user) {
   try {
     data = await parseFormData(req);
   } catch (err) {
-    return addCorsHeaders(NextResponse.json({ error: err.message }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: err.message }, { status: 400 })
+    );
   }
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
   const savedFilenames = [];
 
-  const uploadDir = path.join(process.cwd(), "public/assets/images/product-items");
+  const uploadDir = path.join(
+    process.cwd(),
+    "public/assets/images/product-items"
+  );
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of data.images) {
     if (!allowedTypes.includes(file.mime)) {
-      return addCorsHeaders(NextResponse.json({ error: "Only JPG, PNG, WEBP, AVIF allowed" }, { status: 200 }));
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "Only JPG, PNG, WEBP, AVIF allowed" },
+          { status: 200 }
+        )
+      );
     }
 
     const newFilename = `${Date.now()}_${file.filename}`;
@@ -73,7 +92,9 @@ export const POST = withAuth(async function (req, user) {
       savedFilenames.push(newFilename);
     } catch (err) {
       console.error("Image save failed:", err);
-      return addCorsHeaders(NextResponse.json({ error: "Image upload failed" }, { status: 500 }));
+      return addCorsHeaders(
+        NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+      );
     }
   }
 
@@ -81,7 +102,9 @@ export const POST = withAuth(async function (req, user) {
   try {
     decodedCategoryId = decodeObjectId(data.category);
   } catch (error) {
-    return addCorsHeaders(NextResponse.json({ error: "Invalid category ID" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid category ID" }, { status: 400 })
+    );
   }
 
   try {
@@ -98,9 +121,35 @@ export const POST = withAuth(async function (req, user) {
       createdBy: userId,
     });
 
-    return addCorsHeaders(NextResponse.json({ msg: "Product added successfully", product: newProduct }, { status: 200 }));
+    const baseImageUrl = `${process.env.IMAGE_URL}/product-items`;
+
+    return addCorsHeaders(
+      NextResponse.json(
+        {
+          msg: "Product added successfully",
+          product: {
+            id: newProduct._id,
+            title: newProduct.title,
+            category: data.category,
+            price: newProduct.price,
+            city: newProduct.city,
+            state: newProduct.state,
+            shortDesc: newProduct.shortDesc,
+            description: newProduct.description,
+            image: newProduct.image
+              ? `${baseImageUrl}/${newProduct.image}`
+              : null,
+            gallery: newProduct.gallery.map((img) => `${baseImageUrl}/${img}`),
+            createdBy: userId,
+          },
+        },
+        { status: 200 }
+      )
+    );
   } catch (err) {
     console.error("DB insert failed:", err);
-    return addCorsHeaders(NextResponse.json({ error: "Database insert failed" }, { status: 500 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Database insert failed" }, { status: 500 })
+    );
   }
 });
