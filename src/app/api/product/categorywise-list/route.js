@@ -81,7 +81,13 @@ export const GET = async (req) => {
     }));
 
     return addCorsHeaders(
-      NextResponse.json({ productList: updatedProducts }, { status: 200 })
+      NextResponse.json(
+        {
+          msg: "Products loaded successfully",
+          productList: updatedProducts,
+        },
+        { status: 200 }
+      )
     );
   } catch (err) {
     console.error("Fetch failed:", err);
