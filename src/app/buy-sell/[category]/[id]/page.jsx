@@ -147,7 +147,7 @@ const BuySellCategoryPage = () => {
                   {/* 🪑 Product Grid - show allItems */}
                   <div className="container my-5">
                     <div className="row g-4">
-                      {allItems.length === 0 ? (
+                      {!loading && allItems.length === 0 ? (
                         <div className="col-12">
                           <div className="text-center p-5 rounded border shadow-sm bg-light">
                             <img
