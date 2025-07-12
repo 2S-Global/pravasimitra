@@ -18,12 +18,36 @@ const RentItemSchema = new mongoose.Schema(
     roomSize: {
       type: String,
     },
+    bedrooms: {
+      type: Number,
+    },
+    bathrooms: {
+      type: Number,
+    },
+    furnished: {
+      type: Boolean,
+    },
     price: {
       type: Number,
     },
     description: {
       type: String,
     },
+    location: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    amenities: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Amenity",
+      },
+    ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

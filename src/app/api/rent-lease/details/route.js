@@ -6,6 +6,7 @@ import RoomItem from "../../../../../models/Room";
 import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
+import Amenity from "../../../../../models/Amenity";
 import { decodeObjectId,encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
@@ -40,6 +41,7 @@ export const GET = async (req) => {
     const item = await RoomItem.findOne({ _id: decodedId, isDel: false })
       .select("-__v -isDel")
       .populate("propertyType", "name")
+      .populate("amenities", "name")
       .lean();
 
     if (!item) {
