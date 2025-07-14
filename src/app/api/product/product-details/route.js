@@ -46,9 +46,15 @@ export const GET = async (req) => {
       return addCorsHeaders(NextResponse.json({ msg: "Product not found" }, { status: 404 }));
     }
 
+    const baseImageUrl = process.env.IMAGE_URL + "/product-items";
+
     const updatedProduct = {
       ...product,
       id: encodeObjectId(product._id),
+      image: product.image ? `${baseImageUrl}/${product.image}` : null,
+      gallery: Array.isArray(product.gallery)
+        ? product.gallery.map((img) => `${baseImageUrl}/${img}`)
+        : [],
     };
     delete updatedProduct._id;
 

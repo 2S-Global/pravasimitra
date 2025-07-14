@@ -24,17 +24,23 @@ export const GET = withAuth(async function (req, user) {
       .sort({ createdAt: -1 })
       .select("-__v -is_del")
       .populate("category", "name")
-      .populate("createdBy", "name")
+      .populate("createdBy", "name email mobile")
       .lean();
 
     if (!products || products.length === 0) {
       return NextResponse.json({ msg: "No Products Found", items: [] }, { status: 200 });
     }
 
+    const baseImageUrl = process.env.IMAGE_URL + "/product-items";
+
     const updatedProducts = products.map((item) => ({
       ...item,
       id: encodeObjectId(item._id),
       _id: undefined,
+      image: item.image ? `${baseImageUrl}/${item.image}` : null,
+      gallery: Array.isArray(item.gallery)
+        ? item.gallery.map((img) => `${baseImageUrl}/${img}`)
+        : [],
     }));
 
     return NextResponse.json({ items: updatedProducts }, { status: 200 });
