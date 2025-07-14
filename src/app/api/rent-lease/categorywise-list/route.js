@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import RoomItem from "../../../../../models/Room";
+import RoomCategory from "../../../../../models/RoomCategory";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
@@ -23,10 +24,12 @@ export const GET = async (req) => {
   const propertyTypeEncoded = searchParams.get("id");
 
   if (!propertyTypeEncoded) {
-    return addCorsHeaders(NextResponse.json(
-      { error: "Missing propertyType ID in query" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Missing propertyType ID in query" },
+        { status: 400 }
+      )
+    );
   }
 
   let query = { isDel: false };
@@ -45,10 +48,9 @@ export const GET = async (req) => {
     query.propertyType = categoryId;
   } catch (err) {
     console.error("ID decoding failed:", err.message);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Invalid propertyType ID" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid propertyType ID" }, { status: 400 })
+    );
   }
 
   try {
@@ -58,29 +60,32 @@ export const GET = async (req) => {
       .lean();
 
     if (!items.length) {
-      return addCorsHeaders(NextResponse.json(
-        { msg: "No items available", itemList: [] },
-        { status: 200 }
-      ));
+      return addCorsHeaders(
+        NextResponse.json(
+          { msg: "No items available", itemList: [] },
+          { status: 200 }
+        )
+      );
     }
 
-    const baseUrl = process.env.IMAGE_URL || "http://localhost:3000/assets/images";
+    const baseImageUrl = process.env.IMAGE_URL + "/rent-items";
 
     const updatedItems = items.map((item) => ({
       ...item,
       id: encodeObjectId(item._id),
-      image: item.image
-        ? `$(baseUrl)/room/${item.image}`
-        : `${baseUrl}/default-room.png`,
       _id: undefined,
+      images: Array.isArray(item.images)
+        ? item.images.map((img) => `${baseImageUrl}/${img}`)
+        : [],
     }));
 
-    return addCorsHeaders(NextResponse.json({ itemList: updatedItems }, { status: 200 }));
+    return addCorsHeaders(
+      NextResponse.json({ itemList: updatedItems }, { status: 200 })
+    );
   } catch (err) {
     console.error("Fetch failed:", err);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Failed to fetch items" },
-      { status: 500 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Failed to fetch items" }, { status: 500 })
+    );
   }
 };
