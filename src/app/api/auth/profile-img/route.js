@@ -31,10 +31,11 @@ export const GET = withAuth(async (req, user) => {
         NextResponse.json({ msg: "User Not Found" }, { status: 200 })
       );
     }
-    const imageUrl = existingUser.image
-      ? `/assets/images/profile-img/${existingUser.image}`
-      : '/assets/images/default-user.png';
+    const baseImageUrl = `${process.env.IMAGE_URL}/profile-img`;
 
+    const imageUrl = existingUser.image
+      ? `${baseImageUrl}/${existingUser.image}`
+      : `${process.env.IMAGE_URL}/default-user.png`;
 
     return addCorsHeaders(
       NextResponse.json(
@@ -103,13 +104,19 @@ export const PUT = withAuth(async (req, user) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
   if (!allowedTypes.includes(type)) {
     return addCorsHeaders(
-      NextResponse.json({ error: "Only JPG, PNG, and WEBP allowed" }, { status: 400 })
+      NextResponse.json(
+        { error: "Only JPG, PNG, and WEBP allowed" },
+        { status: 400 }
+      )
     );
   }
 
   const ext = path.extname(filename);
   const newFileName = `${userId}_${Date.now()}${ext}`;
-  const uploadDir = path.join(process.cwd(), "public/assets/images/profile-img");
+  const uploadDir = path.join(
+    process.cwd(),
+    "public/assets/images/profile-img"
+  );
 
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -141,10 +148,12 @@ export const PUT = withAuth(async (req, user) => {
       );
     }
 
+    const fullImagePath = `${process.env.IMAGE_URL}/profile-img/${updatedUser.image}`;
+
     return addCorsHeaders(
       NextResponse.json({
         msg: "Profile image updated successfully",
-        user: updatedUser,
+        image: fullImagePath,
       })
     );
   } catch (err) {
