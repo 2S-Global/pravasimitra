@@ -42,6 +42,7 @@ export const GET = async (req) => {
       .select("-__v -isDel")
       .populate("propertyType", "name")
       .populate("amenities", "name")
+      .populate("createdBy", "name email phone")
       .lean();
 
     if (!item) {
@@ -62,7 +63,7 @@ export const GET = async (req) => {
   } catch (err) {
     console.error("Fetch failed:", err);
     return addCorsHeaders(NextResponse.json(
-      { error: "Invalid or malformed RoomItem ID" },
+      { error: "Invalid RoomItem ID" },
       { status: 400 }
     ));
   }
