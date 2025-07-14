@@ -64,9 +64,14 @@ export const GET = async (req) => {
       ));
     }
 
+    const baseUrl = process.env.IMAGE_URL || "http://localhost:3000/assets/images";
+
     const updatedItems = items.map((item) => ({
       ...item,
       id: encodeObjectId(item._id),
+      image: item.image
+        ? `$(baseUrl)/room/${item.image}`
+        : `${baseUrl}/default-room.png`,
       _id: undefined,
     }));
 

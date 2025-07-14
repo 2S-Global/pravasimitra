@@ -22,9 +22,11 @@ export const GET = withAuth(async (req, user) => {
       );
     }
 
+    const baseURL = process.env.IMAGE_URL || "http://localhost:3000/assets/images";
+
     const imageUrl = existingUser.image
-      ? `/assets/images/profile-img/${existingUser.image}`
-      : "/assets/images/default-user.png";
+      ? `${baseURL}/profile-img/${existingUser.image}`
+      : `${baseURL}/default-user.png`;
 
     // Build the user object with new image path
     const userToReturn = {
