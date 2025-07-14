@@ -42,7 +42,7 @@ export const GET = async (req) => {
       .select("-__v -isDel")
       .populate("propertyType", "name")
       .populate("amenities", "name")
-      .populate("createdBy", "name email phone")
+      .populate("createdBy", "name email mobile")
       .lean();
 
     if (!item) {
