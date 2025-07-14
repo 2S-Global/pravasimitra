@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import Product from "../../../../../models/Product";
+import ProductCategory from "../../../../../models/ProductCategory";
+import { withAuth } from "../../../../../lib/withAuth";
+import User from "../../../../../models/User";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
@@ -36,6 +39,7 @@ export const GET = async (req) => {
     const product = await Product.findOne({ _id: decodedId, is_del: false })
       .select("-__v -is_del")
       .populate("category", "name")
+      .populate("createdBy", "name email mobile")
       .lean();
 
     if (!product) {
@@ -52,7 +56,7 @@ export const GET = async (req) => {
   } catch (err) {
     console.error("Fetch failed:", err);
     return addCorsHeaders(NextResponse.json(
-      { error: "Invalid or malformed Product ID" },
+      { error: "Invalid Product ID" },
       { status: 400 }
     ));
   }
