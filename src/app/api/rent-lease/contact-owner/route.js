@@ -67,24 +67,24 @@ export const POST = withAuth(async (req, authUser) => {
     await RoomContact.create({ userId, ownerId, roomId });
 
     // Send email to owner
-    // const transporter = nodemailer.createTransport({
-    //   service: "gmail",
-    //   auth: {
-    //     user: process.env.EMAIL_USER,
-    //     pass: process.env.EMAIL_PASS,
-    //   },
-    // });
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-    // await transporter.sendMail({
-    //   from: `"${user.name}" <${process.env.EMAIL_USER}>`,
-    //   to: owner.email,
-    //   subject: `Rental Inquiry: ${room.title}`,
-    //   html: `
-    //     <p>Hello ${owner.name},</p>
-    //     <p>${user.name} is interested in your room: <b>${room.title}</b>.</p>
-    //     <p>Contact: <a href="mailto:${user.email}">${user.email}</a></p>
-    //   `,
-    // });
+    await transporter.sendMail({
+      from: `"${user.name}" <${process.env.EMAIL_USER}>`,
+      to: owner.email,
+      subject: `Rental Inquiry: ${room.title}`,
+      html: `
+        <p>Hello ${owner.name},</p>
+        <p>${user.name} is interested in your room: <b>${room.title}</b>.</p>
+        <p>Contact: <a href="mailto:${user.email}">${user.email}</a></p>
+      `,
+    });
 
    return addCorsHeaders(
       NextResponse.json(

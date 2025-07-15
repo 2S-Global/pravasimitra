@@ -66,25 +66,25 @@ export const POST = withAuth(async (req, authUser) => {
     // ✅ If no existing contact, create new record
     await ProductContact.create({ userId, sellerId, productId });
 
-    // Send email to seller
-    // const transporter = nodemailer.createTransport({
-    //   service: "gmail",
-    //   auth: {
-    //     user: process.env.EMAIL_USER,
-    //     pass: process.env.EMAIL_PASS,
-    //   },
-    // });
+    //Send email to seller
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-    // await transporter.sendMail({
-    //   from: `"${user.name}" <${process.env.EMAIL_USER}>`,
-    //   to: seller.email,
-    //   subject: `Inquiry: ${product.title}`,
-    //   html: `
-    //     <p>Hello ${seller.name},</p>
-    //     <p>${user.name} is interested in your product <b>${product.title}</b>.</p>
-    //     <p>You can reply at: <a href="mailto:${user.email}">${user.email}</a></p>
-    //   `,
-    // });
+    await transporter.sendMail({
+      from: `"${user.name}" <${process.env.EMAIL_USER}>`,
+      to: seller.email,
+      subject: `Inquiry: ${product.title}`,
+      html: `
+        <p>Hello ${seller.name},</p>
+        <p>${user.name} is interested in your product <b>${product.title}</b>.</p>
+        <p>You can reply at: <a href="mailto:${user.email}">${user.email}</a></p>
+      `,
+    });
 
     return addCorsHeaders(
       NextResponse.json(
