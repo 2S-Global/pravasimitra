@@ -19,7 +19,9 @@ export const POST = withAuth(async (req, authUser) => {
   try {
     data = await req.json();
   } catch {
-    return addCorsHeaders(NextResponse.json({ error: "Invalid JSON" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
+    );
   }
 
   let { roomId, ownerId } = data;
@@ -28,7 +30,9 @@ export const POST = withAuth(async (req, authUser) => {
   const userId = authUser.id;
 
   if (!roomId || !ownerId) {
-    return addCorsHeaders(NextResponse.json({ error: "Missing fields" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Missing fields" }, { status: 400 })
+    );
   }
 
   try {
@@ -39,9 +43,27 @@ export const POST = withAuth(async (req, authUser) => {
     ]);
 
     if (!user || !owner || !room) {
-      return addCorsHeaders(NextResponse.json({ error: "Invalid references" }, { status: 404 }));
+      return addCorsHeaders(
+        NextResponse.json({ error: "Invalid references" }, { status: 404 })
+      );
     }
 
+    // ✅ Check if already contacted for the same room
+    const existingContact = await RoomContact.findOne({
+      userId,
+      ownerId,
+      roomId,
+    });
+
+    if (existingContact) {
+      return addCorsHeaders(
+        NextResponse.json({
+          msg: "You have already contacted the owner for this room.",
+        }, { status: 200 })
+      );
+    }
+
+    // ✅ Create new contact
     await RoomContact.create({ userId, ownerId, roomId });
 
     // Send email to owner
@@ -64,9 +86,16 @@ export const POST = withAuth(async (req, authUser) => {
     //   `,
     // });
 
-    return addCorsHeaders(NextResponse.json({ msg: "You’ve successfully reached out to the seller." }, { status: 200 }));
+   return addCorsHeaders(
+      NextResponse.json(
+        { msg: "You’ve successfully reached out to the owner." },
+        { status: 200 }
+      )
+    );
   } catch (err) {
     console.error("Contact Owner Error:", err);
-    return addCorsHeaders(NextResponse.json({ error: "Server error" }, { status: 500 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Server error" }, { status: 500 })
+    );
   }
 });
