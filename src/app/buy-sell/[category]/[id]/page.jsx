@@ -39,7 +39,7 @@ const BuySellCategoryPage = () => {
         });
         // console.log("Products Response:", productsRes.data.products);
         setAllItems(productsRes.data.productList);
-        AlertService.success(productsRes.data.msg);
+        // AlertService.success(productsRes.data.msg);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
