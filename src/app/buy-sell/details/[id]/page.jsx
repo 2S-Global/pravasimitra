@@ -13,7 +13,7 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState([]);
   const [item, setItem] = useState(true);
   const { id } = useParams();
-
+const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   const handleContactSeller = async () => {
@@ -28,7 +28,9 @@ const ProductDetails = () => {
     }
 
     try {
-     const contactSeller= await axios.post("/api/product/contact-seller", {
+       setContactLoading(true);
+
+      const contactSeller = await axios.post("/api/product/contact-seller", {
         productId: item.id,
         sellerId: item.createdBy._id,
       });
@@ -37,6 +39,9 @@ const ProductDetails = () => {
       // console.error(error);
       AlertService.error("Failed to contact the seller. Please try again.");
     }
+    finally {
+    setContactLoading(false);
+  }
   };
 
   useEffect(() => {
@@ -173,8 +178,23 @@ const ProductDetails = () => {
                     className="btn btn-primary px-4"
                     style={{ background: "#c12020", border: "#c12020" }}
                     onClick={handleContactSeller}
+                    disabled={contactLoading}
                   >
-                    <i className="bi bi-cart-plus me-2"></i> Contact Seller
+                    {contactLoading ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        Contacting...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-cart-plus me-2"></i> Contact Seller
+                      </>
+                    )}
+                   
                   </button>
                   {/* <button
                   className="btn btn-outline-secondary px-4"
