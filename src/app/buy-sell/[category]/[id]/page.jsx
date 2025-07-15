@@ -14,6 +14,7 @@ const BuySellCategoryPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [allCategories, setAllCategories] = useState([]);
   const [allItems, setAllItems] = useState([]);
+  const [productLoading, setProductLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,7 +31,7 @@ const BuySellCategoryPage = () => {
 
     const fetchProducts = async () => {
       try {
-        setLoading(true);
+        setProductLoading(true);
         const productsRes = await axios.get("/api/product/categorywise-list", {
           params: {
             id,
@@ -38,11 +39,11 @@ const BuySellCategoryPage = () => {
         });
         // console.log("Products Response:", productsRes.data.products);
         setAllItems(productsRes.data.productList);
-        // AlertService.success(productsRes.data.msg);
+        AlertService.success(productsRes.data.msg);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
-        setLoading(false);
+        setProductLoading(false);
       }
     };
 
@@ -78,7 +79,7 @@ const BuySellCategoryPage = () => {
         banner_image="/assets/images/bg/furniture_banner.jpg"
       />
 
-      {loading ? (
+      {productLoading  ? (
         <div
           className="d-flex justify-content-center align-items-center"
           style={{ minHeight: "400px" }}
@@ -138,7 +139,7 @@ const BuySellCategoryPage = () => {
                             setSelectedCategory("");
                           }}
                         >
-                          Clear
+                          Submit
                         </button>
                       </div>
                     </div>
@@ -196,9 +197,12 @@ const BuySellCategoryPage = () => {
                                 <p className="card-text text-muted">
                                   {item.city} | {item.state}
                                 </p>
-                                <p className="card-text text-muted">
-                                  {item.shortDesc}
-                                </p>
+                               <p className="card-text text-muted">
+  {item.shortDesc
+    ? item.shortDesc.split(" ").slice(0, 10).join(" ") + (item.shortDesc.split(" ").length > 10 ? "..." : "")
+    : ""}
+</p>
+
                                 <p className="fw-bold text-primary fs-5">
                                   ${item.price}
                                 </p>
