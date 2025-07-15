@@ -57,9 +57,12 @@ export const POST = withAuth(async (req, authUser) => {
 
     if (existingContact) {
       return addCorsHeaders(
-        NextResponse.json({
-          msg: "You have already contacted the owner for this room.",
-        }, { status: 200 })
+        NextResponse.json(
+          {
+            msg: "You have already contacted the owner for this room.",
+          },
+          { status: 200 }
+        )
       );
     }
 
@@ -68,7 +71,9 @@ export const POST = withAuth(async (req, authUser) => {
 
     // Send email to owner
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: process.env.EMAIL_HOST,
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -76,7 +81,7 @@ export const POST = withAuth(async (req, authUser) => {
     });
 
     await transporter.sendMail({
-      from: `"${user.name}" <${process.env.EMAIL_USER}>`,
+      from: `"Pravasi Mitra" <${process.env.EMAIL_USER}>`,
       to: owner.email,
       subject: `Rental Inquiry: ${room.title}`,
       html: `
@@ -86,7 +91,7 @@ export const POST = withAuth(async (req, authUser) => {
       `,
     });
 
-   return addCorsHeaders(
+    return addCorsHeaders(
       NextResponse.json(
         { msg: "You’ve successfully reached out to the owner." },
         { status: 200 }

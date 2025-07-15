@@ -8,7 +8,6 @@ import { withAuth } from "../../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 
-
 export async function OPTIONS() {
   return optionsResponse();
 }
@@ -57,9 +56,12 @@ export const POST = withAuth(async (req, authUser) => {
 
     if (existingContact) {
       return addCorsHeaders(
-        NextResponse.json({
-          msg: "You have already contacted the seller for this product.",
-        }, { status: 200 })
+        NextResponse.json(
+          {
+            msg: "You have already contacted the seller for this product.",
+          },
+          { status: 200 }
+        )
       );
     }
 
@@ -67,18 +69,18 @@ export const POST = withAuth(async (req, authUser) => {
     await ProductContact.create({ userId, sellerId, productId });
 
     //Send email to seller
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: 465,
-  secure: true, 
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
     await transporter.sendMail({
-      from: `"${user.name}" <${process.env.EMAIL_USER}>`,
+      from: `"Pravasi Mitra" <${process.env.EMAIL_USER}>`,
       to: seller.email,
       subject: `Inquiry: ${product.title}`,
       html: `
