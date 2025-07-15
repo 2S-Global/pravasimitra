@@ -6,6 +6,7 @@ import User from "../../../../../models/User";
 import nodemailer from "nodemailer";
 import { withAuth } from "../../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+import { decodeObjectId } from "../../../../../lib/idCodec";
 
 export async function OPTIONS() {
   return optionsResponse();
@@ -21,7 +22,9 @@ export const POST = withAuth(async (req, authUser) => {
     return addCorsHeaders(NextResponse.json({ error: "Invalid JSON" }, { status: 400 }));
   }
 
-  const { roomId, ownerId } = data;
+  let { roomId, ownerId } = data;
+
+  roomId = decodeObjectId(roomId);
   const userId = authUser.id;
 
   if (!roomId || !ownerId) {
@@ -61,7 +64,7 @@ export const POST = withAuth(async (req, authUser) => {
     //   `,
     // });
 
-    return addCorsHeaders(NextResponse.json({ msg: "Email sent successfully" }, { status: 200 }));
+    return addCorsHeaders(NextResponse.json({ msg: "You’ve successfully reached out to the seller." }, { status: 200 }));
   } catch (err) {
     console.error("Contact Owner Error:", err);
     return addCorsHeaders(NextResponse.json({ error: "Server error" }, { status: 500 }));

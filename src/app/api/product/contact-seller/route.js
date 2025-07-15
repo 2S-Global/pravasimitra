@@ -20,17 +20,19 @@ export const POST = withAuth(async (req, authUser) => {
   try {
     data = await req.json();
   } catch {
-    return addCorsHeaders(NextResponse.json({ error: "Invalid JSON" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
+    );
   }
 
   let { productId, sellerId } = data;
-
-
-  productId=decodeObjectId(productId);
+  productId = decodeObjectId(productId);
   const userId = authUser.id;
 
   if (!productId || !sellerId) {
-    return addCorsHeaders(NextResponse.json({ error: "Missing fields" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Missing fields" }, { status: 400 })
+    );
   }
 
   try {
@@ -41,9 +43,27 @@ export const POST = withAuth(async (req, authUser) => {
     ]);
 
     if (!user || !seller || !product) {
-      return addCorsHeaders(NextResponse.json({ error: "Invalid references" }, { status: 404 }));
+      return addCorsHeaders(
+        NextResponse.json({ error: "Invalid references" }, { status: 404 })
+      );
     }
 
+    // 🔍 Check if user already contacted seller for this product
+    const existingContact = await ProductContact.findOne({
+      userId,
+      sellerId,
+      productId,
+    });
+
+    if (existingContact) {
+      return addCorsHeaders(
+        NextResponse.json({
+          msg: "You have already contacted the seller for this product.",
+        }, { status: 200 })
+      );
+    }
+
+    // ✅ If no existing contact, create new record
     await ProductContact.create({ userId, sellerId, productId });
 
     // Send email to seller
@@ -66,9 +86,16 @@ export const POST = withAuth(async (req, authUser) => {
     //   `,
     // });
 
-    return addCorsHeaders(NextResponse.json({ msg: "Email sent successfully" }, { status: 200 }));
+    return addCorsHeaders(
+      NextResponse.json(
+        { msg: "You’ve successfully reached out to the seller." },
+        { status: 200 }
+      )
+    );
   } catch (err) {
     console.error("Contact error:", err);
-    return addCorsHeaders(NextResponse.json({ error: "Server error" }, { status: 500 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Server error" }, { status: 500 })
+    );
   }
 });
