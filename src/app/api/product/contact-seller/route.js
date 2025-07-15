@@ -6,6 +6,8 @@ import User from "../../../../../models/User";
 import nodemailer from "nodemailer";
 import { withAuth } from "../../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
+
 
 export async function OPTIONS() {
   return optionsResponse();
@@ -21,7 +23,10 @@ export const POST = withAuth(async (req, authUser) => {
     return addCorsHeaders(NextResponse.json({ error: "Invalid JSON" }, { status: 400 }));
   }
 
-  const { productId, sellerId } = data;
+  let { productId, sellerId } = data;
+
+
+  productId=decodeObjectId(productId);
   const userId = authUser.id;
 
   if (!productId || !sellerId) {
