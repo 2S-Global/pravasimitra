@@ -82,19 +82,26 @@ const BuySellCategoryPage = () => {
     }
   };
 
-  const handleClick = (categoryName, categoryId) => {
-    const slug = encodeURIComponent(
-      categoryName.toLowerCase().replace(/\s+/g, "-")
-    );
-    const scrollY = window.scrollY;
-    router.push(`/buy-sell/${slug}/${categoryId}`, undefined, {
- 
-      scroll: false,
-    });
-    setTimeout(() => {
-      window.scrollTo(0, scrollY);
-    }, 50);
-  };
+const handleClick = (categoryName, categoryId) => {
+  const slug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, "-"));
+  const scrollY = window.scrollY;
+
+  // Set loading early
+  setGridLoading(true);
+
+  router.push(`/buy-sell/${slug}/${categoryId}`, undefined, {
+    scroll: false,
+  });
+
+  setTimeout(() => {
+    window.scrollTo(0, scrollY);
+
+    // Manually update state and refetch
+    setSelectedCategory(categoryId);
+    fetchProducts(categoryId); // Trigger the fetch here to ensure immediate update
+  }, 100);
+};
+
 
   return (
     <>
