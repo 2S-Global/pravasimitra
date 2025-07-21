@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
-import MarketCategory from "../../../../../models/Room";
+import MarketCategory from "../../../../../models/MarketCategory";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import MarketProduct from "../../../../../models/MarketProduct";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
