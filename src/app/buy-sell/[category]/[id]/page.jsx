@@ -12,14 +12,7 @@ const BuySellCategoryPage = () => {
   const { category, id } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(id || "");
-  const [allCategories, setAllCategories] = useState(() => {
-    // Initialize from localStorage if available
-    if (typeof window !== "undefined") {
-      const cached = localStorage.getItem("categories");
-      return cached ? JSON.parse(cached) : [];
-    }
-    return [];
-  });
+  const [allCategories, setAllCategories] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [gridLoading, setGridLoading] = useState(false);
 
@@ -42,21 +35,15 @@ const BuySellCategoryPage = () => {
       const catRes = await axios.get("/api/product/category-list");
       const categories = catRes.data.categories || [];
       setAllCategories(categories);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("categories", JSON.stringify(categories));
-      }
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
   useEffect(() => {
-    // Only fetch categories if not already cached
-    if (allCategories.length === 0) {
-      fetchCategories();
-    }
+    fetchCategories();
     fetchProducts(id);
-  }, [id, allCategories.length]);
+  }, [id]);
 
   const handleSearch = async () => {
     try {
@@ -94,7 +81,7 @@ const BuySellCategoryPage = () => {
     fetchProducts(categoryId);
 
     // Use router.replace to avoid adding to history stack
-    router.replace(`/buy-sell/${slug}/${categoryId}`, { scroll: false });
+    router.replace(`/buy-sell/${slug束,categoryId}`, { scroll: false });
 
     // Restore scroll position
     window.scrollTo(0, scrollY);
