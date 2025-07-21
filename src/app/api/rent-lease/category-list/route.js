@@ -34,6 +34,9 @@ export const GET = async (req) => {
       name: cat.name,
       // icon: cat.icon ? `${imageBaseUrl}/${cat.icon}` : "",
       icon: cat.icon || "",
+      image: cat.image
+        ? `${process.env.IMAGE_URL}/room-category/${cat.image}`
+        : "",
     }));
 
     if (!categories || categories.length === 0) {
