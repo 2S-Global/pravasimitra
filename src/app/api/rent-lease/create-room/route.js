@@ -40,6 +40,7 @@ async function parseFormData(req) {
   const propertyType = form.get("propertyType");
   const roomSize = form.get("roomSize");
   const price = form.get("price");
+  const shortDesc = form.get("shortDesc") || "";
   const description = form.get("description") || "";
   const bedrooms = form.get("bedrooms");
   const bathrooms = form.get("bathrooms");
@@ -67,6 +68,7 @@ async function parseFormData(req) {
     propertyType,
     roomSize,
     price,
+    shortDesc,
     description,
     bedrooms,
     bathrooms,
@@ -152,6 +154,7 @@ export const POST = withAuth(async function (req, user) {
       propertyType: decodedCategoryId,
       roomSize: data.roomSize,
       price: parseFloat(data.price),
+      shortDesc: data.shortDesc,
       description: data.description,
       bedrooms: parseInt(data.bedrooms),
       bathrooms: parseInt(data.bathrooms),
