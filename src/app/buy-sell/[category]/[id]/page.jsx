@@ -31,28 +31,27 @@ const BuySellCategoryPage = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const catRes = await axios.get("/api/product/category-list");
-        setAllCategories(catRes.data.categories);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      setSelectedCategory(id);
-    } else {
-      setSelectedCategory("");
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const catRes = await axios.get("/api/product/category-list");
+      setAllCategories(catRes.data.categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchData();
-    fetchProducts(id);
-  }, []);
+  if (id && selectedCategory !== id) {
+    setSelectedCategory(id); // only set if different
+  }
+
+  fetchData();
+  fetchProducts(id);
+}, [id]);
+
 
   const handleSearch = async () => {
     try {
