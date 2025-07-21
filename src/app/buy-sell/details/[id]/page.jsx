@@ -11,7 +11,7 @@ const ProductDetails = () => {
 
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState([]);
+  const [selectedImage, setSelectedImage] = useState('');
   const [item, setItem] = useState(true);
   const { id } = useParams();
 
@@ -67,6 +67,21 @@ const [contactLoading, setContactLoading] = useState(false);
     fetchDetails();
   }, [id]);
 
+
+  const handlePrevImage = () => {
+  const currentIndex = item.gallery.indexOf(selectedImage);
+  if (currentIndex > 0) {
+    setSelectedImage(item.gallery[currentIndex - 1]);
+  }
+};
+
+const handleNextImage = () => {
+  const currentIndex = item.gallery.indexOf(selectedImage);
+  if (currentIndex < item.gallery.length - 1) {
+    setSelectedImage(item.gallery[currentIndex + 1]);
+  }
+};
+
   return (
     <>
       <Header />
@@ -107,10 +122,7 @@ const [contactLoading, setContactLoading] = useState(false);
                     type="button"
                     className="btn btn-light position-absolute top-50 start-0 translate-middle-y shadow"
                     style={{ zIndex: 1 }}
-                    onClick={() => {
-                      const el = document.getElementById("thumbnail-scroll");
-                      el.scrollBy({ left: -120, behavior: "smooth" });
-                    }}
+                    onClick={handlePrevImage}
                   >
                     <i className="bi bi-chevron-left"></i>
                   </button>
@@ -150,10 +162,7 @@ const [contactLoading, setContactLoading] = useState(false);
                     type="button"
                     className="btn btn-light position-absolute top-50 end-0 translate-middle-y shadow"
                     style={{ zIndex: 1 }}
-                    onClick={() => {
-                      const el = document.getElementById("thumbnail-scroll");
-                      el.scrollBy({ left: 120, behavior: "smooth" });
-                    }}
+                    onClick={handleNextImage}
                   >
                     <i className="bi bi-chevron-right"></i>
                   </button>
