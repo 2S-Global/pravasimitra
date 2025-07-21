@@ -52,7 +52,7 @@ const BuySellCategoryPage = () => {
 
     fetchData();
     fetchProducts(id);
-  }, [id]);
+  }, []);
 
   const handleSearch = async () => {
     try {
