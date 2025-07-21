@@ -15,73 +15,74 @@ const BuySellCategoryPage = () => {
   const [allCategories, setAllCategories] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [productLoading, setProductLoading] = useState(true);
+  const [gridLoading, setGridLoading] = useState(true);
 
-const fetchProducts = async (categoryId = "") => {
-  try {
-    setProductLoading(true);
-    const productsRes = await axios.get("/api/product/categorywise-list", {
-      params: { id: categoryId },
-    });
-    setAllItems(productsRes.data.productList || []);
-  } catch (error) {
-    console.error("Error fetching products:", error);
-  } finally {
-    setProductLoading(false);
-  }
-};
-
-useEffect(() => {
-  const fetchData = async () => {
+  const fetchProducts = async (categoryId = "") => {
     try {
-      setLoading(true);
-      const catRes = await axios.get("/api/product/category-list");
-      setAllCategories(catRes.data.categories);
+      setGridLoading(true);
+      const productsRes = await axios.get("/api/product/categorywise-list", {
+        params: { id: categoryId },
+      });
+      setAllItems(productsRes.data.productList || []);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching products:", error);
     } finally {
-      setLoading(false);
+      setGridLoading(false);
     }
   };
 
-  if (id) {
-    setSelectedCategory(id);
-  } else {
-    setSelectedCategory("");
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const catRes = await axios.get("/api/product/category-list");
+        setAllCategories(catRes.data.categories);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchData();
-  fetchProducts(id);
-}, [id]);
+    if (id) {
+      setSelectedCategory(id);
+    } else {
+      setSelectedCategory("");
+    }
 
-const handleSearch = async () => {
-  try {
-    setProductLoading(true);
-    const res = await axios.get("/api/product/search-items", {
-      params: {
-        categoryId: selectedCategory,
-        keyword: searchTerm,
-      },
-    });
-    setAllItems(res.data?.itemList || []);
-  } catch (error) {
-    console.error("Error searching products:", error);
-    AlertService.error("Failed to search products.");
-  } finally {
-    setProductLoading(false);
-  }
-};
+    fetchData();
+    fetchProducts(id);
+  }, [id]);
 
-const handleClear = async () => {
-  try {
-    setSearchTerm("");
+  const handleSearch = async () => {
+    try {
+      setProductLoading(true);
+      const res = await axios.get("/api/product/search-items", {
+        params: {
+          categoryId: selectedCategory,
+          keyword: searchTerm,
+        },
+      });
+      setAllItems(res.data?.itemList || []);
+    } catch (error) {
+      console.error("Error searching products:", error);
+      AlertService.error("Failed to search products.");
+    } finally {
+      setProductLoading(false);
+    }
+  };
 
-    await fetchProducts(selectedCategory);
-  } catch (error) {
-    console.error("Error clearing filters:", error);
-  }
-};
+  const handleClear = async () => {
+    try {
+      setSearchTerm("");
 
-const handleClick = (categoryName, categoryId) => {
+      await fetchProducts(selectedCategory);
+    } catch (error) {
+      console.error("Error clearing filters:", error);
+    }
+  };
+
+  const handleClick = (categoryName, categoryId) => {
     const slug = encodeURIComponent(
       categoryName.toLowerCase().replace(/\s+/g, "-")
     );
@@ -95,7 +96,6 @@ const handleClick = (categoryName, categoryId) => {
     }, 50);
   };
 
-
   return (
     <>
       <Header />
@@ -104,16 +104,7 @@ const handleClick = (categoryName, categoryId) => {
         banner_image="/assets/images/bg/furniture_banner.jpg"
       />
 
-      {productLoading ? (
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ minHeight: "400px" }}
-        >
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      ) : (
+   
         <>
           <div className="tm-section tm-login-register-area bg-white tm-padding-section">
             <div className="container">
@@ -162,7 +153,7 @@ const handleClick = (categoryName, categoryId) => {
                             className="btn btn-danger w-50"
                             type="button"
                             onClick={handleSearch}
-                             disabled={!searchTerm.trim()} 
+                            disabled={!searchTerm.trim()}
                           >
                             Search
                           </button>
@@ -180,90 +171,111 @@ const handleClick = (categoryName, categoryId) => {
 
                   {/* 🪑 Product Grid - show allItems */}
                   <div className="container my-5">
-                    <div className="row g-4">
-                      {!loading && allItems.length === 0 ? (
-                        <div className="col-12">
-                          <div className="text-center p-5 rounded border shadow-sm bg-light">
-                            <img
-                              src="/assets/images/empty-box.png"
-                              alt="No Records"
-                              className="mx-auto d-block"
-                              style={{
-                                width: "120px",
-                                opacity: 0.5,
-                                marginBottom: "20px",
-                              }}
-                            />
-                            <h4 className="fw-bold text-muted">
-                              No Items Found
-                            </h4>
-                            <p className="text-secondary">
-                              Sorry, we couldn't find any items in this
-                              category.
-                            </p>
-                          </div>
+                    {gridLoading ? (
+                      <div
+                        className="d-flex justify-content-center align-items-center"
+                        style={{ minHeight: "300px" }}
+                      >
+                        <div
+                          className="spinner-border text-primary"
+                          role="status"
+                        >
+                          <span className="visually-hidden">
+                            Loading products...
+                          </span>
                         </div>
-                      ) : (
-                        allItems.map((item, index) => (
-                          <div className="col-md-4" key={index}>
-                            <div className="card h-100 shadow-sm border-0 position-relative">
+                      </div>
+                    ) : (
+                      <div className="row g-4">
+                        {!loading && allItems.length === 0 ? (
+                          <div className="col-12">
+                            <div className="text-center p-5 rounded border shadow-sm bg-light">
                               <img
-                                src={item.image}
-                                className="card-img-top"
-                                alt={item.title}
-                                style={{ height: "250px", objectFit: "cover" }}
+                                src="/assets/images/empty-box.png"
+                                alt="No Records"
+                                className="mx-auto d-block"
+                                style={{
+                                  width: "120px",
+                                  opacity: 0.5,
+                                  marginBottom: "20px",
+                                }}
                               />
-                              {item.images && item.images.length > 1 && (
-                                <span
-                                  className="badge bg-dark position-absolute top-0 end-0 m-2"
-                                  style={{ padding: "7px" }}
-                                >
-                                  {item.images.length} More Photos
-                                </span>
-                              )}
-                              <div className="card-body text-center">
-                                <h5 className="card-title">
-                                  {item.title.length > 30
-                                    ? item.title.slice(0, 30) + "..."
-                                    : item.title}
-                                </h5>
-                                <p className="card-text text-muted">
-                                  {item.city} | {item.state}
-                                </p>
-                                <p className="card-text text-muted">
-                                  {item.shortDesc
-                                    ? item.shortDesc
-                                        .split(" ")
-                                        .slice(0, 10)
-                                        .join(" ") +
-                                      (item.shortDesc.split(" ").length > 10
-                                        ? "..."
-                                        : "")
-                                    : ""}
-                                </p>
-
-                                <p className="fw-bold text-primary fs-5">
-                                  ${item.price}
-                                </p>
-                                <button
-                                  className="btn btn-outline-primary btn-sm"
-                                  onClick={() =>
-                                    router.push(`/buy-sell/details/${item.id}`)
-                                  }
-                                  style={{
-                                    background: "#c12020",
-                                    color: "#fff",
-                                    border: "#c12020",
-                                  }}
-                                >
-                                  View Details
-                                </button>
-                              </div>
+                              <h4 className="fw-bold text-muted">
+                                No Items Found
+                              </h4>
+                              <p className="text-secondary">
+                                Sorry, we couldn't find any items in this
+                                category.
+                              </p>
                             </div>
                           </div>
-                        ))
-                      )}
-                    </div>
+                        ) : (
+                          allItems.map((item, index) => (
+                            <div className="col-md-4" key={index}>
+                              <div className="card h-100 shadow-sm border-0 position-relative">
+                                <img
+                                  src={item.image}
+                                  className="card-img-top"
+                                  alt={item.title}
+                                  style={{
+                                    height: "250px",
+                                    objectFit: "cover",
+                                  }}
+                                />
+                                {item.images && item.images.length > 1 && (
+                                  <span
+                                    className="badge bg-dark position-absolute top-0 end-0 m-2"
+                                    style={{ padding: "7px" }}
+                                  >
+                                    {item.images.length} More Photos
+                                  </span>
+                                )}
+                                <div className="card-body text-center">
+                                  <h5 className="card-title">
+                                    {item.title.length > 30
+                                      ? item.title.slice(0, 30) + "..."
+                                      : item.title}
+                                  </h5>
+                                  <p className="card-text text-muted">
+                                    {item.city} | {item.state}
+                                  </p>
+                                  <p className="card-text text-muted">
+                                    {item.shortDesc
+                                      ? item.shortDesc
+                                          .split(" ")
+                                          .slice(0, 10)
+                                          .join(" ") +
+                                        (item.shortDesc.split(" ").length > 10
+                                          ? "..."
+                                          : "")
+                                      : ""}
+                                  </p>
+
+                                  <p className="fw-bold text-primary fs-5">
+                                    ${item.price}
+                                  </p>
+                                  <button
+                                    className="btn btn-outline-primary btn-sm"
+                                    onClick={() =>
+                                      router.push(
+                                        `/buy-sell/details/${item.id}`
+                                      )
+                                    }
+                                    style={{
+                                      background: "#c12020",
+                                      color: "#fff",
+                                      border: "#c12020",
+                                    }}
+                                  >
+                                    View Details
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* 🚨 Floating SOS Button */}
@@ -283,7 +295,7 @@ const handleClick = (categoryName, categoryId) => {
           </div>
           <Footer />
         </>
-      )}
+
     </>
   );
 };
