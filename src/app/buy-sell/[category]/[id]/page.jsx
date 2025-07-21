@@ -88,7 +88,7 @@ const BuySellCategoryPage = () => {
     );
     const scrollY = window.scrollY;
     router.push(`/buy-sell/${slug}/${categoryId}`, undefined, {
-      shallow: true,
+ 
       scroll: false,
     });
     setTimeout(() => {
