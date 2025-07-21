@@ -30,6 +30,9 @@ const RentItemSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
+    shortDesc: {
+      type: String,
+    },
     description: {
       type: String,
     },

@@ -9,6 +9,9 @@ const RoomCategorySchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    icon: {
+      type: String,
+    },
     isDel: {
       type: Boolean,
       default: false,
