@@ -8,14 +8,15 @@ import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/store/authStore";
 import AlertService from "@/app/components/alertService";
 const ProductDetails = () => {
+
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState([]);
   const [item, setItem] = useState(true);
   const { id } = useParams();
+
 const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-
   const handleContactSeller = async () => {
     if (!isLoggedIn) {
       AlertService.error("Please login first to contact the seller.");
@@ -73,6 +74,7 @@ const [contactLoading, setContactLoading] = useState(false);
         page_title="Product Details"
         banner_image="/assets/images/bg/furniture_banner.jpg"
       />
+      
 
       {loading ? (
         <div

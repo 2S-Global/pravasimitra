@@ -16,48 +16,72 @@ const BuySellCategoryPage = () => {
   const [allItems, setAllItems] = useState([]);
   const [productLoading, setProductLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const catRes = await axios.get("/api/product/category-list");
-        setAllCategories(catRes.data.categories);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+const fetchProducts = async (categoryId = "") => {
+  try {
+    setProductLoading(true);
+    const productsRes = await axios.get("/api/product/categorywise-list", {
+      params: { id: categoryId },
+    });
+    setAllItems(productsRes.data.productList || []);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  } finally {
+    setProductLoading(false);
+  }
+};
 
-    const fetchProducts = async () => {
-      try {
-        setProductLoading(true);
-        const productsRes = await axios.get("/api/product/categorywise-list", {
-          params: {
-            id,
-          },
-        });
-        // console.log("Products Response:", productsRes.data.products);
-        setAllItems(productsRes.data.productList);
-        // AlertService.success(productsRes.data.msg);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setProductLoading(false);
-      }
-    };
-
-    if (id) {
-      setSelectedCategory(id);
-    } else {
-      setSelectedCategory("");
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const catRes = await axios.get("/api/product/category-list");
+      setAllCategories(catRes.data.categories);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchData();
-    fetchProducts();
-  }, [id]);
+  if (id) {
+    setSelectedCategory(id);
+  } else {
+    setSelectedCategory("");
+  }
 
-  const handleClick = (categoryName, categoryId) => {
+  fetchData();
+  fetchProducts(id);
+}, [id]);
+
+const handleSearch = async () => {
+  try {
+    setProductLoading(true);
+    const res = await axios.get("/api/product/search-items", {
+      params: {
+        categoryId: selectedCategory,
+        keyword: searchTerm,
+      },
+    });
+    setAllItems(res.data?.itemList || []);
+  } catch (error) {
+    console.error("Error searching products:", error);
+    AlertService.error("Failed to search products.");
+  } finally {
+    setProductLoading(false);
+  }
+};
+
+const handleClear = async () => {
+  try {
+    setSearchTerm("");
+
+    await fetchProducts(selectedCategory);
+  } catch (error) {
+    console.error("Error clearing filters:", error);
+  }
+};
+
+const handleClick = (categoryName, categoryId) => {
     const slug = encodeURIComponent(
       categoryName.toLowerCase().replace(/\s+/g, "-")
     );
@@ -71,6 +95,7 @@ const BuySellCategoryPage = () => {
     }, 50);
   };
 
+
   return (
     <>
       <Header />
@@ -79,7 +104,7 @@ const BuySellCategoryPage = () => {
         banner_image="/assets/images/bg/furniture_banner.jpg"
       />
 
-      {productLoading  ? (
+      {productLoading ? (
         <div
           className="d-flex justify-content-center align-items-center"
           style={{ minHeight: "400px" }}
@@ -125,22 +150,30 @@ const BuySellCategoryPage = () => {
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="Search furniture items..."
+                          placeholder="Search items..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
                       </div>
-                      <div className="col-md-2 text-end">
-                        <button
-                          className="btn btn-danger w-100"
-                          type="button"
-                          onClick={() => {
-                            setSearchTerm("");
-                            setSelectedCategory("");
-                          }}
-                        >
-                          Submit
-                        </button>
+
+                      <div className="col-md-2">
+                        <div className="d-flex gap-2">
+                          <button
+                            className="btn btn-danger w-50"
+                            type="button"
+                            onClick={handleSearch}
+                             disabled={!searchTerm.trim()} 
+                          >
+                            Search
+                          </button>
+                          <button
+                            className="btn btn-outline-secondary w-50"
+                            type="button"
+                            onClick={handleClear}
+                          >
+                            Clear
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -197,11 +230,17 @@ const BuySellCategoryPage = () => {
                                 <p className="card-text text-muted">
                                   {item.city} | {item.state}
                                 </p>
-                               <p className="card-text text-muted">
-  {item.shortDesc
-    ? item.shortDesc.split(" ").slice(0, 10).join(" ") + (item.shortDesc.split(" ").length > 10 ? "..." : "")
-    : ""}
-</p>
+                                <p className="card-text text-muted">
+                                  {item.shortDesc
+                                    ? item.shortDesc
+                                        .split(" ")
+                                        .slice(0, 10)
+                                        .join(" ") +
+                                      (item.shortDesc.split(" ").length > 10
+                                        ? "..."
+                                        : "")
+                                    : ""}
+                                </p>
 
                                 <p className="fw-bold text-primary fs-5">
                                   ${item.price}
