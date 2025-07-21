@@ -76,7 +76,9 @@ export const GET = async (req) => {
       ...item,
       id: encodeObjectId(item._id),
       _id: undefined,
-      image: item.image ? `${baseImageUrl}/${item.image}` : null,
+      images: Array.isArray(item.images)
+       ? item.images.map((img) => `${baseImageUrl}/${img}`)
+        : [],
     }));
 
     return addCorsHeaders(
