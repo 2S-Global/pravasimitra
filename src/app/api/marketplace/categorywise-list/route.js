@@ -20,22 +20,24 @@ export async function OPTIONS() {
 
 export const GET = async (req) => {
   await connectDB();
-  
+
   const { searchParams } = new URL(req.url);
   const category = searchParams.get("id");
 
   if (!category) {
-    return addCorsHeaders(NextResponse.json(
-      { error: "Missing Category ID in query" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Missing Category ID in query" },
+        { status: 400 }
+      )
+    );
   }
 
   let query = { isDel: false };
 
   try {
     const categoryId = decodeObjectId(category);
-    // console.log(categoryId);                               
+    // console.log(categoryId);
 
     if (
       !categoryId ||
@@ -48,10 +50,9 @@ export const GET = async (req) => {
     query.category = categoryId;
   } catch (err) {
     console.error("ID decoding failed:", err.message);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Invalid propertyType ID" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid propertyType ID" }, { status: 400 })
+    );
   }
 
   try {
@@ -61,24 +62,36 @@ export const GET = async (req) => {
       .lean();
 
     if (!items.length) {
-      return addCorsHeaders(NextResponse.json(
-        { msg: "No items available", itemList: [] },
-        { status: 200 }
-      ));
+      return addCorsHeaders(
+        NextResponse.json(
+          { msg: "No items available", itemList: [] },
+          { status: 200 }
+        )
+      );
     }
+
+    const baseImageUrl = process.env.IMAGE_URL + "/e-marketplace";
 
     const updatedItems = items.map((item) => ({
       ...item,
       id: encodeObjectId(item._id),
       _id: undefined,
+      image: item.image ? `${baseImageUrl}/${item.image}` : null,
     }));
 
-    return addCorsHeaders(NextResponse.json({ itemList: updatedItems }, { status: 200 }));
+    return addCorsHeaders(
+      NextResponse.json(
+        {
+          msg: "Product category items loaded successfully",
+          itemList: updatedItems,
+        },
+        { status: 200 }
+      )
+    );
   } catch (err) {
     console.error("Fetch failed:", err);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Failed to fetch items" },
-      { status: 500 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Failed to fetch items" }, { status: 500 })
+    );
   }
 };
