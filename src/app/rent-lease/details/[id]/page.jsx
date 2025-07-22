@@ -3,8 +3,47 @@ import { useState } from "react"
 import Header from "@/app/components/Header"
 import Footer from "@/app/components/Footer"
 import OtherBanner from "@/app/components/OtherBanner"
+import axios from "axios";
+import { useParams, useRouter } from "next/navigation";
+import {  useEffect } from "react";
+import { useAuthStore } from "@/app/store/authStore";
+import AlertService from "@/app/components/alertService";
+
 
 const RentLeaseDetails = () => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [item, setItem] = useState(true);
+  const { id } = useParams();
+
+  const [contactLoading, setContactLoading] = useState(false);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
+
+  useEffect(() => {
+    const fetchDetails = async () => {
+      // alert("hello");
+      try {
+        setLoading(true);
+        const productDetails = await axios.get("/api/rent-lease/details", {
+          params: { id },
+        });
+        // console.log(productDetails.data.item);
+        setSelectedImage(productDetails.data.item.image);
+
+        setItem(productDetails.data.item);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetails();
+  }, [id]);
+
+
   const images = [
     "https://lid.zoocdn.com/u/1200/900/6a618a847a92bcb165bc77b7d9567f3b1e0e1b91.jpg:p",
     "https://lid.zoocdn.com/u/1200/900/2960a330eea12120776a10898e76a7d85394cc74.jpg:p",

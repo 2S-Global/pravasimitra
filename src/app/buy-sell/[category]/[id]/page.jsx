@@ -81,7 +81,7 @@ const BuySellCategoryPage = () => {
     fetchProducts(categoryId);
 
     // Use router.replace to avoid adding to history stack
-    router.replace(`/buy-sell/${slug束,categoryId}`, { scroll: false });
+      //  router.replace(`/buy-sell/${slug}/${categoryId}`, { scroll: false });
 
     // Restore scroll position
     window.scrollTo(0, scrollY);
@@ -188,7 +188,7 @@ const BuySellCategoryPage = () => {
                           </p>
                         </div>
                       </div>
-                    ) : (
+                    ) : ( 
                       allItems.map((item, index) => (
                         <div className="col-md-4" key={index}>
                           <div className="card h-100 shadow-sm border-0 position-relative">
@@ -198,12 +198,12 @@ const BuySellCategoryPage = () => {
                               alt={item.title}
                               style={{ height: "250px", objectFit: "cover" }}
                             />
-                            {item.images && item.images.length > 1 && (
+                            {item.gallery && item.gallery.length > 1 && (
                               <span
                                 className="badge bg-dark position-absolute top-0 end-0 m-2"
                                 style={{ padding: "7px" }}
                               >
-                                {item.images.length} More Photos
+                                {item.gallery.length} More Photos
                               </span>
                             )}
                             <div className="card-body text-center">

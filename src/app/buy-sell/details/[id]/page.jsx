@@ -7,15 +7,15 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/store/authStore";
 import AlertService from "@/app/components/alertService";
-const ProductDetails = () => {
 
+const ProductDetails = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState("");
   const [item, setItem] = useState(true);
   const { id } = useParams();
 
-const [contactLoading, setContactLoading] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const handleContactSeller = async () => {
     if (!isLoggedIn) {
@@ -29,7 +29,7 @@ const [contactLoading, setContactLoading] = useState(false);
     }
 
     try {
-       setContactLoading(true);
+      setContactLoading(true);
 
       const contactSeller = await axios.post("/api/product/contact-seller", {
         productId: item.id,
@@ -39,10 +39,9 @@ const [contactLoading, setContactLoading] = useState(false);
     } catch (error) {
       // console.error(error);
       AlertService.error("Failed to contact the seller. Please try again.");
+    } finally {
+      setContactLoading(false);
     }
-    finally {
-    setContactLoading(false);
-  }
   };
 
   useEffect(() => {
@@ -67,20 +66,19 @@ const [contactLoading, setContactLoading] = useState(false);
     fetchDetails();
   }, [id]);
 
-
   const handlePrevImage = () => {
-  const currentIndex = item.gallery.indexOf(selectedImage);
-  if (currentIndex > 0) {
-    setSelectedImage(item.gallery[currentIndex - 1]);
-  }
-};
+    const currentIndex = item.gallery.indexOf(selectedImage);
+    if (currentIndex > 0) {
+      setSelectedImage(item.gallery[currentIndex - 1]);
+    }
+  };
 
-const handleNextImage = () => {
-  const currentIndex = item.gallery.indexOf(selectedImage);
-  if (currentIndex < item.gallery.length - 1) {
-    setSelectedImage(item.gallery[currentIndex + 1]);
-  }
-};
+  const handleNextImage = () => {
+    const currentIndex = item.gallery.indexOf(selectedImage);
+    if (currentIndex < item.gallery.length - 1) {
+      setSelectedImage(item.gallery[currentIndex + 1]);
+    }
+  };
 
   return (
     <>
@@ -89,7 +87,6 @@ const handleNextImage = () => {
         page_title="Product Details"
         banner_image="/assets/images/bg/furniture_banner.jpg"
       />
-      
 
       {loading ? (
         <div
@@ -205,7 +202,6 @@ const handleNextImage = () => {
                         <i className="bi bi-cart-plus me-2"></i> Contact Seller
                       </>
                     )}
-                   
                   </button>
                   {/* <button
                   className="btn btn-outline-secondary px-4"

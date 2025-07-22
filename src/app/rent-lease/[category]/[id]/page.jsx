@@ -1,0 +1,349 @@
+"use client";
+
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
+import OtherBanner from "@/app/components/OtherBanner";
+import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect, useMemo } from "react";
+import axios from "axios";
+
+const ListHomes = () => {
+  const router = useRouter();
+  const { category, id } = useParams();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(id || "");
+  const [allCategories, setAllCategories] = useState([]);
+  const [properties, setProperties] = useState([]);
+  const [gridLoading, setGridLoading] = useState(false);
+
+  // const categories = ["All", "Rent", "Lease", "Purchase"];
+
+  // const properties = [
+  //   {
+  //     title: "3 Bedroom House For Rent - E3 4QH",
+  //     desc: "Robert Alan Homes - Hackney & Barnet Estate Agent.",
+  //     price: "$49.99",
+  //     image:
+  //       "https://lid.zoocdn.com/u/1200/900/6a618a847a92bcb165bc77b7d9567f3b1e0e1b91.jpg:p",
+  //     imagesCount: 3,
+  //   },
+  //   {
+  //     title: "Luxury Flats and Houses",
+  //     desc: "Luxury Flats and Houses to Rent in West London - Domus Nova.",
+  //     price: "$49.99",
+  //     image: "/assets/rent-lease/2.jpg",
+  //     imagesCount: 4,
+  //   },
+  // ];
+
+  const fetchCategories = async () => {
+    try {
+      const catRes = await axios.get("/api/rent-lease/category-list");
+      const categories = catRes.data.categories || [];
+      setAllCategories(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const fetchProducts = async (categoryId = "") => {
+    try {
+      setGridLoading(true);
+      const productsRes = await axios.get("/api/rent-lease/categorywise-list", {
+        params: { id: categoryId },
+      });
+      setProperties(productsRes.data.itemList || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setGridLoading(false);
+    }
+  };
+
+  const categoryButtons = useMemo(() => {
+    return allCategories.length > 0 ? (
+      allCategories.map((cat) => (
+        <button
+          key={cat.id}
+          className={`btn btn-sm px-4 py-2 ${
+            selectedCategory === cat.id ? "btn-danger" : "btn-outline-danger"
+          } shadow-sm`}
+          onClick={() => handleClick(cat.name, cat.id)}
+        >
+          {cat.name}
+        </button>
+      ))
+    ) : (
+      <button
+        className="btn btn-sm px-4 py-2 btn-outline-danger shadow-sm"
+        disabled
+      >
+        Loading Categories...
+      </button>
+    );
+  }, [allCategories, selectedCategory]);
+
+  const handleSearch = async () => {
+    try {
+      setGridLoading(true);
+      const res = await axios.get("/api/product/search-items", {
+        params: {
+          categoryId: selectedCategory,
+          keyword: searchTerm,
+        },
+      });
+      setAllItems(res.data?.itemList || []);
+    } catch (error) {
+      console.error("Error searching products:", error);
+      AlertService.error("Failed to search products.");
+    } finally {
+      setGridLoading(false);
+    }
+  };
+
+  const handleClear = async () => {
+    try {
+      setSearchTerm("");
+      await fetchProducts(selectedCategory);
+    } catch (error) {
+      console.error("Error clearing filters:", error);
+    }
+  };
+
+  const handleClick = (categoryName, categoryId) => {
+    const slug = encodeURIComponent(
+      categoryName.toLowerCase().replace(/\s+/g, "-")
+    );
+    const scrollY = window.scrollY;
+
+    // Update state and fetch products
+    setSelectedCategory(categoryId);
+    fetchProducts(categoryId);
+
+    // Use router.replace to avoid adding to history stack
+    //  router.replace(`/buy-sell/${slug}/${categoryId}`, { scroll: false });
+
+    // Restore scroll position
+    window.scrollTo(0, scrollY);
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    fetchProducts(id);
+  }, [id]);
+
+  return (
+    <>
+      <Header />
+      <OtherBanner
+        page_title={category}
+        banner_image="/assets/images/bg/rent.jpg"
+      />
+
+      <div className="tm-section tm-login-register-area bg-white tm-padding-section">
+        <div className="container">
+          <div className="row col-md-12">
+            <div className="profile-info col-md-12">
+              {/* Category Buttons */}
+              <div className="mb-4 text-center">
+                <div className="d-flex flex-wrap justify-content-center gap-2">
+                  {categoryButtons}
+                </div>
+              </div>
+
+              {/* Search Panel */}
+              <div className="container mb-4">
+                <div className="card shadow-sm border-0 p-4">
+                  <h5 className="mb-3 fw-bold text-center">
+                    Search Properties
+                  </h5>
+
+                  <div className="d-flex justify-content-center">
+                    <form
+                      className="row g-3 w-100"
+                   
+                    >
+                      <div className="col-md-4">
+                        <label htmlFor="location" className="form-label">
+                          Location
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="location"
+                          placeholder="Enter city or area"
+                        />
+                      </div>
+
+                      <div className="col-md-3">
+                        <label htmlFor="priceRange" className="form-label">
+                          Price Range
+                        </label>
+                        <select className="form-select" id="priceRange">
+                          <option value="">Select</option>
+                          <option value="0-500">$0 - $500</option>
+                          <option value="500-1000">$500 - $1000</option>
+                          <option value="1000+">$1000+</option>
+                        </select>
+                      </div>
+
+                      <div className="col-md-3">
+                        <label htmlFor="bedrooms" className="form-label">
+                          Bedrooms
+                        </label>
+                        <select className="form-select" id="bedrooms">
+                          <option value="">Any</option>
+                          <option value="1">1 Bedroom</option>
+                          <option value="2">2 Bedrooms</option>
+                          <option value="3">3+ Bedrooms</option>
+                        </select>
+                      </div>
+
+                      <div className="col-md-2 d-flex align-items-end">
+                        <div className="d-flex gap-2 w-100">
+                          <button
+                            className="btn btn-danger w-50"
+                            type="button"
+                            onClick={handleSearch}
+                            disabled={!searchTerm.trim()}
+                          >
+                            Search
+                          </button>
+                          <button
+                            className="btn btn-outline-secondary w-50"
+                            type="button"
+                            onClick={handleClear}
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              {/* Property Listings */}
+              <div className="container my-5">
+                {gridLoading ? (
+                  <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ minHeight: "300px" }}
+                  >
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">
+                        Loading products...
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="row g-4">
+                    {properties.length === 0 ? (
+                      <div className="col-12">
+                        <div className="text-center p-5 rounded border shadow-sm bg-light">
+                          <img
+                            src="/assets/images/empty-box.png"
+                            alt="No Records"
+                            className="mx-auto d-block"
+                            style={{
+                              width: "120px",
+                              opacity: 0.5,
+                              marginBottom: "20px",
+                            }}
+                          />
+                          <h4 className="fw-bold text-muted">No Items Found</h4>
+                          <p className="text-secondary">
+                            Sorry, we couldn't find any items in this category.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      properties.map((property, idx) => (
+                        <div className="col-md-4" key={idx}>
+                          <div className="card h-100 shadow-sm border-0 position-relative">
+                            <div style={{ position: "relative" }}>
+                             <img
+                              src={property.images?.[0]}
+                              className="card-img-top"
+                              alt={property.title}
+                              style={{ height: "250px", objectFit: "cover" }}
+                            />
+                            {property.images && property.images.length > 1 && (
+                              <span
+                                className="badge bg-dark position-absolute top-0 end-0 m-2"
+                                style={{ padding: "7px" }}
+                              >
+                                {property.images.length} More Photos
+                              </span>
+                            )}
+                              <div
+                                className="badge bg-dark text-white position-absolute"
+                                style={{
+                                  top: 10,
+                                  left: 10,
+                                  padding: "5px 10px",
+                                  borderRadius: "12px",
+                                }}
+                              >
+                                {/* {property.images.length} Images */}
+                              </div>
+                            </div>
+                            <div className="card-body text-center">
+                              <h5 className="card-title">{property.title}</h5>
+                              <p>{property.city} | {property.state}</p>
+                              <p className="card-text text-muted">
+                                 {property.shortDesc
+                                  ? property.shortDesc
+                                      .split(" ")
+                                      .slice(0, 10)
+                                      .join(" ") +
+                                    (property.shortDesc.split(" ").length > 10 ? "..." : "")
+                                  : ""}
+                              </p>
+                              <p className="fw-bold text-primary fs-5">
+                                ${property.price}
+                              </p>
+                              <button
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() =>
+                                  router.push(`/rent-lease/details/${property.id}`)
+                                }
+                                style={{
+                                  background: "#c12020",
+                                  color: "#fff",
+                                  border: "#c12020",
+                                }}
+                              >
+                                View Details
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Floating SOS Button */}
+              <button
+                className="btn btn-danger rounded-circle position-fixed"
+                style={{ bottom: 20, right: 20, width: 50, height: 50 }}
+              >
+                <img
+                  src="/assets/images/icon-sos.png"
+                  alt=""
+                  style={{ maxWidth: 25 }}
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </>
+  );
+};
+
+export default ListHomes;

@@ -4,31 +4,55 @@ import { useRouter } from 'next/navigation'
 import Header from "@/app/components/Header"
 import Footer from "@/app/components/Footer"
 import OtherBanner from "@/app/components/OtherBanner"
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 const MarketPlaceCategory = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleClick = (category) => {
-    const slug = encodeURIComponent(category.toLowerCase().replace(/\s+/g, '-'))
-   router.push(`/rent-lease/${slug}`)
 
-   // router.push(`/rent-lease/category_id?name=${slug}`)
+    useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get("/api/rent-lease/category-list");
+        setCategories(res.data.categories);
+        // AlertService.success(res.data.msg);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+
+  const handleClick = (categoryName,categoryId) => {
+    const slug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, '-'))
+   router.push(`/rent-lease/${slug}/${categoryId}`)
+
+  
   }
 
-  const categories = [
-     { id: 1, label: "Rent Room", image: "/assets/images/rent.png" },
-     { id: 2, label: "Rent Apartments", image: "/assets/images/RentApartments.png" },
-     { id: 3, label: "Rent Villa", image: "/assets/images/RentTownhouses.png" },
-     { id: 4, label: "Lease Room", image: "/assets/images/Lease.png" },
-     { id: 5, label: "Lease Apartments", image: "/assets/images/LeaseApartments.png" },
-     { id: 6, label: "Lease Villa", image: "/assets/images/LeaseTownhouses.png" },
-  ]
 
   return (
     <>
       <Header />
       <OtherBanner page_title="Rent & Lease"  banner_image="/assets/images/bg/rent.jpg" />
 
+   {loading ? (
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ minHeight: "400px" }}
+        >
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ) : (
       <section className="tm-section bg-light py-5">
         <div className="container">
           <h2 className="text-center fw-bold mb-5">Explore Categories</h2>
@@ -37,7 +61,7 @@ const MarketPlaceCategory = () => {
               <div key={category.id} className="col-12 col-sm-6 col-md-4">
                 <div
                   className="category-card d-flex flex-column justify-content-center align-items-center text-center shadow-sm p-4"
-                  onClick={() => handleClick(category.label)}
+                  onClick={() => handleClick(category.name, category.id)}
                   style={{
                     borderRadius: '20px',
                     cursor: 'pointer',
@@ -66,13 +90,15 @@ const MarketPlaceCategory = () => {
                       marginBottom: '1rem'
                     }}
                   />
-                  <h6 className="fw-semibold mb-0">{category.label}</h6>
+                  <h6 className="fw-semibold mb-0">{category.name}</h6>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+          )}
 
       {/* Floating SOS Button */}
       <button
