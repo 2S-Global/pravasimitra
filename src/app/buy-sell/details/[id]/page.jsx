@@ -203,16 +203,7 @@ const ProductDetails = () => {
                       </>
                     )}
                   </button>
-                  {/* <button
-                  className="btn btn-outline-secondary px-4"
-                  style={{
-                    background: "#c12020",
-                    color: "#fff",
-                    border: "#c12020",
-                  }}
-                >
-                  <i className="bi bi-heart me-2"></i> Wishlist
-                </button> */}
+           
                 </div>
               </div>
             </div>

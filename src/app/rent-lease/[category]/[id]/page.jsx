@@ -301,7 +301,7 @@ const ListHomes = () => {
                                   : ""}
                               </p>
                               <p className="fw-bold text-primary fs-5">
-                                ${property.price}
+                                ${property.price}/{property.frequency}
                               </p>
                               <button
                                 className="btn btn-outline-primary btn-sm"
