@@ -47,6 +47,10 @@ export const GET = async (req) => {
       return addCorsHeaders(NextResponse.json({ msg: "Item not found" }, { status: 404 }));
     }
 
+    item.images = item.images.map(filename => {
+      return `${process.env.IMAGE_URL}/e-marketplace/${filename}`;
+    });
+
     const updatedItem = {
       ...item,
       id: encodeObjectId(item._id), 
