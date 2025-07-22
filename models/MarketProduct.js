@@ -12,7 +12,15 @@ const MarketProductSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "MarketCategory",
     },
-   
+    city: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    ingredients: {
+      type: [String],
+    },
     price: {
       type: Number,
     },
