@@ -36,6 +36,7 @@ async function parseFormData(req) {
   const location = form.get("location");
   const city = form.get("city");
   const state = form.get("state");
+  const amenities = form.getAll("amenities");
   const files = form.getAll("images");
   const existingImageRaw = form.get("existingImageRaw");
   const existingImages = existingImageRaw ? JSON.parse(existingImageRaw) : [];
@@ -57,10 +58,17 @@ async function parseFormData(req) {
     title,
     propertyType,
     roomSize,
-
+    shortDesc,
     price,
     frequency,
     description,
+    bedrooms,
+    bathrooms,
+    furnished,
+    location,
+    city,
+    state,
+    amenities,
     newImages: images.filter(Boolean),
     existingImages,
   };
@@ -147,7 +155,15 @@ export const PATCH = withAuth(async (req, user) => {
     roomSize,
     price,
     frequency,
+    shortDesc,
     description,
+    bedrooms,
+    bathrooms,
+    furnished,
+    location,
+    city,
+    state,
+    amenities,
     newImages,
     existingImages,
   } = data;
@@ -166,6 +182,9 @@ export const PATCH = withAuth(async (req, user) => {
       NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 })
     );
   }
+
+  const amenityObjectIds = amenities.map((id) => new mongoose.Types.ObjectId(id));
+
 
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
   const savedFilenames = [...existingImages];
@@ -204,7 +223,15 @@ export const PATCH = withAuth(async (req, user) => {
           propertyType,
           roomSize,
           price: parseFloat(price),
+          shortDesc,
           description,
+          bedrooms: parseInt(bedrooms, 10),
+          bathrooms: parseInt(bathrooms, 10),
+          furnished,
+          location,
+          city,
+          state,
+          amenities: amenityObjectIds,
           frequency,
           images: savedFilenames,
         },
