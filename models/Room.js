@@ -22,7 +22,7 @@ const RentItemSchema = new mongoose.Schema(
     bedrooms: {
       type: Number,
     },
-  
+
     bathrooms: {
       type: Number,
     },
@@ -32,7 +32,7 @@ const RentItemSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
-      frequency: {
+    frequency: {
       type: String,
     },
     shortDesc: {

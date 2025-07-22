@@ -85,7 +85,7 @@ const RentLeaseDetails = () => {
                     <h2 className="fw-bold mb-1">{item.title}</h2>
                     <p className="text-muted">{item.location}</p>
                   </div>
-                  <h3 className="text-primary fw-bold">$1,250 / month</h3>
+                  <h3 className="text-primary fw-bold">${item.price}/{item.frequency}</h3>
                 </div>
 
                 {/* 🖼️ Image Carousel with Arrows */}

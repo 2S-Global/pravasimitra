@@ -34,11 +34,11 @@ export const config = {
 
 async function parseFormData(req) {
   const form = await req.formData();
-
   const title = form.get("title");
   const propertyType = form.get("propertyType");
   const roomSize = form.get("roomSize");
   const price = form.get("price");
+  const frequency = form.get("frequency");
   const shortDesc = form.get("shortDesc") || "";
   const description = form.get("description") || "";
   const bedrooms = form.get("bedrooms");
