@@ -30,6 +30,9 @@ export const GET = async (req) => {
       id: encodeObjectId(cat._id),
       name: cat.name,
       icon: cat.icon || "",
+      image: cat.image
+        ? `${process.env.IMAGE_URL}/marketplace-category/${cat.image}`
+        : "",
     }));
 
     if (!categories || categories.length === 0) {
