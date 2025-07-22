@@ -39,9 +39,14 @@ export const GET =withAuth (async function (req,user) {
           return addCorsHeaders(NextResponse.json({msg:"No Items Found",items:[]},{status:200}))
       }
 
+      const baseImageUrl = `${process.env.IMAGE_URL}/e-marketplace`;
+
       const updatedItems=items.map(item=>({
         ...item,
         id:encodeObjectId(item._id),
+        images: Array.isArray(item.images)
+        ? item.images.map(img => `${baseImageUrl}/${img}`)
+        : [],
         _id: undefined
       }))
 
