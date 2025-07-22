@@ -1,3 +1,4 @@
+import { type } from "jquery";
 import mongoose from "mongoose";
 
 const RentItemSchema = new mongoose.Schema(
@@ -21,6 +22,7 @@ const RentItemSchema = new mongoose.Schema(
     bedrooms: {
       type: Number,
     },
+  
     bathrooms: {
       type: Number,
     },
@@ -29,6 +31,9 @@ const RentItemSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
+    },
+      frequency: {
+      type: String,
     },
     shortDesc: {
       type: String,

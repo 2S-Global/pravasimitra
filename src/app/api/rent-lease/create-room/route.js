@@ -10,7 +10,6 @@ import User from "../../../../../models/User";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
-
 /**
  * @description Create a new room listing with images
  * @route POST /api/rent-lease/add-item
@@ -68,6 +67,7 @@ async function parseFormData(req) {
     propertyType,
     roomSize,
     price,
+    frequency,
     shortDesc,
     description,
     bedrooms,
@@ -97,10 +97,7 @@ export const POST = withAuth(async function (req, user) {
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
   const savedFilenames = [];
 
-  const uploadDir = path.join(
-    process.cwd(),
-    "public/assets/images/rent-items"
-  );
+  const uploadDir = path.join(process.cwd(), "public/assets/images/rent-items");
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of data.images) {
@@ -139,13 +136,14 @@ export const POST = withAuth(async function (req, user) {
   // Convert amenities from strings to ObjectId array
   let amenityObjectIds = [];
   try {
-    amenityObjectIds = data.amenities.map((id) => new mongoose.Types.ObjectId(id));
+    amenityObjectIds = data.amenities.map(
+      (id) => new mongoose.Types.ObjectId(id)
+    );
   } catch (error) {
     return addCorsHeaders(
       NextResponse.json({ error: "Invalid Amenity ID(s)" }, { status: 400 })
     );
   }
-
 
   try {
     const newItem = await RoomItem.create({
@@ -154,6 +152,7 @@ export const POST = withAuth(async function (req, user) {
       propertyType: decodedCategoryId,
       roomSize: data.roomSize,
       price: parseFloat(data.price),
+      frequency: data.frequency,
       shortDesc: data.shortDesc,
       description: data.description,
       bedrooms: parseInt(data.bedrooms),

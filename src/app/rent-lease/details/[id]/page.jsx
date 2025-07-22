@@ -82,8 +82,8 @@ const RentLeaseDetails = () => {
                 {/* Title & Price */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <div>
-                    <h2 className="fw-bold mb-1">Luxury - Domus Nova in West London.</h2>
-                    <p className="text-muted">Sector 21, West London</p>
+                    <h2 className="fw-bold mb-1">{item.title}</h2>
+                    <p className="text-muted">{item.location}</p>
                   </div>
                   <h3 className="text-primary fw-bold">$1,250 / month</h3>
                 </div>
@@ -103,7 +103,7 @@ const RentLeaseDetails = () => {
                     style={{ zIndex: 10 }}
                     onClick={handlePrev}
                   >
-                    <i className="bi bi-chevron-left fs-4" />
+                    <i className="bi bi-chevron-left fs-5" />
                   </button>
 
                   {/* ➡️ Next Arrow */}
@@ -112,7 +112,7 @@ const RentLeaseDetails = () => {
                     style={{ zIndex: 10 }}
                     onClick={handleNext}
                   >
-                    <i className="bi bi-chevron-right fs-4" />
+                    <i className="bi bi-chevron-right fs-5" />
                   </button>
                 </div>
 
