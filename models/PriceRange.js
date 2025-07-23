@@ -1,0 +1,16 @@
+import mongoose from 'mongoose';
+
+const priceRangeSchema = new mongoose.Schema(
+  {
+    label: {
+      type: String,
+    },
+    value: {
+      type: String, // Storing like "0-500", "500-1000", etc.
+    },
+  },
+  { timestamps: true }
+);
+
+export default mongoose.models.PriceRange ||
+  mongoose.model('PriceRange', priceRangeSchema);
