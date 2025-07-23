@@ -28,12 +28,12 @@ export async function GET(req) {
 
         const result = await PriceRange.insertMany(ranges);
         return NextResponse.json(
-          { msg: "Price ranges created successfully", priceRanges: result },
+          { msg: "Price ranges created successfully", ranges: result },
           { status: 200 }
         );
       } else {
         return NextResponse.json(
-          { msg: "Price ranges already exist", priceRanges: existing },
+          { msg: "Price ranges already exist", ranges: existing },
           { status: 200 }
         );
       }
@@ -46,7 +46,7 @@ export async function GET(req) {
       );
     }
   } catch (error) {
-    console.error("Price range fetch/seed failed:", error);
+    console.error("Price range fetch/create failed:", error);
     return NextResponse.json(
       { error: "Failed to fetch or create price ranges" },
       { status: 500 }
