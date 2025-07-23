@@ -25,10 +25,10 @@ export async function GET(req) {
     if (action === "true") {
       const existing = await PriceRange.find({});
       if (existing.length === 0) {
-        const ranges = [
-          { label: "$0 - $500", value: "0-500" },
-          { label: "$500 - $1000", value: "500-1000" },
-          { label: "$1000+", value: "1000+" },
+        const data = [
+          { label: "$0 - $500", value: "0-500", min: 0, max: 500 },
+          { label: "$500 - $1000", value: "500-1000", min: 500, max: 1000 },
+          { label: "$1000+", value: "1000+", min: 1000, max: null },
         ];
 
         const result = await PriceRange.insertMany(ranges);
@@ -48,7 +48,7 @@ export async function GET(req) {
         );
       }
     } else {
-      const ranges = await PriceRange.find({}).sort({ value: 1 });
+      const ranges = await PriceRange.find({}).sort({ min: 1 });
 
       return addCorsHeaders(
         NextResponse.json(
