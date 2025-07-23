@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { connectDB } from '../../../../../lib/db';
-import PriceRange from '../../../../../models/PriceRange';
-import { addCorsHeaders, optionsResponse } from '../../../../../lib/cors';
+import { NextResponse } from "next/server";
+import { connectDB } from "../../../../../lib/db";
+import PriceRange from "../../../../../models/PriceRange";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 /**
  * @description Fetch or Create Price Ranges
@@ -13,7 +13,7 @@ import { addCorsHeaders, optionsResponse } from '../../../../../lib/cors';
 
 export async function OPTIONS() {
   return optionsResponse();
-} 
+}
 
 export async function GET(req) {
   await connectDB();
@@ -34,17 +34,17 @@ export async function GET(req) {
         const result = await PriceRange.insertMany(ranges);
 
         return addCorsHeaders(
-            NextResponse.json(
-                { msg: "Price ranges created successfully", ranges: result },
-                { status: 200 }
-            )
+          NextResponse.json(
+            { msg: "Price ranges created successfully", ranges: result },
+            { status: 200 }
+          )
         );
       } else {
         return addCorsHeaders(
-            NextResponse.json(
-                { msg: "Price ranges already exist", ranges: existing },
-                { status: 200 }
-            )
+          NextResponse.json(
+            { msg: "Price ranges already exist", ranges: existing },
+            { status: 200 }
+          )
         );
       }
     } else {
@@ -52,18 +52,18 @@ export async function GET(req) {
 
       return addCorsHeaders(
         NextResponse.json(
-            { msg: "Fetched price ranges", ranges },
-            { status: 200 }
+          { msg: "Fetched price ranges", ranges },
+          { status: 200 }
         )
       );
     }
   } catch (error) {
     console.error("Price range fetch/create failed:", error);
     return addCorsHeaders(
-        NextResponse.json(
-            { error: "Failed to fetch or create price ranges" },
-            { status: 500 }
-        )
+      NextResponse.json(
+        { error: "Failed to fetch or create price ranges" },
+        { status: 500 }
+      )
     );
   }
 }
