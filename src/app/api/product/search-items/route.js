@@ -16,6 +16,8 @@ export const GET = async (req) => {
   const categoryEncoded = searchParams.get("categoryId");
   const keyword = searchParams.get("keyword");
 
+  
+
   let query = {
     is_del: false,
   };

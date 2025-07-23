@@ -71,6 +71,7 @@ const RentLeaseDetails = () => {
     }
   };
 
+
   // const images = [
   //   "https://lid.zoocdn.com/u/1200/900/6a618a847a92bcb165bc77b7d9567f3b1e0e1b91.jpg:p",
   //   "https://lid.zoocdn.com/u/1200/900/2960a330eea12120776a10898e76a7d85394cc74.jpg:p",
@@ -81,6 +82,8 @@ const RentLeaseDetails = () => {
   //   "https://lid.zoocdn.com/u/1200/900/6102c01fe431e928c8332575916a65504ec16297.jpg:p",
   //   "https://lid.zoocdn.com/u/1200/900/3876b4bef80347f8949a4bca7a100e85602a9c10.jpg:p",
   // ]
+
+  
   const images = selectedImage;
 
   const [activeIndex, setActiveIndex] = useState(0);
