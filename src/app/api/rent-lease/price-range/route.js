@@ -9,7 +9,7 @@ import { addCorsHeaders, optionsResponse } from '../../../../../lib/cors';
  * @query ?action=true  => Creates default price ranges only if collection is empty
  * @success {object} 200 - Returns price range list
  * @error {object} 500 - On DB failure or internal error
- */\
+ */
 
 export async function OPTIONS() {
   return optionsResponse();
