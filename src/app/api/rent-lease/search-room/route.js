@@ -25,25 +25,54 @@ export async function GET(req) {
   };
 
   // Location (case-insensitive partial match)
- if (location) {
-  const regex = new RegExp(location, "i"); // case-insensitive regex
+  if (location) {
+    const regex = new RegExp(location, "i"); // case-insensitive regex
 
-  query.$or = [
-    { location: { $regex: regex } },
-    { city: { $regex: regex } },
-    { state: { $regex: regex } },
-  ];
-}
+    query.$or = [
+      { location: { $regex: regex } },
+      { city: { $regex: regex } },
+      { state: { $regex: regex } },
+    ];
+  }
 
   // Price range
- if (priceRange && priceRange.includes("-")) {
-    const [min, max] = priceRange.split("-").map(Number);
-    query.price = { $gte: min, $lte: max };
+  if (priceRange) {
+    if (priceRange.includes("+")) {
+      // Handle "1000+"
+      const min = Number(priceRange.replace("+", ""));
+      if (!isNaN(min)) {
+        query.price = { $gte: min };
+      }
+    } else {
+      const [minStr, maxStr] = priceRange.split("-");
+      const min = Number(minStr);
+      const max = Number(maxStr);
+
+      if (!isNaN(min) && !isNaN(max)) {
+        query.price = { $gte: min, $lte: max };
+      } else if (!isNaN(min)) {
+        query.price = { $gte: min };
+      } else if (!isNaN(max)) {
+        query.price = { $lte: max };
+      }
+    }
   }
+
+  
 
   // Bedrooms
   if (bedrooms) {
-    query.bedrooms = Number(bedrooms);
+    if (bedrooms.includes("+")) {
+      const minBedrooms = Number(bedrooms.replace("+", ""));
+      if (!isNaN(minBedrooms)) {
+        query.bedrooms = { $gte: minBedrooms };
+      }
+    } else {
+      const exactBedrooms = Number(bedrooms);
+      if (!isNaN(exactBedrooms)) {
+        query.bedrooms = exactBedrooms;
+      }
+    }
   }
 
   // Category (propertyType)
@@ -52,11 +81,10 @@ export async function GET(req) {
     query.propertyType = category;
   }
 
-
   try {
     const rooms = await RoomItem.find(query).populate("propertyType");
 
-     const formattedRooms = rooms.map((room) => ({
+    const formattedRooms = rooms.map((room) => ({
       ...room.toObject(),
       id: encodeObjectId(room._id),
       images: Array.isArray(room.images)
@@ -66,7 +94,10 @@ export async function GET(req) {
     }));
 
     return addCorsHeaders(
-      NextResponse.json({ success: true, data: formattedRooms }, { status: 200 })
+      NextResponse.json(
+        { success: true, data: formattedRooms },
+        { status: 200 }
+      )
     );
   } catch (err) {
     return addCorsHeaders(

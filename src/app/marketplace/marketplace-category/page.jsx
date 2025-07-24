@@ -4,28 +4,54 @@ import { useRouter } from 'next/navigation'
 import Header from "@/app/components/Header"
 import Footer from "@/app/components/Footer"
 import OtherBanner from "@/app/components/OtherBanner"
+import axios from "axios";
+import { useState, useEffect } from "react";
+
 
 const MarketPlaceCategory = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleClick = (category) => {
-    const slug = encodeURIComponent(category.toLowerCase().replace(/\s+/g, '-'))
-    router.push(`/marketplace/${slug}`)
+
+      useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get("/api/marketplace/category-list");
+        setCategories(res.data.categories);
+        // AlertService.success(res.data.msg);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleClick = (categoryName,categoryId) => {
+    const slug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, '-'))
+    router.push(`/marketplace/${slug}/${categoryId}`)
   }
 
-  const categories = [
-    { id: 1, label: "Cooked Food", image: "/assets/images/CookedFood.png" },
-    { id: 2, label: "Package Food", image: "/assets/images/PackageFood.png" },
-    { id: 3, label: "Clothings", image: "/assets/images/Clothings.png" },
-    { id: 4, label: "Fruites", image: "/assets/images/Fruites.png" },
-    { id: 5, label: "Religious items", image: "/assets/images/religiousitems.png" },
-    { id: 6, label: "Ayurvedic and herbal products", image: "/assets/images/Ayurvedicherbalproducts.png" },
-  ]
+
 
   return (
     <>
       <Header />
       <OtherBanner page_title="Marketplace"  banner_image="/assets/images/bg/marketplace.png" />
+
+         {loading ? (
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ minHeight: "400px" }}
+        >
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      ) : (
 
       <section className="tm-section bg-light py-5">
         <div className="container">
@@ -35,7 +61,7 @@ const MarketPlaceCategory = () => {
               <div key={category.id} className="col-12 col-sm-6 col-md-4">
                 <div
                   className="category-card d-flex flex-column justify-content-center align-items-center text-center shadow-sm p-4"
-                  onClick={() => handleClick(category.label)}
+                  onClick={() => handleClick(category.name, category.id)}
                   style={{
                     borderRadius: '20px',
                     cursor: 'pointer',
@@ -64,7 +90,7 @@ const MarketPlaceCategory = () => {
                       marginBottom: '1rem'
                     }}
                   />
-                  <h6 className="fw-semibold mb-0">{category.label}</h6>
+                  <h6 className="fw-semibold mb-0">{category.name}</h6>
                 </div>
               </div>
             ))}
@@ -72,6 +98,7 @@ const MarketPlaceCategory = () => {
         </div>
       </section>
 
+          )}
       {/* Floating SOS Button */}
       <button
         className="btn btn-danger rounded-circle position-fixed d-flex align-items-center justify-content-center"

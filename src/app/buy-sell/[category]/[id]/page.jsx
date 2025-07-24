@@ -40,6 +40,8 @@ const BuySellCategoryPage = () => {
     }
   };
 
+  
+
   useEffect(() => {
     fetchCategories();
     fetchProducts(id);

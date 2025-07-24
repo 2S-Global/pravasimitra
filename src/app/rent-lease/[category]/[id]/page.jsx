@@ -20,6 +20,20 @@ const ListHomes = () => {
   const [bedrooms, setBedrooms] = useState("");
   const [priceRangeOptions, setPriceRangeOptions] = useState([]);
 
+  const handleClear = async () => {
+  try {
+    setLocation("");
+    setPriceRange("");
+    setBedrooms("");
+    setSearchTerm("");
+
+    await fetchProducts(selectedCategory); // Re-fetch products for selected category (or pass empty to fetch all)
+  } catch (error) {
+    console.error("Error clearing filters:", error);
+  }
+};
+
+
   const fetchCategories = async () => {
     try {
       const catRes = await axios.get("/api/rent-lease/category-list");
@@ -47,8 +61,8 @@ const ListHomes = () => {
   const fetchPriceRange = async () => {
     try {
       const res = await axios.get("/api/rent-lease/price-range");
+      console.log("Price range fetched:", res.data);
       setPriceRangeOptions(res.data?.ranges || []);
-      // console.log(res.data?.ranges)
     } catch (error) {
       console.error("Error fetching price ranges:", error);
     }
@@ -102,14 +116,8 @@ const ListHomes = () => {
     }
   };
 
-  const handleClear = async () => {
-    try {
-      setSearchTerm("");
-      await fetchProducts(selectedCategory);
-    } catch (error) {
-      console.error("Error clearing filters:", error);
-    }
-  };
+0
+
 
   const handleClick = (categoryName, categoryId) => {
     const slug = encodeURIComponent(
@@ -187,23 +195,15 @@ const ListHomes = () => {
                         <select
                           className="form-select"
                           id="priceRange"
-                          style={{
-                            fontSize: "0.85rem",
-                            padding: "0.25rem 0.5rem",
-                          }}
                           value={priceRange}
                           onChange={(e) => setPriceRange(e.target.value)}
                         >
                           <option value="">Select</option>
-                          {priceRangeOptions.length === 0 ? (
-                            <option disabled>Loading...</option>
-                          ) : (
-                            priceRangeOptions.map((range, index) => (
-                              <option key={index} value={range.value}>
-                                {range.label}
-                              </option>
-                            ))
-                          )}
+                          {priceRangeOptions.map((range, index) => (
+                            <option key={index} value={range.value}>
+                              {range.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -223,7 +223,7 @@ const ListHomes = () => {
                           <option value="">Any</option>
                           <option value="1">1 Bedroom</option>
                           <option value="2">2 Bedrooms</option>
-                          <option value="3">3+ Bedrooms</option>
+                          <option value="3+">3+ Bedrooms</option>
                         </select>
                       </div>
 
