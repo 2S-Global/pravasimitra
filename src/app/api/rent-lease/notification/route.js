@@ -38,7 +38,12 @@ export const GET = withAuth(async (req, user) => {
     createdAt: notif.createdAt,
   }));
 
-  return addCorsHeaders(NextResponse.json({ success: true, notifications: formatted }, { status: 200 }));
+  return addCorsHeaders(
+    NextResponse.json(
+      { success: true, notifications: formatted },
+      { status: 200 }
+    )
+  );
 });
 
 // Create a new notification
