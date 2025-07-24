@@ -15,26 +15,10 @@ const ListHomes = () => {
   const [allCategories, setAllCategories] = useState([]);
   const [properties, setProperties] = useState([]);
   const [gridLoading, setGridLoading] = useState(false);
-
-  // const categories = ["All", "Rent", "Lease", "Purchase"];
-
-  // const properties = [
-  //   {
-  //     title: "3 Bedroom House For Rent - E3 4QH",
-  //     desc: "Robert Alan Homes - Hackney & Barnet Estate Agent.",
-  //     price: "$49.99",
-  //     image:
-  //       "https://lid.zoocdn.com/u/1200/900/6a618a847a92bcb165bc77b7d9567f3b1e0e1b91.jpg:p",
-  //     imagesCount: 3,
-  //   },
-  //   {
-  //     title: "Luxury Flats and Houses",
-  //     desc: "Luxury Flats and Houses to Rent in West London - Domus Nova.",
-  //     price: "$49.99",
-  //     image: "/assets/rent-lease/2.jpg",
-  //     imagesCount: 4,
-  //   },
-  // ];
+  const [location, setLocation] = useState("");
+  const [priceRange, setPriceRange] = useState("");
+  const [bedrooms, setBedrooms] = useState("");
+  const [priceRangeOptions, setPriceRangeOptions] = useState([]);
 
   const fetchCategories = async () => {
     try {
@@ -59,6 +43,22 @@ const ListHomes = () => {
       setGridLoading(false);
     }
   };
+
+  const fetchPriceRange = async () => {
+    try {
+      const res = await axios.get("/api/rent-lease/price-range");
+      setPriceRangeOptions(res.data?.ranges || []);
+      // console.log(res.data?.ranges)
+    } catch (error) {
+      console.error("Error fetching price ranges:", error);
+    }
+  };
+
+  const isSearchEnabled =
+    location.trim() !== "" ||
+    priceRange.trim() !== "" ||
+    bedrooms.trim() !== "" ||
+    searchTerm.trim() !== "";
 
   const categoryButtons = useMemo(() => {
     return allCategories.length > 0 ? (
@@ -86,16 +86,17 @@ const ListHomes = () => {
   const handleSearch = async () => {
     try {
       setGridLoading(true);
-      const res = await axios.get("/api/product/search-items", {
+      const res = await axios.get("/api/rent-lease/search-room", {
         params: {
           categoryId: selectedCategory,
-          keyword: searchTerm,
+          location,
+          priceRange,
+          bedrooms,
         },
       });
-      setAllItems(res.data?.itemList || []);
+      setProperties(res.data.data);
     } catch (error) {
       console.error("Error searching products:", error);
-      AlertService.error("Failed to search products.");
     } finally {
       setGridLoading(false);
     }
@@ -130,6 +131,7 @@ const ListHomes = () => {
   useEffect(() => {
     fetchCategories();
     fetchProducts(id);
+    fetchPriceRange();
   }, [id]);
 
   return (
@@ -159,10 +161,7 @@ const ListHomes = () => {
                   </h5>
 
                   <div className="d-flex justify-content-center">
-                    <form
-                      className="row g-3 w-100"
-                   
-                    >
+                    <form className="row g-3 w-100">
                       <div className="col-md-4">
                         <label htmlFor="location" className="form-label">
                           Location
@@ -171,7 +170,13 @@ const ListHomes = () => {
                           type="text"
                           className="form-control"
                           id="location"
+                          style={{
+                            fontSize: "0.85rem",
+                            padding: "0.25rem 0.5rem",
+                          }}
                           placeholder="Enter city or area"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
                         />
                       </div>
 
@@ -179,11 +184,26 @@ const ListHomes = () => {
                         <label htmlFor="priceRange" className="form-label">
                           Price Range
                         </label>
-                        <select className="form-select" id="priceRange">
+                        <select
+                          className="form-select"
+                          id="priceRange"
+                          style={{
+                            fontSize: "0.85rem",
+                            padding: "0.25rem 0.5rem",
+                          }}
+                          value={priceRange}
+                          onChange={(e) => setPriceRange(e.target.value)}
+                        >
                           <option value="">Select</option>
-                          <option value="0-500">$0 - $500</option>
-                          <option value="500-1000">$500 - $1000</option>
-                          <option value="1000+">$1000+</option>
+                          {priceRangeOptions.length === 0 ? (
+                            <option disabled>Loading...</option>
+                          ) : (
+                            priceRangeOptions.map((range, index) => (
+                              <option key={index} value={range.value}>
+                                {range.label}
+                              </option>
+                            ))
+                          )}
                         </select>
                       </div>
 
@@ -191,7 +211,15 @@ const ListHomes = () => {
                         <label htmlFor="bedrooms" className="form-label">
                           Bedrooms
                         </label>
-                        <select className="form-select" id="bedrooms">
+                        <select
+                          className="form-select"
+                          id="bedrooms"
+                          style={{
+                            fontSize: "0.85rem",
+                            padding: "0.25rem 0.5rem",
+                          }}
+                          onChange={(e) => setBedrooms(e.target.value)}
+                        >
                           <option value="">Any</option>
                           <option value="1">1 Bedroom</option>
                           <option value="2">2 Bedrooms</option>
@@ -205,7 +233,7 @@ const ListHomes = () => {
                             className="btn btn-danger w-50"
                             type="button"
                             onClick={handleSearch}
-                            disabled={!searchTerm.trim()}
+                            disabled={!isSearchEnabled}
                           >
                             Search
                           </button>
@@ -262,20 +290,21 @@ const ListHomes = () => {
                         <div className="col-md-4" key={idx}>
                           <div className="card h-100 shadow-sm border-0 position-relative">
                             <div style={{ position: "relative" }}>
-                             <img
-                              src={property.images?.[0]}
-                              className="card-img-top"
-                              alt={property.title}
-                              style={{ height: "250px", objectFit: "cover" }}
-                            />
-                            {property.images && property.images.length > 1 && (
-                              <span
-                                className="badge bg-dark position-absolute top-0 end-0 m-2"
-                                style={{ padding: "7px" }}
-                              >
-                                {property.images.length} More Photos
-                              </span>
-                            )}
+                              <img
+                                src={property.images?.[0]}
+                                className="card-img-top"
+                                alt={property.title}
+                                style={{ height: "250px", objectFit: "cover" }}
+                              />
+                              {property.images &&
+                                property.images.length > 1 && (
+                                  <span
+                                    className="badge bg-dark position-absolute top-0 end-0 m-2"
+                                    style={{ padding: "7px" }}
+                                  >
+                                    {property.images.length} More Photos
+                                  </span>
+                                )}
                               <div
                                 className="badge bg-dark text-white position-absolute"
                                 style={{
@@ -290,14 +319,18 @@ const ListHomes = () => {
                             </div>
                             <div className="card-body text-center">
                               <h5 className="card-title">{property.title}</h5>
-                              <p>{property.city} | {property.state}</p>
+                              <p>
+                                {property.city} | {property.state}
+                              </p>
                               <p className="card-text text-muted">
-                                 {property.shortDesc
+                                {property.shortDesc
                                   ? property.shortDesc
                                       .split(" ")
                                       .slice(0, 10)
                                       .join(" ") +
-                                    (property.shortDesc.split(" ").length > 10 ? "..." : "")
+                                    (property.shortDesc.split(" ").length > 10
+                                      ? "..."
+                                      : "")
                                   : ""}
                               </p>
                               <p className="fw-bold text-primary fs-5">
@@ -306,7 +339,9 @@ const ListHomes = () => {
                               <button
                                 className="btn btn-outline-primary btn-sm"
                                 onClick={() =>
-                                  router.push(`/rent-lease/details/${property.id}`)
+                                  router.push(
+                                    `/rent-lease/details/${property.id}`
+                                  )
                                 }
                                 style={{
                                   background: "#c12020",

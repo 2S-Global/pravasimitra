@@ -60,7 +60,7 @@ export async function GET(req) {
       ...room.toObject(),
       id: encodeObjectId(room._id),
       images: Array.isArray(room.images)
-        ? room.images.map((img) => `${baseImageUrl}/${img}`)
+        ? room.images.map((img) => `${baseImageUrl}/rent-items/${img}`)
         : [],
       _id: undefined,
     }));
