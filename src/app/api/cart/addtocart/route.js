@@ -14,8 +14,6 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-
-
 export const POST = withAuth(async (req, user) => {
   await connectDB();
 
@@ -78,8 +76,6 @@ export const POST = withAuth(async (req, user) => {
   }
 });
 
-
-
 export const GET = withAuth(async (req, user) => {
   await connectDB();
 
@@ -112,7 +108,7 @@ export const GET = withAuth(async (req, user) => {
       product: {
         title: item.productId.title,
         images: item.productId.images.map(
-          (img) => `/assets/images/e-marketplace/${img}`
+          (img) => `${process.env.IMAGE_URL}/e-marketplace/${img}`
         ),
         price: item.productId.price,
         description: item.productId.description,
