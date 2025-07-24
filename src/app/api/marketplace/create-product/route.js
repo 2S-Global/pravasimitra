@@ -25,6 +25,7 @@ async function parseFormData(req) {
   const state = form.get("state");
   const ingredients = form.getAll("ingredients") || [];
   const price = form.get("price");
+  const shortDesc = form.get("shortDesc") || "";
   const description = form.get("description") || "";
   const files = form.getAll("images");
 
@@ -40,7 +41,7 @@ async function parseFormData(req) {
     })
   );
 
-  return { title, category, city, state, ingredients, price, description, images };
+  return { title, category, city, state, ingredients, price, shortDesc, description, images };
 }
 
 export const POST = withAuth(async function (req, user) {
@@ -107,6 +108,7 @@ export const POST = withAuth(async function (req, user) {
       state: data.state,
       ingredients: data.ingredients,
       price: parseFloat(data.price),
+      shortDesc: data.shortDesc,
       description: data.description,
       createdBy: userId,
     });
