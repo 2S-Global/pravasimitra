@@ -7,7 +7,6 @@ import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 
-
 export async function OPTIONS() {
   return optionsResponse();
 }
@@ -58,12 +57,12 @@ export const POST = withAuth(async (req, user) => {
     }
 
     // Increment or decrement
-    cart.items[itemIndex].quantity += delta;
+    cart.items[itemIndex].quantity = delta;
 
-    if (cart.items[itemIndex].quantity <= 0) {
-      // Remove item if quantity is now zero or negative
-      cart.items.splice(itemIndex, 1);
-    }
+    // if (cart.items[itemIndex].quantity <= 0) {
+    //   // Remove item if quantity is now zero or negative
+    //   cart.items.splice(itemIndex, 1);
+    // }
 
     await cart.save();
 

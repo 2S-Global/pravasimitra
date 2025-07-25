@@ -22,7 +22,7 @@ const MarketProductSchema = new mongoose.Schema(
       type: String,
     },
     ingredients: {
-      type: [String],
+      type: String,
     },
     price: {
       type: Number,

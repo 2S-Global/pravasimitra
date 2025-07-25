@@ -23,7 +23,7 @@ async function parseFormData(req) {
   const category = form.get("category");
   const city = form.get("city");
   const state = form.get("state");
-  const ingredients = form.getAll("ingredients") || [];
+  const ingredients = form.get("ingredients") || "";
   const price = form.get("price");
   const shortDesc = form.get("shortDesc") || "";
   const description = form.get("description") || "";
