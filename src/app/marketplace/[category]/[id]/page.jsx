@@ -1,32 +1,30 @@
-'use client'
-import Header from "@/app/components/Header"
-import Footer from "@/app/components/Footer"
-import OtherBanner from "@/app/components/OtherBanner"
-import { useParams, useRouter } from 'next/navigation'
-import { useState,useMemo,useEffect } from "react"
+"use client";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
+import OtherBanner from "@/app/components/OtherBanner";
+import { useParams, useRouter } from "next/navigation";
+import { useState, useMemo, useEffect } from "react";
 import axios from "axios";
 import AlertService from "@/app/components/alertService";
 
-
-
 const MarketPlaceListing = () => {
- const { category, id } = useParams();
+  const { category, id } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(id || "");
   const [allCategories, setAllCategories] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [gridLoading, setGridLoading] = useState(false);
-
-
-
-
+  const router = useRouter();
 
   const fetchProducts = async (categoryId = "") => {
     try {
       setGridLoading(true);
-      const productsRes = await axios.get("/api/marketplace/categorywise-list", {
-        params: { id: categoryId },
-      });
+      const productsRes = await axios.get(
+        "/api/marketplace/categorywise-list",
+        {
+          params: { id: categoryId },
+        }
+      );
       setAllItems(productsRes.data.itemList || []);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -35,21 +33,37 @@ const MarketPlaceListing = () => {
     }
   };
 
-  const currentSlug = decodeURIComponent(category || '').toLowerCase().replace(/\s+/g, '-')
-  const isAll = currentSlug === '' || currentSlug === 'all'
+  const handleSearch = async () => {
+    try {
+      setGridLoading(true);
+      const res = await axios.get("/api/marketplace/search-items", {
+        params: {
+          categoryId: selectedCategory,
+          keyword: searchTerm,
+        },
+      });
+      setAllItems(res.data?.products || []);
+    } catch (error) {
+      console.error("Error searching products:", error);
+      AlertService.error("Failed to search products.");
+    } finally {
+      setGridLoading(false);
+    }
+  };
 
+  const handleClear = async () => {
+    try {
+      setSearchTerm("");
+      await fetchProducts(selectedCategory);
+    } catch (error) {
+      console.error("Error clearing filters:", error);
+    }
+  };
 
-
-  const handleViewDetails = () => {
-    router.push('/marketplace/details')
-  }
-
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value)
-  }
-
-    const handleClick = (categoryName, categoryId) => {
-    const slug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, "-"));
+  const handleClick = (categoryName, categoryId) => {
+    const slug = encodeURIComponent(
+      categoryName.toLowerCase().replace(/\s+/g, "-")
+    );
     const scrollY = window.scrollY;
 
     // Update state and fetch products
@@ -57,15 +71,13 @@ const MarketPlaceListing = () => {
     fetchProducts(categoryId);
 
     // Use router.replace to avoid adding to history stack
-      //  router.replace(`/buy-sell/${slug}/${categoryId}`, { scroll: false });
+    //  router.replace(`/buy-sell/${slug}/${categoryId}`, { scroll: false });
 
     // Restore scroll position
     window.scrollTo(0, scrollY);
   };
 
-
-
-    const fetchCategories = async () => {
+  const fetchCategories = async () => {
     try {
       const catRes = await axios.get("/api/marketplace/category-list");
       const categories = catRes.data.categories || [];
@@ -75,33 +87,34 @@ const MarketPlaceListing = () => {
     }
   };
 
-    useEffect(() => {
+  useEffect(() => {
     fetchCategories();
     fetchProducts(id);
   }, [id]);
 
-
-
-    // Memoize the category buttons to prevent re-rendering
-    const categoryButtons = useMemo(() => {
-      return allCategories.length > 0 ? (
-        allCategories.map((cat) => (
-          <button
-            key={cat.id}
-            className={`btn btn-sm px-4 py-2 ${
-              selectedCategory === cat.id ? "btn-danger" : "btn-outline-danger"
-            } shadow-sm`}
-            onClick={() => handleClick(cat.name, cat.id)}
-          >
-            {cat.name}
-          </button>
-        ))
-      ) : (
-        <button className="btn btn-sm px-4 py-2 btn-outline-danger shadow-sm" disabled>
-          Loading Categories...
+  // Memoize the category buttons to prevent re-rendering
+  const categoryButtons = useMemo(() => {
+    return allCategories.length > 0 ? (
+      allCategories.map((cat) => (
+        <button
+          key={cat.id}
+          className={`btn btn-sm px-4 py-2 ${
+            selectedCategory === cat.id ? "btn-danger" : "btn-outline-danger"
+          } shadow-sm`}
+          onClick={() => handleClick(cat.name, cat.id)}
+        >
+          {cat.name}
         </button>
-      );
-    }, [allCategories, selectedCategory]);
+      ))
+    ) : (
+      <button
+        className="btn btn-sm px-4 py-2 btn-outline-danger shadow-sm"
+        disabled
+      >
+        Loading Categories...
+      </button>
+    );
+  }, [allCategories, selectedCategory]);
   return (
     <>
       <Header />
@@ -114,17 +127,15 @@ const MarketPlaceListing = () => {
         <div className="container">
           <div className="row col-md-12">
             <div className="profile-info col-md-12">
-
               {/* Category Filter */}
-               <div className="mb-5 text-center">
+              <div className="mb-5 text-center">
                 <div className="d-flex flex-wrap justify-content-center gap-2">
                   {categoryButtons}
                 </div>
               </div>
 
               {/* Search Panel */}
-       
-              <div className="search-panel p-4 mb-5 mt-5 rounded shadow-sm border bg-light">
+              <div className="search-panel p-4 mb-3 rounded shadow-sm border bg-light">
                 <div className="row g-3 align-items-center">
                   <div className="col-md-10">
                     <input
@@ -132,17 +143,27 @@ const MarketPlaceListing = () => {
                       className="form-control"
                       placeholder="Search items..."
                       value={searchTerm}
-                      onChange={handleSearchChange}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
-                  <div className="col-md-2 text-end">
-                    <button
-                      className="btn btn-danger w-100"
-                      type="button"
-                      onClick={() => setSearchTerm("")}
-                    >
-                      Clear
-                    </button>
+                  <div className="col-md-2">
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-danger w-50"
+                        type="button"
+                        onClick={handleSearch}
+                        disabled={!searchTerm.trim()}
+                      >
+                        Search
+                      </button>
+                      <button
+                        className="btn btn-outline-secondary w-50"
+                        type="button"
+                        onClick={handleClear}
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -152,51 +173,72 @@ const MarketPlaceListing = () => {
                 {readableCategory}
               </h4> */}
               <div className="container my-4">
-                 {gridLoading ? (
+                {gridLoading ? (
                   <div
                     className="d-flex justify-content-center align-items-center"
                     style={{ minHeight: "300px" }}
                   >
                     <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading products...</span>
+                      <span className="visually-hidden">
+                        Loading products...
+                      </span>
                     </div>
                   </div>
-                ) :(
-                <div className="row g-4">
-                  {allItems
-                    .filter(item =>
-                      item.title.toLowerCase().includes(searchTerm.toLowerCase())
-                    )
-                    .map((item, index) => (
+                ) : (
+                  <div className="row g-4">
+                    {allItems.map((item, index) => (
                       <div className="col-md-4" key={index}>
                         <div className="card h-100 shadow-sm border-0">
-                          <div style={{ position: 'relative' }}>
+                          <div style={{ position: "relative" }}>
                             <img
                               src={item.images[0]}
                               className="card-img-top"
                               alt={item.title}
-                              style={{ height: '250px', objectFit: 'cover' }}
+                              style={{ height: "250px", objectFit: "cover" }}
                             />
-                            {item.imagesCount && (
+                            {item.images && (
                               <div
-                                className="badge bg-dark text-white position-absolute"
-                                style={{ top: 10, left: 10, padding: "5px 10px", borderRadius: "12px" }}
+                                className="badge bg-dark text-white position-absolute end-0"
+                                style={{
+                                  padding: "7px",
+                                  top: "0px",
+                                }}
                               >
-                                {item.imagesCount} Photos
+                                {item.images.length} Photos
                               </div>
                             )}
                           </div>
                           <div className="card-body text-center">
-                            <h5 className="card-title">{item.title}</h5>
-                            <p className="card-text text-muted">{item.desc}</p>
-                            <p className="fw-bold text-primary fs-5">${item.price}</p>
+                            <h5 className="card-title">
+                              {" "}
+                              {item.title.length > 30
+                                ? item.title.slice(0, 30) + "..."
+                                : item.title}
+                            </h5>
+                            <p className="card-text text-muted">
+                              {" "}
+                              {item.shortDesc
+                                ? item.shortDesc
+                                    .split(" ")
+                                    .slice(0, 10)
+                                    .join(" ") +
+                                  (item.shortDesc.split(" ").length > 10
+                                    ? "..."
+                                    : "")
+                                : ""}
+                            </p>
+                            <p className="fw-bold text-primary fs-5">
+                              ${item.price}
+                            </p>
                             <button
                               className="btn btn-outline-primary btn-sm"
-                              onClick={handleViewDetails}
+                              onClick={() =>
+                                router.push(`/market/details/${item.id}`)
+                              }
                               style={{
-                                background: '#c12020',
-                                color: '#fff',
-                                border: '#c12020'
+                                background: "#c12020",
+                                color: "#fff",
+                                border: "#c12020",
                               }}
                             >
                               View Details
@@ -205,9 +247,8 @@ const MarketPlaceListing = () => {
                         </div>
                       </div>
                     ))}
-        
-                </div>
-                       )}
+                  </div>
+                )}
               </div>
 
               {/* Floating SOS Button */}
@@ -215,9 +256,12 @@ const MarketPlaceListing = () => {
                 className="btn btn-danger rounded-circle position-fixed"
                 style={{ bottom: 20, right: 20, width: 50, height: 50 }}
               >
-                <img src="/assets/images/icon-sos.png" alt="" style={{ maxWidth: 25 }} />
+                <img
+                  src="/assets/images/icon-sos.png"
+                  alt=""
+                  style={{ maxWidth: 25 }}
+                />
               </button>
-
             </div>
           </div>
         </div>
@@ -225,7 +269,7 @@ const MarketPlaceListing = () => {
 
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default MarketPlaceListing
+export default MarketPlaceListing;
