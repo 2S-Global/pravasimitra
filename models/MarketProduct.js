@@ -25,7 +25,7 @@ const MarketProductSchema = new mongoose.Schema(
       type: String,
     },
     price: {
-      type: Number,
+      type: Decimal128,
     },
     shortDesc: {
       type: String,
