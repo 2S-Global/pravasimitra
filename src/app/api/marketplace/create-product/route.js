@@ -23,6 +23,7 @@ async function parseFormData(req) {
   const category = form.get("category");
   const city = form.get("city");
   const state = form.get("state");
+  const location = form.get("location") || "";
   const ingredients = form.get("ingredients") || "";
   const price = form.get("price");
   const shortDesc = form.get("shortDesc") || "";
@@ -41,7 +42,7 @@ async function parseFormData(req) {
     })
   );
 
-  return { title, category, city, state, ingredients, price, shortDesc, description, images };
+  return { title, category, city, state, location, ingredients, price, shortDesc, description, images };
 }
 
 export const POST = withAuth(async function (req, user) {
@@ -106,6 +107,7 @@ export const POST = withAuth(async function (req, user) {
       category: decodedCategoryId,
       city: data.city,
       state: data.state,
+      location: data.location,
       ingredients: data.ingredients,
       price: parseFloat(data.price),
       shortDesc: data.shortDesc,
