@@ -80,15 +80,18 @@ export const POST = withAuth(async (req, user) => {
 
       return {
         productId: item.productId._id,
-        title: item.productId.title,
-        images: item.productId.images.map(
-          (img) => `/assets/images/e-marketplace/${img}`
-        ),
-        quantity,
-        unitPrice,
-        subtotal,
-        category: item.productId.category
-    
+        product: {
+          title: item.productId.title,
+          images: item.productId.images.map(
+            (img) => `${process.env.IMAGE_URL}/e-marketplace/${img}`
+          ),
+          price: item.productId.price,
+          description: item.productId.description,
+          category: item.productId.category,
+        },
+        quantity: item.quantity,
+        itemPrice: item.price,
+        subtotal: item.price * item.quantity,
       };
     });
 
