@@ -233,7 +233,7 @@ const MarketPlaceListing = () => {
                             <button
                               className="btn btn-outline-primary btn-sm"
                               onClick={() =>
-                                router.push(`/market/details/${item.id}`)
+                                router.push(`/marketplace/details/${item.id}`)
                               }
                               style={{
                                 background: "#c12020",

@@ -11,8 +11,8 @@ import AlertService from "@/app/components/alertService";
 const ProductDetails = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState("");
-  const [item, setItem] = useState(true);
+  const [selectedImage, setSelectedImage] = useState([]);
+  const [item, setItem] = useState("");
   const { id } = useParams();
 
   const [contactLoading, setContactLoading] = useState(false);
