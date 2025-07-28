@@ -6,12 +6,18 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
 import axios from "axios";
+import { useCartStore } from "@/app/store/cartStore"; // ✅ Import Zustand store
+import AlertService from "@/app/components/alertService";
+
+
 const Cart = () => {
   const router = useRouter();
 
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cartTotal, SetCartTotal] = useState([]);
+
+  const { setCart } = useCartStore(); 
 
   const updateQuantity = async (productId, newQuantity) => {
     try {
@@ -22,6 +28,7 @@ const Cart = () => {
 
       setCartItems(response.data.cart.items);
       SetCartTotal(response.data.cart.cartTotal);
+      setCart(response.data.cart);
       // console.log(response.data.cart.items);
     } catch (error) {
       console.error("Error updating quantity:", error);
@@ -29,17 +36,30 @@ const Cart = () => {
   };
 
   const removeItem = async (productId) => {
-    try {
-      const response = await axios.delete("/api/cart/deleteCart", {
-     data:{productId}
-      });
+    AlertService.confirm(
+    "Remove Item",
+    "Are you sure you want to remove this item?",
+    async () => {
+      try {
+        const response = await axios.delete("/api/cart/deleteCart", {
+          data: { productId },
+        });
 
-      setCartItems(response.data.cart.items);
-      SetCartTotal(response.data.cart.cartTotal);
-    } catch (error) {
-      console.error("Error deleting:", error);
+        setCartItems(response.data.cart.items);
+        SetCartTotal(response.data.cart.cartTotal);
+        setCart(response.data.cart);
+
+        AlertService.success("Item removed successfully!");
+      } catch (error) {
+        console.error("Error deleting:", error);
+        AlertService.error("Failed to remove item.");
+      }
+    },
+    () => {
+      AlertService.message("Item not removed");
     }
-  };
+  );
+};
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -48,6 +68,7 @@ const Cart = () => {
         const cartDetails = await axios.get("/api/cart/addtocart");
         setCartItems(cartDetails.data.cart.items);
         SetCartTotal(cartDetails.data.cart.cartTotal);
+            setCart(cartDetails.data.cart);
       } catch (error) {
         console.error(error);
       } finally {

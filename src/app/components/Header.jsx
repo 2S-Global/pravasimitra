@@ -5,12 +5,12 @@ import Link from "next/link";
 import { useAuthStore } from "@/app/store/authStore";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
+import { useCartStore } from "@/app/store/cartStore";
 const Header = () => {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const setLoggedOut = useAuthStore((state) => state.setLoggedOut);
   const router = useRouter();
-
+const totalQuantity = useCartStore((state) => state.totalQuantity);
   const handleLogout = async () => {
     try {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
@@ -127,7 +127,7 @@ const Header = () => {
                   <Link href="/cart" className="text-dark position-relative">
                     <i className="fas fa-shopping-cart fa-lg"></i>
                     <span className="cart-count badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">
-                      2
+                  {totalQuantity}
                     </span>
                   </Link>
                 </div>
