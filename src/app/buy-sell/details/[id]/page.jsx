@@ -17,6 +17,7 @@ const ProductDetails = () => {
 
   const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
   const handleContactSeller = async () => {
     if (!isLoggedIn) {
       AlertService.error("Please login first to contact the seller.");
@@ -41,6 +42,7 @@ const ProductDetails = () => {
       AlertService.error("Failed to contact the seller. Please try again.");
     } finally {
       setContactLoading(false);
+
     }
   };
 
@@ -252,11 +254,11 @@ const ProductDetails = () => {
                       {item.description}
                     </p>
                   </div>
-                  <div className="tab-pane fade" id="reviews" role="tabpanel">
+                  {/* <div className="tab-pane fade" id="reviews" role="tabpanel">
                     <p className="text-muted">
                       No reviews yet. Be the first to review this product!
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

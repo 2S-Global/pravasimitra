@@ -19,13 +19,7 @@ const ProductDetails = () => {
   const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-  // const images = [
-  //   "/assets/marketplace/hi-kolkata.webp",
-  //   "https://thumbs.dreamstime.com/z/selective-focus-illish-hilsa-fish-cooking-mustard-seed-famous-india-bangladesh-hilsa-fish-oily-species-318939598.jpg?ct=jpeg",
-  //   "https://thumbs.dreamstime.com/z/sorshe-illish-hilsa-fish-cooking-mustard-seed-famous-bengali-food-cooked-green-chili-poppy-seeds-over-white-299291513.jpg?ct=jpeg",
-  //   "https://thumbs.dreamstime.com/z/illish-succulent-fish-distinct-taste-popular-bengali-cuisine-often-cooked-mustard-sauce-selective-focus-hilsa-314659423.jpg?ct=jpeg",
-  //   "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKRRQa7Lr27aCcFRMN4HxS45HLTORjIdQ0Fg&s",
-  // ];
+
 
   const handlePrevImage = () => {
     const currentIndex = item.images.indexOf(selectedImage);
@@ -41,6 +35,37 @@ const ProductDetails = () => {
     }
   };
 
+
+   const handleAddToCart = async () => {
+    if (!isLoggedIn) {
+      AlertService.error("Please login first to contact the seller.");
+      return;
+    }
+
+    if (!item?.id || !item?.createdBy) {
+      AlertService.error("Invalid product or seller information.");
+      return;
+    }
+
+    try {
+      setContactLoading(true);
+
+      const addToCart = await axios.post("/api/cart/addtocart", {
+        productId: item.id,
+        quantity: 1,
+        price:item.price
+      });
+      AlertService.success(addToCart.data.message);
+    } catch (error) {
+      // console.error(error);
+      AlertService.error("Failed to contact the seller. Please try again.");
+    } finally {
+      setContactLoading(false);
+      router.push(`/cart`)
+      
+    }
+  };
+
   useEffect(() => {
     const fetchDetails = async () => {
       // alert("hello");
@@ -53,11 +78,13 @@ const ProductDetails = () => {
         setSelectedImage(productDetails.data.item.images[0]);
 
         setItem(productDetails.data.item);
+        // console.log(productDetails.data.item.id);
         setIngredient(productDetails.data.item.category.name);
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
+        
       }
     };
 
@@ -158,42 +185,47 @@ const ProductDetails = () => {
                   <strong className="text-dark">{item.category.name}</strong>
                 </p>
 
- {(ingredient === "Cooked Food" ||
+                {(ingredient === "Cooked Food" ||
                   ingredient === "Packaged Food") && (
                   <p className="text-secondary mb-3 mt-2">
                     Ingredients:{" "}
                     <strong className="text-dark">{item.ingredients}</strong>
                   </p>
                 )}
-                <div className="d-flex align-items-center mb-3">
+                {/* <div className="d-flex align-items-center mb-3">
                   <span className="badge bg-success me-2">In Stock</span>
                   <span className="text-warning fw-semibold fs-5">★★★★☆</span>
                   <small className="ms-2 text-muted">(112 reviews)</small>
-                </div>
-               
+                </div> */}
+
                 <h3 className="text-primary fw-bold mb-4">${item.price}</h3>
-                <p className="text-muted mb-4" style={{ textAlign:"justify" }}>
-              {item.shortDesc}
+                <p className="text-muted mb-4" style={{ textAlign: "justify" }}>
+                  {item.shortDesc}
                 </p>
 
-                <div className="d-flex gap-2">
+                 <div className="d-flex gap-2">
                   <button
                     className="btn btn-primary px-4"
                     style={{ background: "#c12020", border: "#c12020" }}
-                    onClick={() => router.push("/cart")}
+                    onClick={handleAddToCart}
+                    disabled={contactLoading}
                   >
-                    <i className="bi bi-cart-plus me-2"></i> Add to Cart
+                    {contactLoading ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-cart-plus me-2"></i>Add To Cart
+                      </>
+                    )}
                   </button>
-                  <button
-                    className="btn btn-outline-secondary px-4"
-                    style={{
-                      background: "#c12020",
-                      color: "#fff",
-                      border: "#c12020",
-                    }}
-                  >
-                    <i className="bi bi-heart me-2"></i> Wishlist
-                  </button>
+           
                 </div>
               </div>
             </div>
@@ -238,23 +270,15 @@ const ProductDetails = () => {
                     id="desc"
                     role="tabpanel"
                   >
-                    <p className="text-muted">
-                      Bhapa Ilish is a signature Bengali dish where Hilsa fish
-                      is gently steamed in a creamy mustard and green chili
-                      paste, enriched with a splash of mustard oil. This slow
-                      steaming process enhances the natural flavors of the fish
-                      while infusing it with the bold, tangy taste of mustard.
-                      Each bite offers a perfect balance of heat, sharpness, and
-                      richness, with the soft, flaky hilsa melting in the mouth.
-                      Simple yet deeply flavorful, Bhapa Ilish is a true
-                      celebration of Bengal’s culinary heritage.
+                    <p className="text-muted" style={{ textAlign: "justify" }}>
+                      {item.description}
                     </p>
                   </div>
-                  <div className="tab-pane fade" id="reviews" role="tabpanel">
+                  {/* <div className="tab-pane fade" id="reviews" role="tabpanel">
                     <p className="text-muted">
                       No reviews yet. Be the first to review this product!
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
