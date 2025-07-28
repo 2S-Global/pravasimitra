@@ -19,8 +19,6 @@ const ProductDetails = () => {
   const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
-
-
   const handlePrevImage = () => {
     const currentIndex = item.images.indexOf(selectedImage);
     if (currentIndex > 0) {
@@ -35,8 +33,7 @@ const ProductDetails = () => {
     }
   };
 
-
-   const handleAddToCart = async () => {
+  const handleAddToCart = async () => {
     if (!isLoggedIn) {
       AlertService.error("Please login first to contact the seller.");
       return;
@@ -53,7 +50,7 @@ const ProductDetails = () => {
       const addToCart = await axios.post("/api/cart/addtocart", {
         productId: item.id,
         quantity: 1,
-        price:item.price
+        price: item.price,
       });
       AlertService.success(addToCart.data.message);
     } catch (error) {
@@ -61,8 +58,7 @@ const ProductDetails = () => {
       AlertService.error("Failed to contact the seller. Please try again.");
     } finally {
       setContactLoading(false);
-      router.push(`/cart`)
-      
+      router.push(`/cart`);
     }
   };
 
@@ -84,7 +80,6 @@ const ProductDetails = () => {
         console.error(error);
       } finally {
         setLoading(false);
-        
       }
     };
 
@@ -203,7 +198,7 @@ const ProductDetails = () => {
                   {item.shortDesc}
                 </p>
 
-                 <div className="d-flex gap-2">
+                <div className="d-flex gap-2">
                   <button
                     className="btn btn-primary px-4"
                     style={{ background: "#c12020", border: "#c12020" }}
@@ -225,7 +220,6 @@ const ProductDetails = () => {
                       </>
                     )}
                   </button>
-           
                 </div>
               </div>
             </div>

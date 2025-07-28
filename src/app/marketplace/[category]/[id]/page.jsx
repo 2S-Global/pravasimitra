@@ -186,67 +186,88 @@ const MarketPlaceListing = () => {
                   </div>
                 ) : (
                   <div className="row g-4">
-                    {allItems.map((item, index) => (
-                      <div className="col-md-4" key={index}>
-                        <div className="card h-100 shadow-sm border-0">
-                          <div style={{ position: "relative" }}>
-                            <img
-                              src={item.images[0]}
-                              className="card-img-top"
-                              alt={item.title}
-                              style={{ height: "250px", objectFit: "cover" }}
-                            />
-                            {item.images && (
-                              <div
-                                className="badge bg-dark text-white position-absolute end-0"
-                                style={{
-                                  padding: "7px",
-                                  top: "0px",
-                                }}
-                              >
-                                {item.images.length} Photos
-                              </div>
-                            )}
-                          </div>
-                          <div className="card-body text-center">
-                            <h5 className="card-title">
-                              {" "}
-                              {item.title.length > 30
-                                ? item.title.slice(0, 30) + "..."
-                                : item.title}
-                            </h5>
-                            <p className="card-text text-muted">
-                              {" "}
-                              {item.shortDesc
-                                ? item.shortDesc
-                                    .split(" ")
-                                    .slice(0, 10)
-                                    .join(" ") +
-                                  (item.shortDesc.split(" ").length > 10
-                                    ? "..."
-                                    : "")
-                                : ""}
-                            </p>
-                            <p className="fw-bold text-primary fs-5">
-                              ${item.price}
-                            </p>
-                            <button
-                              className="btn btn-outline-primary btn-sm"
-                              onClick={() =>
-                                router.push(`/marketplace/details/${item.id}`)
-                              }
-                              style={{
-                                background: "#c12020",
-                                color: "#fff",
-                                border: "#c12020",
-                              }}
-                            >
-                              View Details
-                            </button>
-                          </div>
+                    {allItems.length === 0 ? (
+                      <div className="col-12">
+                        <div className="text-center p-5 rounded border shadow-sm bg-light">
+                          <img
+                            src="/assets/images/empty-box.png"
+                            alt="No Records"
+                            className="mx-auto d-block"
+                            style={{
+                              width: "120px",
+                              opacity: 0.5,
+                              marginBottom: "20px",
+                            }}
+                          />
+                          <h4 className="fw-bold text-muted">No Items Found</h4>
+                          <p className="text-secondary">
+                            Sorry, we couldn't find any items in this category.
+                          </p>
                         </div>
                       </div>
-                    ))}
+                    ) : (
+                      allItems.map((item, index) => (
+                        <div className="col-md-4" key={index}>
+                          <div className="card h-100 shadow-sm border-0">
+                            <div style={{ position: "relative" }}>
+                              <img
+                                src={item.images[0]}
+                                className="card-img-top"
+                                alt={item.title}
+                                style={{ height: "250px", objectFit: "cover" }}
+                              />
+                              {item.images && (
+                                <div
+                                  className="badge bg-dark text-white position-absolute end-0"
+                                  style={{
+                                    padding: "7px",
+                                    top: "0px",
+                                  }}
+                                >
+                                  {item.images.length} Photos
+                                </div>
+                              )}
+                            </div>
+                            <div className="card-body text-center">
+                              <h5 className="card-title">
+                                {" "}
+                                {item.title.length > 30
+                                  ? item.title.slice(0, 30) + "..."
+                                  : item.title}
+                              </h5>
+                              <p className="card-text text-muted">
+                                {" "}
+                                {item.shortDesc
+                                  ? item.shortDesc
+                                      .split(" ")
+                                      .slice(0, 10)
+                                      .join(" ") +
+                                    (item.shortDesc.split(" ").length > 10
+                                      ? "..."
+                                      : "")
+                                  : ""}
+                              </p>
+                              <p className="fw-bold text-primary fs-5">
+                                ${item.price}
+                              </p>
+                              <button
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() =>
+                                  router.push(`/marketplace/details/${item.id}`)
+                                }
+                                style={{
+                                  background: "#c12020",
+                                  color: "#fff",
+                                  border: "#c12020",
+                                }}
+                              >
+                                View Details
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 )}
               </div>
