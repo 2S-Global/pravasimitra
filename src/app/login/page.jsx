@@ -8,7 +8,7 @@ import { useState } from "react";
 import AlertService from "@/app/components/alertService";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/app/store/authStore";
-
+import { useCartStore } from "@/app/store/cartStore";
 const Login = () => {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +16,7 @@ const Login = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
+  const { setCart } = useCartStore(); 
   const { setLoggedIn } = useAuthStore();
   const handleLogin = async () => {
     if (!identifier || !password) {
@@ -35,6 +35,15 @@ const Login = () => {
       AlertService.success(response.data.msg);
       //  console.log("Cookies after login:", document.cookie);
       setLoggedIn();
+    try {
+      const cartResponse = await axios.get("/api/cart/addtocart", {
+        withCredentials: true,
+      });
+    setCart(cartResponse.data.cart);
+    } catch (cartError) {
+      console.error("Failed to fetch cart after login:", cartError);
+    }
+
       router.push("/user/dashboard");
     } catch (err) {
       console.error(err);
