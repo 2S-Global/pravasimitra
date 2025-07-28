@@ -9,7 +9,6 @@ import axios from "axios";
 import { useCartStore } from "@/app/store/cartStore"; // ✅ Import Zustand store
 import AlertService from "@/app/components/alertService";
 
-
 const Cart = () => {
   const router = useRouter();
 
@@ -17,7 +16,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [cartTotal, SetCartTotal] = useState([]);
 
-  const { setCart } = useCartStore(); 
+  const { setCart } = useCartStore();
 
   const updateQuantity = async (productId, newQuantity) => {
     try {
@@ -37,29 +36,29 @@ const Cart = () => {
 
   const removeItem = async (productId) => {
     AlertService.confirm(
-    "Remove Item",
-    "Are you sure you want to remove this item?",
-    async () => {
-      try {
-        const response = await axios.delete("/api/cart/deleteCart", {
-          data: { productId },
-        });
+      "Remove Item",
+      "Are you sure you want to remove this item?",
+      async () => {
+        try {
+          const response = await axios.delete("/api/cart/deleteCart", {
+            data: { productId },
+          });
 
-        setCartItems(response.data.cart.items);
-        SetCartTotal(response.data.cart.cartTotal);
-        setCart(response.data.cart);
+          setCartItems(response.data.cart.items);
+          SetCartTotal(response.data.cart.cartTotal);
+          setCart(response.data.cart);
 
-        AlertService.success("Item removed successfully!");
-      } catch (error) {
-        console.error("Error deleting:", error);
-        AlertService.error("Failed to remove item.");
+          AlertService.success("Item removed successfully!");
+        } catch (error) {
+          console.error("Error deleting:", error);
+          AlertService.error("Failed to remove item.");
+        }
+      },
+      () => {
+        AlertService.message("Item not removed");
       }
-    },
-    () => {
-      AlertService.message("Item not removed");
-    }
-  );
-};
+    );
+  };
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -68,7 +67,7 @@ const Cart = () => {
         const cartDetails = await axios.get("/api/cart/addtocart");
         setCartItems(cartDetails.data.cart.items);
         SetCartTotal(cartDetails.data.cart.cartTotal);
-            setCart(cartDetails.data.cart);
+        setCart(cartDetails.data.cart);
       } catch (error) {
         console.error(error);
       } finally {

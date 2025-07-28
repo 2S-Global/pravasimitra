@@ -35,7 +35,7 @@ const ProductDetails = () => {
 
   const handleAddToCart = async () => {
     if (!isLoggedIn) {
-      AlertService.error("Please login first to contact the seller.");
+      AlertService.error("Please login first to add the product in cart.");
       return;
     }
 
