@@ -4,9 +4,23 @@ import Header from "@/app/components/Header"
 import Footer from "@/app/components/Footer"
 import OtherBanner from "@/app/components/OtherBanner"
 import { useRouter } from "next/navigation"
-
+import { useState,useEffect } from "react";
+import { useOrderStore } from "@/app/store/orderStore";
 const CardPayment = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const { billing, shipping, clearOrder } = useOrderStore();
+
+
+  useEffect(() => {
+    if (!billing || !shipping) {
+      router.push("/checkout");
+    }
+  }, [billing, shipping, router]);
+
+
+ console.log("Billing Info:", billing);
+console.log("Shipping Info:", shipping);
+  if (!billing || !shipping) return null;
 
   const handlePayment = (e) => {
     e.preventDefault()
