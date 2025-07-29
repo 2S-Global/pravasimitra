@@ -14,12 +14,13 @@ const Header = () => {
 const totalQuantity = useCartStore((state) => state.totalQuantity);
 
   const handleLogout = async () => {
-    const { clearCart } = useCartStore.getState(); 
+ const { clearCart } = useCartStore.getState();
     try {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
     } catch (err) {
       console.error("Logout error", err);
     } finally {
+      clearCart();
       setLoggedOut();
       window.location.href = "/login";
       window.location.reload();
