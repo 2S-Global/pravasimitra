@@ -29,25 +29,32 @@ export const POST = withAuth(async (req, user) => {
       );
     }
 
-    let itemCount = 0;
-    let totalMRP = 0;
-    let totalAmount = 0;
+    let uniqueItemCount = 0;
+let totalMRP = 0;
+let totalAmount = 0;
 
-    cart.items.forEach((item) => {
-      const product = item.productId;
-      const quantity = item.quantity || 1;
+const uniqueProducts = new Set();
 
-      itemCount += quantity;
-      totalMRP += (product.mrp || product.price || 0)* quantity;
-      totalAmount += (product?.price || 0) * quantity;
-    });
+cart.items.forEach((item) => {
+  const product = item.productId;
+  const quantity = item.quantity || 1;
+
+  // Unique item count by product ID
+  if (!uniqueProducts.has(product._id.toString())) {
+    uniqueProducts.add(product._id.toString());
+    uniqueItemCount += 1;
+  }
+
+  totalMRP += (product.mrp || product.price || 0)* quantity;
+  totalAmount += (product?.price || 0) * quantity;
+});
 
     return addCorsHeaders(
       NextResponse.json(
         {
           summary: {
             price: `${totalMRP}`,
-            items: `${itemCount}`,
+            items: `${uniqueItemCount}`,
             totalAmount: `${totalAmount}`,
           },
         },
