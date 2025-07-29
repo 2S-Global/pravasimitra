@@ -18,8 +18,9 @@ export const POST = withAuth(async (req, user) => {
       return addCorsHeaders(
         NextResponse.json(
           {
-            items: {
-              price: "0 (0 items)",
+            summary: {
+              price: "0",
+              items: "0",
               totalAmount: "0",
             },
           },
@@ -37,15 +38,16 @@ export const POST = withAuth(async (req, user) => {
       const quantity = item.quantity || 1;
 
       itemCount += quantity;
-      totalMRP += (product.mrp || product.price || 0) ;
+      totalMRP += (product.mrp || product.price || 0)* quantity;
       totalAmount += (product?.price || 0) * quantity;
     });
 
     return addCorsHeaders(
       NextResponse.json(
         {
-          items: {
-            price: `${totalMRP} (${itemCount} items)`,
+          summary: {
+            price: `${totalMRP}`,
+            items: `${itemCount}`,
             totalAmount: `${totalAmount}`,
           },
         },
