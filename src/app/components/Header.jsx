@@ -6,12 +6,15 @@ import { useAuthStore } from "@/app/store/authStore";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/app/store/cartStore";
+
 const Header = () => {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const setLoggedOut = useAuthStore((state) => state.setLoggedOut);
   const router = useRouter();
 const totalQuantity = useCartStore((state) => state.totalQuantity);
+
   const handleLogout = async () => {
+    const { clearCart } = useCartStore.getState(); 
     try {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
     } catch (err) {
