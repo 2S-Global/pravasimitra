@@ -13,19 +13,28 @@ const Header = () => {
   const router = useRouter();
 const totalQuantity = useCartStore((state) => state.totalQuantity);
 
-  const handleLogout = async () => {
- const { clearCart } = useCartStore.getState();
-    try {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
-    } catch (err) {
-      console.error("Logout error", err);
-    } finally {
-      clearCart();
-      setLoggedOut();
-      window.location.href = "/login";
-      window.location.reload();
-    }
-  };
+const handleLogout = async () => {
+  const { clearCart } = useCartStore.getState();
+  try {
+    console.log("Starting logout process...");
+    await axios.post("/api/auth/logout", {}, { withCredentials: true });
+
+    clearCart();
+
+    setLoggedOut();
+
+    router.push("/login");
+
+  } catch (err) {
+    console.error("Logout error:", err);
+    clearCart();
+
+    setLoggedOut();
+
+    router.push("/login");
+
+  }
+};
 
   return (
     <div id="wrapper" className="wrapper">
