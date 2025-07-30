@@ -59,7 +59,7 @@ export const POST = withAuth(async function (req, user) {
   await connectDB();
   const userId = user?.id;
 
-  const baseImageUrl = `${process.env.IMAGE_URL}/product-items`; // ✅ must be defined before use
+  //const baseImageUrl = `${process.env.IMAGE_URL}/product-items`;
 
   let data;
   try {
