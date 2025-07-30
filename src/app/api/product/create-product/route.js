@@ -72,7 +72,7 @@ export const POST = withAuth(async function (req, user) {
   const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/avif"];
   const savedFilenames = [];
 
-const uploadDir = path.join(process.cwd(), "public", "assets", "images", "product-items");
+const uploadDir = path.join(process.cwd(), "public/assets/images/product-items");
 
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
