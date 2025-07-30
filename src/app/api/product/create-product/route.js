@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
 import Product from "../../../../../models/Product";
-import ProductCategory from "../../../../../models/ProductCategory"; // 🟢 Needed for populate to work
+import ProductCategory from "../../../../../models/ProductCategory"; // For population
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
@@ -40,7 +40,7 @@ async function parseFormData(req) {
         };
       })
     )
-  ).filter(Boolean); // Removes null entries
+  ).filter(Boolean);
 
   return {
     title,
@@ -58,6 +58,8 @@ export const POST = withAuth(async function (req, user) {
   await connectDB();
   const userId = user?.id;
 
+  const baseImageUrl = `${process.env.IMAGE_URL}/product-items`; // ✅ must be defined before use
+
   let data;
   try {
     data = await parseFormData(req);
@@ -67,13 +69,10 @@ export const POST = withAuth(async function (req, user) {
     );
   }
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/avif"];
   const savedFilenames = [];
 
-  const uploadDir = path.join(
-    process.cwd(),
-    `${baseImageUrl}/product-items`
-  );
+  const uploadDir = path.join(process.cwd(), "public", "product-items"); // ✅ use local disk path
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of data.images) {
@@ -128,8 +127,6 @@ export const POST = withAuth(async function (req, user) {
       createdBy: userId,
     });
 
-    const baseImageUrl = `${process.env.IMAGE_URL}/product-items`;
-
     return addCorsHeaders(
       NextResponse.json(
         {
@@ -143,10 +140,8 @@ export const POST = withAuth(async function (req, user) {
             state: newProduct.state,
             shortDesc: newProduct.shortDesc,
             description: newProduct.description,
-            image: newProduct.image
-              ? `${baseImageUrl}/${newProduct.image}`
-              : null,
-            gallery: newProduct.gallery.map((img) => `${baseImageUrl}/${img}`),
+            image: newProduct.image,
+            gallery: newProduct.gallery.map((img) => `${img}`),
             createdBy: userId,
           },
         },
