@@ -28,17 +28,19 @@ async function parseFormData(req) {
   const description = form.get("description") || "";
   const files = form.getAll("images");
 
-  const images = await Promise.all(
-    files.map(async (file) => {
-      if (typeof file === "string") return null;
-      const buffer = Buffer.from(await file.arrayBuffer());
-      return {
-        buffer,
-        filename: file.name,
-        mime: file.type,
-      };
-    })
-  );
+  const images = (
+    await Promise.all(
+      files.map(async (file) => {
+        if (typeof file === "string") return null;
+        const buffer = Buffer.from(await file.arrayBuffer());
+        return {
+          buffer,
+          filename: file.name,
+          mime: file.type,
+        };
+      })
+    )
+  ).filter(Boolean); // Removes null entries
 
   return {
     title,
@@ -75,11 +77,16 @@ export const POST = withAuth(async function (req, user) {
   if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of data.images) {
+    if (!file || !file.mime) {
+      console.warn("Skipping invalid file:", file);
+      continue;
+    }
+
     if (!allowedTypes.includes(file.mime)) {
       return addCorsHeaders(
         NextResponse.json(
           { error: "Only JPG, PNG, WEBP, AVIF allowed" },
-          { status: 200 }
+          { status: 400 }
         )
       );
     }
