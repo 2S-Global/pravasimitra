@@ -51,7 +51,7 @@ export const POST = withAuth(async (req, user) => {
 
     let status = "pending";
     if (paymentMethod.toLowerCase() === "cash") {
-      status = "confirmed";
+      status = "pending";
     }
 
     const newOrder = new Order({
@@ -63,9 +63,9 @@ export const POST = withAuth(async (req, user) => {
     });
     const savedOrder = await newOrder.save();
 
-    if (paymentMethod.toLowerCase() === "cash") {
+    // if (paymentMethod.toLowerCase() === "cash") {
       await Cart.deleteOne({ userId: user.id });
-    }
+    //}
 
     return addCorsHeaders(
       NextResponse.json(

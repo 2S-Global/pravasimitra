@@ -2,22 +2,26 @@ import mongoose from "mongoose";
 
 const billingSchema = new mongoose.Schema(
   {
-    firstName: String,
-    lastName: String,
+    fullName: String,
     email: String,
     phone: String,
     address: String,
+    pinCode: String,
+    city: String,
+    state: String,
   },
   { _id: false }
 );
 
 const shippingSchema = new mongoose.Schema(
   {
-    firstName: String,
-    lastName: String,
+    fullName: String,
+    email: String,
     phone: String,
-    pinCode: String,
     address: String,
+    pinCode: String,
+    city: String,
+    state: String,
   },
   { _id: false }
 );
