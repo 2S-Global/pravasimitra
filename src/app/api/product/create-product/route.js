@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
+import cloudinary from "../../../../../lib/cloudinary";
 import Product from "../../../../../models/Product";
 import ProductCategory from "../../../../../models/ProductCategory"; // For population
 import { withAuth } from "../../../../../lib/withAuth";
@@ -69,18 +70,18 @@ export const POST = withAuth(async function (req, user) {
     );
   }
 
-  const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/avif"];
-  const savedFilenames = [];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/avif",
+  ];
 
-const uploadDir = path.join(process.cwd(), "public/assets/images/product-items");
-
-  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+  const savedUrls = [];
 
   for (const file of data.images) {
-    if (!file || !file.mime) {
-      console.warn("Skipping invalid file:", file);
-      continue;
-    }
+    if (!file || !file.mime) continue;
 
     if (!allowedTypes.includes(file.mime)) {
       return addCorsHeaders(
@@ -91,14 +92,25 @@ const uploadDir = path.join(process.cwd(), "public/assets/images/product-items")
       );
     }
 
-    const newFilename = `${Date.now()}_${file.filename}`;
-    const savePath = path.join(uploadDir, newFilename);
-
     try {
-      fs.writeFileSync(savePath, file.buffer);
-      savedFilenames.push(newFilename);
+      await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "product-items",
+            resource_type: "image",
+            public_id: `${Date.now()}_${file.filename}`,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            savedUrls.push(result.secure_url);
+            resolve();
+          }
+        );
+
+        stream.end(file.buffer);
+      });
     } catch (err) {
-      console.error("Image save failed:", err);
+      console.error("Cloudinary upload failed:", err);
       return addCorsHeaders(
         NextResponse.json({ error: "Image upload failed" }, { status: 500 })
       );
@@ -123,8 +135,8 @@ const uploadDir = path.join(process.cwd(), "public/assets/images/product-items")
       price: parseFloat(data.price),
       shortDesc: data.shortDesc,
       description: data.description,
-      image: savedFilenames[0] || null,
-      gallery: savedFilenames,
+      image: savedUrls[0] || null,
+      gallery: savedUrls,
       createdBy: userId,
     });
 
