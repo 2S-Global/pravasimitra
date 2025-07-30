@@ -6,6 +6,7 @@ import { ProductCategory } from "../../../../../models/ProductCategory";
 import { withAuth } from "../../../../../lib/withAuth";
 import { encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+import ProductContact from "../../../../../models/ProductContact";
 
 /**
  * @description Get all Products created by the authenticated user (excluding deleted)
@@ -38,13 +39,21 @@ export const GET = withAuth(async function (req, user) {
       );
     }
 
-    const updatedProducts = products.map((item) => ({
-      ...item,
-      id: encodeObjectId(item._id),
-      _id: undefined,
-      image: item.image || null, // Full Cloudinary URL
-      gallery: Array.isArray(item.gallery) ? item.gallery : [], // Also full URL
-    }));
+
+    const updatedProducts = await Promise.all(
+      products.map(async (item) => {
+        const contactCount = await ProductContact.countDocuments({ productId: item._id });
+
+        return {
+          ...item,
+          id: encodeObjectId(item._id),
+          _id: undefined,
+          image: item.image || null,
+          gallery: Array.isArray(item.gallery) ? item.gallery : [],
+          contactCount,
+        };
+      })
+    );
 
     return addCorsHeaders(
       NextResponse.json({ items: updatedProducts }, { status: 200 })
