@@ -31,16 +31,12 @@ export const GET = withAuth(async function (req, user) {
       return NextResponse.json({ msg: "No Products Found", items: [] }, { status: 200 });
     }
 
-    const baseImageUrl = process.env.IMAGE_URL + "/product-items";
-
     const updatedProducts = products.map((item) => ({
       ...item,
       id: encodeObjectId(item._id),
       _id: undefined,
-      image: item.image ? `${baseImageUrl}/${item.image}` : null,
-      gallery: Array.isArray(item.gallery)
-        ? item.gallery.map((img) => `${baseImageUrl}/${img}`)
-        : [],
+      image: item.image || null, // Full Cloudinary URL
+      gallery: Array.isArray(item.gallery) ? item.gallery : [], // Also full URL
     }));
 
     return NextResponse.json({ items: updatedProducts }, { status: 200 });
@@ -49,3 +45,4 @@ export const GET = withAuth(async function (req, user) {
     return NextResponse.json({ error: "Failed to fetch product items" }, { status: 500 });
   }
 });
+
