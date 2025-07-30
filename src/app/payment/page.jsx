@@ -6,11 +6,16 @@ import OtherBanner from "@/app/components/OtherBanner";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useOrderStore } from "@/app/store/orderStore";
+import { useCartStore } from "@/app/store/cartStore";
 import axios from "axios";
-
+import AlertService from "@/app/components/alertService";
 const CardPayment = () => {
+
+
+   const { clearCart } = useCartStore();
   const router = useRouter();
   const { billing, shipping, clearOrder } = useOrderStore();
+    const [orderSummary,setOrderSummary]=useState([]);
   const [formData, setFormData] = useState({
     cardholdername: "",
     cardnumber: "",
@@ -18,21 +23,83 @@ const CardPayment = () => {
     cvv: "",
   });
 
-  useEffect(() => {
+  
+
+
+  // console.log("Billing Info:", billing);
+  // console.log("Shipping Info:", shipping);
+  // if (!billing || !shipping) return null;
+
+
+      const fetchOrderSummary= async () => {
+    try {
+      const orderSumm = await axios.post("/api/order-summary");
+
+      setOrderSummary(orderSumm.data.summary);
+      // console.log(orderSummary);
+      
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+
+    useEffect(() => {
     if (!billing || !shipping) {
       router.push("/checkout");
     }
+    fetchOrderSummary();
   }, [billing, shipping, router]);
 
-  console.log("Billing Info:", billing);
-  console.log("Shipping Info:", shipping);
-  if (!billing || !shipping) return null;
-
-  const handlePayment = (e) => {
+  const handlePayment = async(e) => {
     e.preventDefault();
-    // Replace with real gateway call (e.g. Stripe, Razorpay)
-    alert("Payment Successful!");
-    router.push("/thank-you"); // or order summary page
+ 
+    try{
+      const transformedBilling = {
+        fullName: `${billing.firstName} ${billing.lastName}`,
+        address: billing.address,
+        city: billing.city ,
+        state: billing.state ,
+        zip: billing.pincode,
+        phone: billing.phone,
+        email: billing.email 
+      };
+
+      const transformedShipping = {
+        fullName: `${shipping.firstName} ${shipping.lastName}`,
+        address: shipping.address,
+        city: shipping.city ,
+        state: shipping.state ,
+        zip: shipping.pincode,
+        phone: shipping.phone,
+        email: billing.email 
+      };
+
+
+            const payload = {
+        billing: transformedBilling,
+        shipping: transformedShipping,
+        paymentMethod: "card",
+      };
+
+       const response = await axios.post("/api/checkout", payload);
+
+      if (response) {
+AlertService.success(response.data.message);
+        clearCart(); // clear order from Zustand
+
+        clearOrder();
+        router.push("/user/orders");
+      } else {
+        alert("Failed to place order. Please try again.");
+      }
+
+
+    }
+    catch(error){
+      console.log(error)
+    }
+    // router.push("/thank-you"); // or order summary page
   };
 
   const handleChange = (e) => {
@@ -121,7 +188,7 @@ const CardPayment = () => {
                   <div className="mt-4 border-top pt-3">
                     <div className="d-flex justify-content-between mb-2">
                       <span>Amount</span>
-                      <span className="fw-bold">₹26,500</span>
+                      <span className="fw-bold">${orderSummary.totalAmount}</span>
                     </div>
                     <button
                       type="submit"

@@ -18,6 +18,8 @@ const Checkout = () => {
     phone: "",
     address: "",
     pincode: "",
+    city:"",
+    state:""
   });
 
   const [shipping, setShipping] = useState({
@@ -27,6 +29,8 @@ const Checkout = () => {
     phone: "",
     address: "",
     pincode: "",
+        city:"",
+    state:""
   });
 
   const [sameAsBilling, setSameAsBilling] = useState(false);
@@ -49,7 +53,7 @@ const Checkout = () => {
   const handleChange = (formType) => (e) => {
     const { name, value } = e.target;
 
-      if ((name === "firstName" || name === "lastName") && /[^a-zA-Z\s-]/.test(value)) {
+      if ((name === "firstName" || name === "lastName" || name === "city" || name === "state") && /[^a-zA-Z\s-]/.test(value)) {
     return;
   }
 
@@ -91,7 +95,7 @@ const Checkout = () => {
   const validateForm = () => {
   const nameRegex = /^[A-Za-z]+$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^[0-9]{10,}$/;
+  const phoneRegex = /^[0-9]{10,11}$/;
  const pincodeRegex = /^\d{5,6}$/;
   const checkFields = (data, type) => {
     for (const key in data) {
@@ -109,6 +113,11 @@ const Checkout = () => {
 
      if (!pincodeRegex.test(data.pincode)) {
       AlertService.error(`${type} Pincode must be 5 or 6 digits`);
+      return false;
+    }
+
+     if (!phoneRegex.test(data.phone)) {
+      AlertService.error(`${type} Phone Number must be 10 or 11 digits`);
       return false;
     }
 
@@ -202,6 +211,33 @@ const placeOrder = () => {
                         value={billing.phone}
                         className="form-control"
                     
+                        onChange={handleChange("billing")}
+                      />
+                    </div>
+
+                           <div className="col-md-6">
+                      <label className="form-label">
+                       City <Required />
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={billing.city}
+                        className="form-control"
+        
+                        onChange={handleChange("billing")}
+                      />
+                    </div>
+                                 <div className="col-md-6">
+                      <label className="form-label">
+                       State <Required />
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={billing.state}
+                        className="form-control"
+        
                         onChange={handleChange("billing")}
                       />
                     </div>
@@ -309,6 +345,32 @@ const placeOrder = () => {
                 
                         readOnly={sameAsBilling}
                         onChange={handleChange("shipping")}
+                      />
+                    </div>
+                               <div className="col-md-6">
+                      <label className="form-label">
+                       City <Required />
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={shipping.city}
+                        className="form-control"
+        
+                        onChange={handleChange("billing")}
+                      />
+                    </div>
+                                 <div className="col-md-6">
+                      <label className="form-label">
+                       State <Required />
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={shipping.state}
+                        className="form-control"
+        
+                        onChange={handleChange("billing")}
                       />
                     </div>
                     <div className="col-12">
