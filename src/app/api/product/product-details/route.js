@@ -27,10 +27,12 @@ export const GET = async (req) => {
   const encodedId = searchParams.get("id");
 
   if (!encodedId) {
-    return addCorsHeaders(NextResponse.json(
-      { error: "Missing Product ID in query" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Missing Product ID in query" },
+        { status: 400 }
+      )
+    );
   }
 
   try {
@@ -43,7 +45,9 @@ export const GET = async (req) => {
       .lean();
 
     if (!product) {
-      return addCorsHeaders(NextResponse.json({ msg: "Product not found" }, { status: 404 }));
+      return addCorsHeaders(
+        NextResponse.json({ msg: "Product not found" }, { status: 404 })
+      );
     }
 
     const baseImageUrl = process.env.IMAGE_URL + "/product-items";
@@ -51,19 +55,18 @@ export const GET = async (req) => {
     const updatedProduct = {
       ...product,
       id: encodeObjectId(product._id),
-      image: product.image ? `${baseImageUrl}/${product.image}` : null,
-      gallery: Array.isArray(product.gallery)
-        ? product.gallery.map((img) => `${baseImageUrl}/${img}`)
-        : [],
+      image: product.image || null, //full URL from Cloudinary
+      gallery: Array.isArray(product.gallery) ? product.gallery : [],
     };
     delete updatedProduct._id;
 
-    return addCorsHeaders(NextResponse.json({ item: updatedProduct }, { status: 200 }));
+    return addCorsHeaders(
+      NextResponse.json({ item: updatedProduct }, { status: 200 })
+    );
   } catch (err) {
     console.error("Fetch failed:", err);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Invalid Product ID" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid Product ID" }, { status: 400 })
+    );
   }
 };
