@@ -68,16 +68,14 @@ export const GET = async (req) => {
       );
     }
 
-    const baseImageUrl = `${process.env.IMAGE_URL}/product-items`;
+    //const baseImageUrl = `${process.env.IMAGE_URL}/product-items`;
 
     const updatedProducts = products.map((product) => ({
       ...product,
       id: encodeObjectId(product._id),
       _id: undefined,
-      image: product.image ? `${baseImageUrl}/${product.image}` : null,
-      gallery: Array.isArray(product.gallery)
-        ? product.gallery.map((img) => `${baseImageUrl}/${img}`)
-        : [],
+      image: product.image || null, //full URL from Cloudinary
+      gallery: Array.isArray(product.gallery) ? product.gallery : [],
     }));
 
     return addCorsHeaders(

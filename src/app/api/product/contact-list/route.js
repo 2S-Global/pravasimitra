@@ -6,12 +6,15 @@ import Product from "../../../../../models/Product";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
-export async function OPTIONS() {
+export async function OPTIONS(req) {
+  const origin = req.headers.get("origin");
   return optionsResponse();
 }
 
 export const GET = async (req) => {
+  const origin = req.headers.get('origin');
   await connectDB();
+
   const { searchParams } = new URL(req.url);
   const encodedProductId = searchParams.get("id");
 
@@ -38,7 +41,7 @@ export const GET = async (req) => {
       contactedAt: entry.createdAt,
     }));
 
-    return addCorsHeaders(NextResponse.json({ users: response }, { status: 200 }));
+    return addCorsHeaders(NextResponse.json({ users: response }, { status: 200 }), origin);
   } catch (err) {
     console.error("Contact fetch failed:", err);
     return addCorsHeaders(NextResponse.json({ error: "Failed to fetch contact list" }, { status: 500 }));
