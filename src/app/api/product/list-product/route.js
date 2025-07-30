@@ -5,6 +5,7 @@ import User from "../../../../../models/User";
 import { ProductCategory } from "../../../../../models/ProductCategory";
 import { withAuth } from "../../../../../lib/withAuth";
 import { encodeObjectId } from "../../../../../lib/idCodec";
+import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 /**
  * @description Get all Products created by the authenticated user (excluding deleted)
@@ -13,6 +14,10 @@ import { encodeObjectId } from "../../../../../lib/idCodec";
  * @success {object} 200 - Returns an array of Products with encoded IDs
  * @error {object} 500 - Database query failed or server error
  */
+
+export async function OPTIONS() {
+  return optionsResponse();
+}
 
 export const GET = withAuth(async function (req, user) {
   await connectDB();
@@ -28,7 +33,9 @@ export const GET = withAuth(async function (req, user) {
       .lean();
 
     if (!products || products.length === 0) {
-      return NextResponse.json({ msg: "No Products Found", items: [] }, { status: 200 });
+      return addCorsHeaders(
+        NextResponse.json({ msg: "No Products Found", items: [] }, { status: 200 })
+      );
     }
 
     const updatedProducts = products.map((item) => ({
@@ -39,10 +46,14 @@ export const GET = withAuth(async function (req, user) {
       gallery: Array.isArray(item.gallery) ? item.gallery : [], // Also full URL
     }));
 
-    return NextResponse.json({ items: updatedProducts }, { status: 200 });
+    return addCorsHeaders(
+      NextResponse.json({ items: updatedProducts }, { status: 200 })
+    );
   } catch (err) {
     console.error("DB fetch failed:", err);
-    return NextResponse.json({ error: "Failed to fetch product items" }, { status: 500 });
+    return  addCorsHeaders(
+      NextResponse.json({ error: "Failed to fetch product items" }, { status: 500 })
+    );
   }
 });
 
