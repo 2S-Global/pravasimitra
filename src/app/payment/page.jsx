@@ -1,15 +1,22 @@
-'use client'
+"use client";
 
-import Header from "@/app/components/Header"
-import Footer from "@/app/components/Footer"
-import OtherBanner from "@/app/components/OtherBanner"
-import { useRouter } from "next/navigation"
-import { useState,useEffect } from "react";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
+import OtherBanner from "@/app/components/OtherBanner";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { useOrderStore } from "@/app/store/orderStore";
+import axios from "axios";
+
 const CardPayment = () => {
   const router = useRouter();
   const { billing, shipping, clearOrder } = useOrderStore();
-
+  const [formData, setFormData] = useState({
+    cardholdername: "",
+    cardnumber: "",
+    expiry: "",
+    cvv: "",
+  });
 
   useEffect(() => {
     if (!billing || !shipping) {
@@ -17,23 +24,37 @@ const CardPayment = () => {
     }
   }, [billing, shipping, router]);
 
-
- console.log("Billing Info:", billing);
-console.log("Shipping Info:", shipping);
+  console.log("Billing Info:", billing);
+  console.log("Shipping Info:", shipping);
   if (!billing || !shipping) return null;
 
   const handlePayment = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     // Replace with real gateway call (e.g. Stripe, Razorpay)
-    alert('Payment Successful!')
-    router.push('/thank-you') // or order summary page
-  }
+    alert("Payment Successful!");
+    router.push("/thank-you"); // or order summary page
+  };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "cardholdername" && /[^a-zA-Z\s-]/.test(value)) return;
+    if (name === "cardnumber" && !/^\d{0,16}$/.test(value.replace(/\s/g, "")))
+      return;
+    if (name === "cvv" && !/^\d{0,4}$/.test(value)) return;
+    if (name === "expiry" && !/^\d{0,5}$/.test(value.replace("/", ""))) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
   return (
     <>
       <Header />
-      <OtherBanner page_title="Card Payment" banner_image="/assets/images/bg/furniture_banner.jpg" />
-
+      <OtherBanner
+        page_title="Card Payment"
+        banner_image="/assets/images/bg/furniture_banner.jpg"
+      />
       <section className="py-5 bg-light">
         <div className="container">
           <h2 className="fw-bold mb-4 text-center">Secure Card Payment</h2>
@@ -43,22 +64,57 @@ console.log("Shipping Info:", shipping);
                 <form onSubmit={handlePayment}>
                   <div className="mb-3">
                     <label className="form-label">Cardholder Name</label>
-                    <input type="text" className="form-control" placeholder="John Doe" required />
+                    <input
+                      type="text"
+                      name="cardholdername"
+                      value={formData.cardholdername}
+                      onChange={handleChange}
+                      className="form-control"
+                      placeholder="John Doe"
+                      required
+                    />
                   </div>
 
                   <div className="mb-3">
                     <label className="form-label">Card Number</label>
-                    <input type="text" className="form-control" placeholder="1234 5678 9012 3456" maxLength={19} required />
+                    <input
+                      type="text"
+                      name="cardnumber"
+                      value={formData.cardnumber}
+                      onChange={handleChange}
+                      className="form-control"
+                      placeholder="1234 5678 9012 3456"
+                      maxLength={19}
+                      required
+                    />
                   </div>
 
                   <div className="row g-3">
                     <div className="col-md-6">
                       <label className="form-label">Expiry Date</label>
-                      <input type="text" className="form-control" placeholder="MM/YY" required />
+                      <input
+                        type="text"
+                        name="expiry"
+                        value={formData.expiry}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="MM/YY"
+                        maxLength={5}
+                        required
+                      />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label">CVV</label>
-                      <input type="password" className="form-control" placeholder="•••" maxLength={4} required />
+                      <input
+                        type="password"
+                        name="cvv"
+                        value={formData.cvv}
+                        onChange={handleChange}
+                        className="form-control"
+                        placeholder="•••"
+                        maxLength={4}
+                        required
+                      />
                     </div>
                   </div>
 
@@ -67,7 +123,10 @@ console.log("Shipping Info:", shipping);
                       <span>Amount</span>
                       <span className="fw-bold">₹26,500</span>
                     </div>
-                    <button type="submit" className="btn btn-danger w-100 fw-semibold py-2 rounded-pill mt-2"   onClick={() => router.push('/payment-success')}>
+                    <button
+                      type="submit"
+                      className="btn btn-danger w-100 fw-semibold py-2 rounded-pill mt-2"
+                    >
                       Pay Now
                     </button>
                   </div>
@@ -77,10 +136,9 @@ console.log("Shipping Info:", shipping);
           </div>
         </div>
       </section>
-
       <Footer />
     </>
-  )
-}
+  );
+};
 
-export default CardPayment
+export default CardPayment;
