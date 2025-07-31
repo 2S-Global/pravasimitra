@@ -3,7 +3,10 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Col, Row } from "react-bootstrap";
 import AlertService from "../components/alertService";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 const AddItemModal = ({ show, onClose }) => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     price: "",
