@@ -35,7 +35,7 @@ export const GET = async (req) => {
     const response = contacts.map((entry) => ({
       name: entry.userId?.name,
       email: entry.userId?.email,
-      image: entry.userId?.image,
+      image: entry.userId?.image || "public/assets/images/default-user.png",
       contactedAt: entry.createdAt,
     }));
 

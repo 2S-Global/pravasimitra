@@ -46,13 +46,16 @@ export const GET = withAuth(async function (req, user) {
       products.map(async (item) => {
         const contactDocs = await ProductContact.find({
           productId: item._id,
-        }).populate("userId", "name email mobile");
+        })
+          .populate("userId", "name email mobile image")
+          .lean();
 
         // Safely map contacts from userId
         const contacts = contactDocs.map((contact) => ({
           name: contact.userId?.name || "",
           email: contact.userId?.email || "",
           phone: contact.userId?.mobile || "",
+          image: contact.userId?.image || "public/assets/images/default-user.png",
         }));
 
         return {
