@@ -7,7 +7,7 @@ import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import Amenity from "../../../../../models/Amenity";
-import { decodeObjectId,encodeObjectId } from "../../../../../lib/idCodec";
+import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 /**
@@ -29,10 +29,12 @@ export const GET = async (req) => {
   const encodedId = searchParams.get("id");
 
   if (!encodedId) {
-    return addCorsHeaders(NextResponse.json(
-      { error: "Missing RoomItem ID in query" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Missing RoomItem ID in query" },
+        { status: 400 }
+      )
+    );
   }
 
   try {
@@ -46,12 +48,19 @@ export const GET = async (req) => {
       .lean();
 
     if (!item) {
-      return addCorsHeaders(NextResponse.json({ msg: "Item not found" }, { status: 404 }));
+      return addCorsHeaders(
+        NextResponse.json({ msg: "Item not found" }, { status: 404 })
+      );
     }
 
-    item.images = item.images.map(filename => {
-      return `${process.env.IMAGE_URL}/rent-items/${filename}`;
-    });
+    // item.images = item.images.map(filename => {
+    //   return `${process.env.IMAGE_URL}/rent-items/${filename}`;
+    // });
+
+    // ✅ Use Cloudinary URLs directly without modifying
+    item.images = Array.isArray(item.images)
+      ? item.images.map((img) => img)
+      : [];
 
     const updatedItem = {
       ...item,
@@ -59,12 +68,13 @@ export const GET = async (req) => {
     };
     delete updatedItem._id;
 
-    return addCorsHeaders(NextResponse.json({ item: updatedItem }, { status: 200 }));
+    return addCorsHeaders(
+      NextResponse.json({ item: updatedItem }, { status: 200 })
+    );
   } catch (err) {
     console.error("Fetch failed:", err);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Invalid RoomItem ID" },
-      { status: 400 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid RoomItem ID" }, { status: 400 })
+    );
   }
 };

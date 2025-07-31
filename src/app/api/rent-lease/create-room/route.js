@@ -51,17 +51,35 @@ async function parseFormData(req) {
   const amenities = form.getAll("amenities");
   const files = form.getAll("images");
 
-  const images = await Promise.all(
-    files.map(async (file) => {
-      if (typeof file === "string") return null;
-      const buffer = Buffer.from(await file.arrayBuffer());
-      return {
-        buffer,
-        filename: file.name,
-        mime: file.type,
-      };
-    })
-  ).filter(Boolean);
+  // const images = await Promise.all(
+  //   files.map(async (file) => {
+  //     if (typeof file === "string") return null;
+  //     const buffer = Buffer.from(await file.arrayBuffer());
+  //     return {
+  //       buffer,
+  //       filename: file.name,
+  //       mime: file.type,
+  //     };
+  //   })
+  // ).filter(Boolean);
+
+  let images = [];
+
+  if (Array.isArray(files)) {
+    const uploads = await Promise.all(
+      files.map(async (file) => {
+        if (!file || typeof file === "string" || !file.arrayBuffer) return null;
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        return {
+          buffer,
+          filename: file.name,
+          mime: file.type,
+        };
+      })
+    );
+    images = uploads.filter((img) => img !== null);
+  }
 
   return {
     title,
@@ -118,8 +136,8 @@ export const POST = withAuth(async function (req, user) {
   //     );
   //   }
 
-    // const newFilename = `${Date.now()}_${file.filename}`;
-    // const savePath = path.join(uploadDir, newFilename);
+  // const newFilename = `${Date.now()}_${file.filename}`;
+  // const savePath = path.join(uploadDir, newFilename);
 
   //   try {
   //     fs.writeFileSync(savePath, file.buffer);
@@ -133,37 +151,40 @@ export const POST = withAuth(async function (req, user) {
   // }
 
   for (const file of data.images) {
-  if (!file || !file.mime) continue;
+    if (!file || !file.mime) continue;
 
-  if (!allowedTypes.includes(file.mime)) {
-    return addCorsHeaders(
-      NextResponse.json({ error: "Only JPG, PNG, WEBP, AVIF allowed" }, { status: 400 })
-    );
-  }
-
-  try {
-    await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          folder: "room-items",
-          resource_type: "image",
-          public_id: `${Date.now()}_${file.filename}`,
-        },
-        (error, result) => {
-          if (error) return reject(error);
-          savedUrls.push(result.secure_url);
-          resolve();
-        }
+    if (!allowedTypes.includes(file.mime)) {
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "Only JPG, PNG, WEBP, AVIF allowed" },
+          { status: 400 }
+        )
       );
-      stream.end(file.buffer);
-    });
-  } catch (err) {
-    console.error("Cloudinary upload failed:", err);
-    return addCorsHeaders(
-      NextResponse.json({ error: "Image upload failed" }, { status: 500 })
-    );
+    }
+
+    try {
+      await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "room-items",
+            resource_type: "image",
+            public_id: `${Date.now()}_${file.filename}`,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            savedUrls.push(result.secure_url);
+            resolve();
+          }
+        );
+        stream.end(file.buffer);
+      });
+    } catch (err) {
+      console.error("Cloudinary upload failed:", err);
+      return addCorsHeaders(
+        NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+      );
+    }
   }
-}
 
   let decodedCategoryId;
   try {

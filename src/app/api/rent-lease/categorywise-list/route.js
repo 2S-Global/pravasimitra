@@ -68,14 +68,23 @@ export const GET = async (req) => {
       );
     }
 
-    const baseImageUrl = process.env.IMAGE_URL + "/rent-items";
+    //const baseImageUrl = process.env.IMAGE_URL + "/rent-items";
+
+    // const updatedItems = items.map((item) => ({
+    //   ...item,
+    //   id: encodeObjectId(item._id),
+    //   _id: undefined,
+    //   images: Array.isArray(item.images)
+    //     ? item.images.map((img) => `${baseImageUrl}/${img}`)
+    //     : [],
+    // }));
 
     const updatedItems = items.map((item) => ({
       ...item,
       id: encodeObjectId(item._id),
       _id: undefined,
       images: Array.isArray(item.images)
-        ? item.images.map((img) => `${baseImageUrl}/${img}`)
+        ? item.images.map((img) => img) // return full Cloudinary URLs
         : [],
     }));
 
