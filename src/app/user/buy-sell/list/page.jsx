@@ -8,7 +8,7 @@ import ContactModal from "@/app/components/ContactModal";
 import AddItemModal from "@/app/components/AddItemModel";
 import axios from "axios";
 import EditItemModal from "@/app/components/EditItemModal";
-
+import AlertService from "@/app/components/alertService";
 const ContactedUsersList = () => {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -20,7 +20,11 @@ const ContactedUsersList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+ 
+    fetchUsers();
+  }, []);
+
+     const fetchUsers = async () => {
       try {
         setLoading(true);
         const response = await axios.get("/api/product/list-product");
@@ -35,8 +39,6 @@ const ContactedUsersList = () => {
       }
     };
 
-    fetchUsers();
-  }, []);
 
   const handleViewDetails = (itemName, contacts) => {
     setSelectedItemName(itemName);
@@ -58,6 +60,32 @@ const ContactedUsersList = () => {
     });
     setShowEditModal(true);
   };
+
+
+
+   const handleDelete = async (id) => {
+    AlertService.confirm(
+      "Remove Item",
+      "Are you sure you want to remove this item?",
+      async () => {
+        try {
+          const response = await axios.patch("/api/product/delete-product", { id },
+          );
+
+          AlertService.success("Item removed successfully!");
+          setUsers((prevUsers) => prevUsers.filter((item) => item.id !== id));
+        } catch (error) {
+          console.error("Error deleting:", error);
+          AlertService.error("Failed to remove item.");
+        }
+      },
+      () => {
+        AlertService.message("Item not removed");
+      }
+    );
+  };
+
+
 
   const filteredUsers = users;
 
@@ -190,7 +218,8 @@ const ContactedUsersList = () => {
                                   <button
                                     className="btn btn-sm btn-outline-danger"
                                     title="Delete"
-                                    onClick={() => handleDelete(user.id)}
+                                     type="button"
+                                 onClick={() => handleDelete(user.id)}
                                   >
                                     <i className="bi bi-trash" />
                                   </button>
@@ -232,6 +261,7 @@ const ContactedUsersList = () => {
                 <AddItemModal
                   show={showAddModal}
                   onClose={() => setShowAddModal(false)}
+                  onItemAdded={fetchUsers}
                 />
                 <EditItemModal
                   show={showEditModal}

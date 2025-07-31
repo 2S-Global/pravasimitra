@@ -5,8 +5,10 @@ import AlertService from "../components/alertService";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-const AddItemModal = ({ show, onClose }) => {
+const AddItemModal = ({ show, onClose, onItemAdded }) => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
     price: "",
@@ -38,11 +40,11 @@ const AddItemModal = ({ show, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-  if (name === "price") {
-    if (!/^\d*\.?\d*$/.test(value)) return; // ✅ blocks invalid input
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    return;
-  }
+    if (name === "price") {
+      if (!/^\d*\.?\d*$/.test(value)) return; // ✅ blocks invalid input
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      return;
+    }
 
     if (name === "images") {
       const newFiles = Array.from(files);
@@ -100,10 +102,20 @@ const AddItemModal = ({ show, onClose }) => {
     setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (!validateForm()) return;
-const { title, price, description, images, category, city, shortDesc, state } = formData;
+    const {
+      title,
+      price,
+      description,
+      images,
+      category,
+      city,
+      shortDesc,
+      state,
+    } = formData;
 
     // if (!title || !price || !description || images.length === 0) {
     //   alert("Please fill all fields and upload at least one image.");
@@ -120,21 +132,17 @@ const { title, price, description, images, category, city, shortDesc, state } = 
     data.append("description", description);
     images.forEach((img) => data.append("images", img));
 
-  try {
-    const response = await axios.post(
-      "/api/product/create-product",
-      data,
-      {
+    try {
+      const response = await axios.post("/api/product/create-product", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        withCredentials: true, 
-      }
-    );
+        withCredentials: true,
+      });
 
-    AlertService.success(response.data.msg);
+      AlertService.success(response.data.msg);
 
-    setFormData({
+      setFormData({
         title: "",
         price: "",
         description: "",
@@ -144,16 +152,19 @@ const { title, price, description, images, category, city, shortDesc, state } = 
         city: "",
         state: "",
       });
-    setImagePreviews([]);
-    onClose();
-    router.refresh();
-  } catch (error) {
-    console.error("❌ Error uploading product:", error);
-
-  }
-
- 
+      setImagePreviews([]);
+      onClose();
+      if (typeof onItemAdded === "function") {
+        onItemAdded();
+      }
+    } catch (error) {
+      console.error("❌ Error uploading product:", error);
+    } finally {
+      setLoading(false); // re-enable button after process
+    }
   };
+
+  
 
   return (
     <Modal
@@ -265,7 +276,7 @@ const { title, price, description, images, category, city, shortDesc, state } = 
               as="textarea"
               name="shortDesc"
               rows={2}
-      value={formData.shortDesc} 
+              value={formData.shortDesc}
               onChange={handleChange}
               placeholder="Short description about the item..."
               className="rounded-3 shadow-sm"
@@ -343,14 +354,24 @@ const { title, price, description, images, category, city, shortDesc, state } = 
           <div className="d-flex justify-content-end mt-4">
             <Button
               type="submit"
+              disabled={loading}
               style={{
                 background: "#c12020",
                 color: "#fff",
                 border: "none",
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
               }}
-              className="px-4 py-2 fw-medium rounded-pill"
+              className="px-4 py-2 fw-medium rounded-pill d-flex align-items-center justify-content-center gap-2"
             >
-              Submit
+              {loading && (
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              )}
+              {loading ? "Submitting..." : "Submit"}
             </Button>
           </div>
         </Form>
