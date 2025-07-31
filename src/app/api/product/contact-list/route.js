@@ -29,12 +29,13 @@ export const GET = async (req) => {
   try {
     const contacts = await ProductContact.find({ productId })
       .sort({ createdAt: -1 })
-      .populate("userId", "name email")
+      .populate("userId", "name email image")
       .lean();
 
     const response = contacts.map((entry) => ({
       name: entry.userId?.name,
       email: entry.userId?.email,
+      image: entry.userId?.image,
       contactedAt: entry.createdAt,
     }));
 
