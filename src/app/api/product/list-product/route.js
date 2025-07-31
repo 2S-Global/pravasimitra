@@ -55,7 +55,7 @@ export const GET = withAuth(async function (req, user) {
           name: contact.userId?.name || "",
           email: contact.userId?.email || "",
           phone: contact.userId?.mobile || "",
-          image: contact.userId?.image || "/public/assets/images/default-user.png",
+          image: contact.userId?.image || "/assets/images/default-user.png",
         }));
 
         return {
