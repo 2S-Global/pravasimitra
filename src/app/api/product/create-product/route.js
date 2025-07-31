@@ -4,7 +4,7 @@ import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
 import cloudinary from "../../../../../lib/cloudinary";
 import Product from "../../../../../models/Product";
-import ProductCategory from "../../../../../models/ProductCategory"; // For population
+import ProductCategory from "../../../../../models/ProductCategory";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";

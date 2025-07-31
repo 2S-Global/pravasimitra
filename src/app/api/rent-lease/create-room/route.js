@@ -7,6 +7,7 @@ import RoomItem from "../../../../../models/Room";
 import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
+import cloudinary from "../../../../../lib/cloudinary";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
@@ -60,7 +61,7 @@ async function parseFormData(req) {
         mime: file.type,
       };
     })
-  );
+  ).filter(Boolean);
 
   return {
     title,
@@ -94,35 +95,75 @@ export const POST = withAuth(async function (req, user) {
     );
   }
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-  const savedFilenames = [];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/avif",
+  ];
 
-  const uploadDir = path.join(process.cwd(), "public/assets/images/rent-items");
-  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+  const savedUrls = [];
+
+  // const uploadDir = path.join(process.cwd(), "public/assets/images/rent-items");
+  // if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+  // for (const file of data.images) {
+  //   if (!allowedTypes.includes(file.mime)) {
+  //     return addCorsHeaders(
+  //       NextResponse.json(
+  //         { error: "Only JPG, PNG, WEBP allowed" },
+  //         { status: 200 }
+  //       )
+  //     );
+  //   }
+
+    // const newFilename = `${Date.now()}_${file.filename}`;
+    // const savePath = path.join(uploadDir, newFilename);
+
+  //   try {
+  //     fs.writeFileSync(savePath, file.buffer);
+  //     savedFilenames.push(newFilename);
+  //   } catch (err) {
+  //     console.error("Image save failed:", err);
+  //     return addCorsHeaders(
+  //       NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+  //     );
+  //   }
+  // }
 
   for (const file of data.images) {
-    if (!allowedTypes.includes(file.mime)) {
-      return addCorsHeaders(
-        NextResponse.json(
-          { error: "Only JPG, PNG, WEBP allowed" },
-          { status: 200 }
-        )
-      );
-    }
+  if (!file || !file.mime) continue;
 
-    const newFilename = `${Date.now()}_${file.filename}`;
-    const savePath = path.join(uploadDir, newFilename);
-
-    try {
-      fs.writeFileSync(savePath, file.buffer);
-      savedFilenames.push(newFilename);
-    } catch (err) {
-      console.error("Image save failed:", err);
-      return addCorsHeaders(
-        NextResponse.json({ error: "Image upload failed" }, { status: 500 })
-      );
-    }
+  if (!allowedTypes.includes(file.mime)) {
+    return addCorsHeaders(
+      NextResponse.json({ error: "Only JPG, PNG, WEBP, AVIF allowed" }, { status: 400 })
+    );
   }
+
+  try {
+    await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: "room-items",
+          resource_type: "image",
+          public_id: `${Date.now()}_${file.filename}`,
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          savedUrls.push(result.secure_url);
+          resolve();
+        }
+      );
+      stream.end(file.buffer);
+    });
+  } catch (err) {
+    console.error("Cloudinary upload failed:", err);
+    return addCorsHeaders(
+      NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+    );
+  }
+}
 
   let decodedCategoryId;
   try {
@@ -148,7 +189,7 @@ export const POST = withAuth(async function (req, user) {
   try {
     const newItem = await RoomItem.create({
       title: data.title,
-      images: savedFilenames,
+      images: savedUrls,
       propertyType: decodedCategoryId,
       roomSize: data.roomSize,
       price: parseFloat(data.price),

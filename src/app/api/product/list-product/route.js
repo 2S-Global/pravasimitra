@@ -35,14 +35,25 @@ export const GET = withAuth(async function (req, user) {
 
     if (!products || products.length === 0) {
       return addCorsHeaders(
-        NextResponse.json({ msg: "No Products Found", items: [] }, { status: 200 })
+        NextResponse.json(
+          { msg: "No Products Found", items: [] },
+          { status: 200 }
+        )
       );
     }
 
-
     const updatedProducts = await Promise.all(
       products.map(async (item) => {
-        const contactCount = await ProductContact.countDocuments({ productId: item._id });
+        const contactDocs = await ProductContact.find({
+          productId: item._id,
+        }).populate("userId", "name email mobile");
+
+        // Safely map contacts from userId
+        const contacts = contactDocs.map((contact) => ({
+          name: contact.userId?.name || "",
+          email: contact.userId?.email || "",
+          phone: contact.userId?.mobile || "",
+        }));
 
         return {
           ...item,
@@ -50,7 +61,8 @@ export const GET = withAuth(async function (req, user) {
           _id: undefined,
           image: item.image || null,
           gallery: Array.isArray(item.gallery) ? item.gallery : [],
-          contactCount,
+          contactCount: contactDocs.length,
+          contacts,
         };
       })
     );
@@ -60,9 +72,11 @@ export const GET = withAuth(async function (req, user) {
     );
   } catch (err) {
     console.error("DB fetch failed:", err);
-    return  addCorsHeaders(
-      NextResponse.json({ error: "Failed to fetch product items" }, { status: 500 })
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Failed to fetch product items" },
+        { status: 500 }
+      )
     );
   }
 });
-
