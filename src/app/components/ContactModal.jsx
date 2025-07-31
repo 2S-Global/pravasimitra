@@ -5,8 +5,9 @@ import { Modal, Button, Table, Image } from "react-bootstrap";
 const ContactModal = ({ show, onClose, contacts, itemName }) => {
   const defaultImage =
     "https://t4.ftcdn.net/jpg/02/14/74/61/360_F_214746128_31JkeaP6rU0NzzzdFC4khGkmqc8noe6h.jpg";
-
+// console.log("contact".contacts);
   return (
+
     <Modal
       show={show}
       onHide={onClose}
@@ -40,29 +41,36 @@ const ContactModal = ({ show, onClose, contacts, itemName }) => {
             </thead>
             <tbody>
               {contacts.map((contact, index) => (
-                <tr
-                  key={index}
-                  className="bg-light shadow-sm mb-2 rounded-3"
-                  style={{ borderBottom: "1px solid #dee2e6" }}
-                >
-                  <td>{index + 1}</td>
-                  <td>
-                    <Image
-                      src={contact.image || defaultImage}
-                      alt={contact.name}
-                      roundedCircle
-                      style={{
-                        objectFit: "cover",
-                        width: "60px",
-                        height: "60px",
-                        border: "2px solid #dee2e6",
-                      }}
-                    />
-                  </td>
-                  <td>{contact.name || <i className="text-muted">N/A</i>}</td>
-                  <td>{contact.email || <i className="text-muted">N/A</i>}</td>
-                  <td>{contact.phone || <i className="text-muted">N/A</i>}</td>
-                </tr>
+ <tr
+  key={index}
+  className="bg-light shadow-sm mb-2 rounded-3"
+  style={{ borderBottom: "1px solid #dee2e6" }}
+>
+  <td className="align-middle text-center">{index + 1}</td>
+  <td className="align-middle" style={{ textAlign: "-webkit-center" }}>
+    <Image
+      src={contact.image || defaultImage}
+      alt={contact.name}
+      roundedCircle
+      style={{
+        objectFit: "cover",
+        width: "60px",
+        height: "60px",
+        border: "2px solid #dee2e6",
+      }}
+    />
+  </td>
+  <td className="align-middle text-center">
+    {contact.name || <i className="text-muted">N/A</i>}
+  </td>
+  <td className="align-middle text-center">
+    {contact.email || <i className="text-muted">N/A</i>}
+  </td>
+  <td className="align-middle text-center">
+    {contact.phone || <i className="text-muted">N/A</i>}
+  </td>
+</tr>
+
               ))}
             </tbody>
           </Table>

@@ -1,55 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
 // import Sidebar from "@/app/components/Sidebar"
 import ContactModal from "@/app/components/ContactModal";
 import AddItemModal from "@/app/components/AddItemModel";
-
+import axios from "axios";
 import EditItemModal from "@/app/components/EditItemModal";
 
 const ContactedUsersList = () => {
-  const [users] = useState([
-  {
-    id: 1,
-    item: "Wooden Table",
-    date: "2025-06-01",
-    price: "100$",
-    counter: "2",
-    category:"home-furniture",
-    images: [
-      "https://5.imimg.com/data5/IH/ZP/YN/SELLER-1084552/wodden-table.jpg",
-      "https://images.woodenstreet.de/image/cache/data/coffee-table/elevate-sheesham-wood-glass-top-coffee-table-with-storage-walnut-finish/walnut-finish/new-logo/1-750x650.jpg",
-    ],
-    contacts: [
-      { name: "Alice", email: "alice@example.com", phone: "1234567890" },
-      { name: "Bob", email: "bob@example.com", phone: "9876543210" },
-    ],
-  },
-  {
-    id: 2,
-    item: "Wooden Chair",
-    date: "2025-06-01",
-    category:"home-furniture",
-    price: "100$",
-    counter: "1",
-    images: [
-      "https://m.media-amazon.com/images/I/710GKrS7GvL._AC_UF894,1000_QL80_.jpg"
-    ],
-    contacts: [
-      { name: "Charlie", email: "charlie@example.com", phone: "9999999999" },
-    ],
-  },
-]);
-
-
+  const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedItemContacts, setSelectedItemContacts] = useState([]);
   const [selectedItemName, setSelectedItemName] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get("/api/product/list-product");
+
+        setUsers(response.data.items);
+
+        // console.log("Fetched users:", response.data.items);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false); // end loading
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleViewDetails = (itemName, contacts) => {
     setSelectedItemName(itemName);
@@ -61,16 +48,16 @@ const ContactedUsersList = () => {
   const handleAdd = () => {
     setShowAddModal(true); // Open add modal
   };
-const handleEdit = (item) => {
-  setItemToEdit({
-    title: item.item, // map 'item' to 'title'
-    price: item.price,
-    description: "Sample description here", // fallback if not present
-    images: item.images || [],
-    category:item.category
-  });
-  setShowEditModal(true);
-};
+  const handleEdit = (item) => {
+    setItemToEdit({
+      title: item.item, // map 'item' to 'title'
+      price: item.price,
+      description: "Sample description here", // fallback if not present
+      images: item.images || [],
+      category: item.category,
+    });
+    setShowEditModal(true);
+  };
 
   const filteredUsers = users;
 
@@ -120,24 +107,62 @@ const handleEdit = (item) => {
                         <tr>
                           <th>#</th>
                           <th>Item Name</th>
-                          {/* <th>Category Name</th> */}
-                          <th>Price</th>
+                          <th>Item Image</th>
+                          <th>Category Name</th>
+                          <th>Price ($)</th>
                           <th>Date</th>
                           <th>Interested Users</th>
                           <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredUsers.length > 0 ? (
+                        {loading ? (
+                          <tr>
+                            <td colSpan="8">
+                              <div
+                                className="d-flex justify-content-center align-items-center"
+                                style={{ minHeight: "200px" }}
+                              >
+                                <div
+                                  className="spinner-border text-danger"
+                                  role="status"
+                                >
+                                  <span className="visually-hidden">
+                                    Loading...
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : filteredUsers.length > 0 ? (
                           filteredUsers.map((user, index) => (
                             <tr key={user.id}>
                               <td>{index + 1}</td>
-                              <td>{user.item}</td>
-                              {/* <td>{user.category}</td> */}
+                              <td>
+                                {user.title.split(" ").length > 5
+                                  ? user.title
+                                      .split(" ")
+                                      .slice(0, 5)
+                                      .join(" ") + "..."
+                                  : user.title}
+                              </td>
+                              <td>
+                                <img
+                                  src={user?.image}
+                                  alt="User"
+                                  width={80}
+                                  height={60}
+                                  style={{ objectFit: "cover" }}
+                                />
+                              </td>
+                              <td>{user.category?.name}</td>
+
                               <td>{user.price}</td>
 
                               <td>
-                                {new Date(user.date).toLocaleDateString()}
+                                {new Date(user.createdAt).toLocaleDateString(
+                                  "en-GB"
+                                )}
                               </td>
                               <td>
                                 <button
@@ -145,10 +170,10 @@ const handleEdit = (item) => {
                                   title="View Details"
                                   type="button"
                                   onClick={() =>
-                                    handleViewDetails(user.item, user.contacts)
+                                    handleViewDetails(user.title, user.contacts)
                                   }
                                 >
-                                  {user.counter}
+                                  {user.contactCount}
                                 </button>
                               </td>
                               <td>
@@ -175,8 +200,8 @@ const handleEdit = (item) => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="7" className="text-center text-muted">
-                              No users found.
+                            <td colSpan="8" className="text-center text-muted">
+                              No Products found.
                             </td>
                           </tr>
                         )}
@@ -213,7 +238,6 @@ const handleEdit = (item) => {
                   onClose={() => setShowEditModal(false)}
                   itemData={itemToEdit}
                   onSave={(formData) => {
-            
                     console.log("Submit updated item", formData);
                   }}
                 />

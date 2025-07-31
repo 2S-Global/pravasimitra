@@ -14,7 +14,7 @@ const Cart = () => {
 
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cartTotal, SetCartTotal] = useState([]);
+  const [cartTotal, setCartTotal] = useState([]);
 
   const { setCart } = useCartStore();
 
@@ -26,7 +26,7 @@ const Cart = () => {
       });
 
       setCartItems(response.data.cart.items);
-      SetCartTotal(response.data.cart.cartTotal);
+      setCartTotal(response.data.cart.cartTotal);
       setCart(response.data.cart);
       // console.log(response.data.cart.items);
     } catch (error) {
@@ -45,7 +45,7 @@ const Cart = () => {
           });
 
           setCartItems(response.data.cart.items);
-          SetCartTotal(response.data.cart.cartTotal);
+          setCartTotal(response.data.cart.cartTotal);
           setCart(response.data.cart);
 
           AlertService.success("Item removed successfully!");
@@ -66,7 +66,7 @@ const Cart = () => {
         setLoading(true);
         const cartDetails = await axios.get("/api/cart/addtocart");
         setCartItems(cartDetails.data.cart.items);
-        SetCartTotal(cartDetails.data.cart.cartTotal);
+        setCartTotal(cartDetails.data.cart.cartTotal);
         setCart(cartDetails.data.cart);
       } catch (error) {
         console.error(error);
@@ -190,7 +190,7 @@ const Cart = () => {
                             </button>
                           </td>
                           <td style={{ textAlign: "-webkit-center" }}>
-                            ₹{item.product.price}
+                            ${item.product.price}
                           </td>
                           <td style={{ textAlign: "-webkit-center" }}>
                             ${item.subtotal}

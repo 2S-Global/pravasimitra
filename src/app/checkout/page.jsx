@@ -84,7 +84,7 @@ const Checkout = () => {
       const orderSumm = await axios.post("/api/order-summary");
 
       setOrderSummary(orderSumm.data.summary);
-      console.log(orderSummary);
+      // console.log(orderSummary);
       
     } catch (error) {
       console.error("Error fetching categories:", error);
