@@ -16,16 +16,27 @@ export const GET = withAuth(async (req, user) => {
   try {
     const contacts = await RoomContact.find({ userId: user.id })
       .sort({ createdAt: -1 })
-      .populate("roomId", "title image")
+      .populate("roomId", "title images")
       .populate({
         path: "ownerId",
         select: "name email phone",
       })
       .lean();
 
+    // const result = contacts.map((contact) => ({
+    //   roomTitle: contact.roomId?.title,
+    //   roomImage: contact.roomId?.image,
+    //   ownerName: contact.ownerId?.name,
+    //   ownerEmail: contact.ownerId?.email,
+    //   ownerPhone: contact.ownerId?.phone || "N/A",
+    //   contactedAt: contact.createdAt,
+    // }));
+
     const result = contacts.map((contact) => ({
       roomTitle: contact.roomId?.title,
-      roomImage: contact.roomId?.image,
+      roomImages: Array.isArray(contact.roomId?.images)
+        ? contact.roomId.images
+        : [contact.roomId?.image || "/assets/images/default-user.png"],
       ownerName: contact.ownerId?.name,
       ownerEmail: contact.ownerId?.email,
       ownerPhone: contact.ownerId?.phone || "N/A",
