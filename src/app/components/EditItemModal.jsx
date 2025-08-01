@@ -60,41 +60,43 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
     }
   }, [itemData]);
 
-  console.log("Selected category:", formData.category);
-  console.log("Categories:", categories);
+  // console.log("Selected category:", formData.category);
+  // console.log("Categories:", categories);
   const Required = () => <span className="text-danger">*</span>;
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
+const handleChange = (e) => {
+  const { name, value, files } = e.target;
 
-    if (name === "images" && files.length > 0) {
-      const newFiles = Array.from(files);
+  if (name === "images" && files.length > 0) {
+    const newFiles = Array.from(files);
 
-      // Filter out duplicates by name
-      const existingFileNames = new Set(formData.images.map((f) => f.name));
-      const filteredNewFiles = newFiles.filter(
-        (file) => !existingFileNames.has(file.name)
-      );
+    const existingFileNames = new Set(formData.images.map((f) => f.name));
+    const filteredNewFiles = newFiles.filter(
+      (file) => !existingFileNames.has(file.name)
+    );
 
-      const updatedImages = [...formData.images, ...filteredNewFiles];
-      setFormData((prev) => ({ ...prev, images: updatedImages }));
+    const updatedImages = [...formData.images, ...filteredNewFiles];
+    setFormData((prev) => ({ ...prev, images: updatedImages }));
 
-      setImagePreviews((prev) => [
-        ...prev,
-        ...filteredNewFiles.map((file) => ({
-          url: URL.createObjectURL(file),
-          isExisting: false,
-          file,
-        })),
-      ]);
-    } else {
-      // ✅ For category, title, etc.
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
+    setImagePreviews((prev) => [
+      ...prev,
+      ...filteredNewFiles.map((file) => ({
+        url: URL.createObjectURL(file),
+        isExisting: false,
+        file,
+      })),
+    ]);
+
+    // ✅ Reset input value so same files can be reselected
+    e.target.value = null;
+  } else {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+};
+
 
   const handleRemoveImage = (index, isExisting = false) => {
     if (isExisting) {
