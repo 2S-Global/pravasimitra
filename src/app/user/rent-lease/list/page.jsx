@@ -1,71 +1,22 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
-// import Sidebar from "@/app/components/Sidebar"
 import ContactModal from "@/app/components/ContactModal";
 import AddRoomModel from "@/app/components/AddRoomModel";
-
 import EditRoomModal from "@/app/components/EditRoomModal";
-
+import AlertService from "@/app/components/alertService";
+import axios from "axios";
 const ContactedUsersList = () => {
-  const [users] = useState([
-    {
-      id: 1,
-      title: "2 BHK Apartment in City Center",
-      propertyType: "Rent",
-      price: "$1,200/month",
-      roomSize: "950 sq.ft",
-      datePosted: "2025-06-01",
-      counter: "2",
-      images: [
-        "https://delf2iyv2crlj.cloudfront.net/Images/253e9e2a-ca65-4bc2-b2ee-9bee6288dff2.webp",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVahLtcySXRTWD6oqowjthP4yUzVWliWJi7w&s",
-        "https://images.nobroker.in/images/8a9fb18278c643d30178c65f903a068a/8a9fb18278c643d30178c65f903a068a_75763_384707_large.jpg"
-      ],
-      contacts: [
-        { name: "Alice", email: "alice@example.com", phone: "1234567890" },
-        { name: "Bob", email: "bob@example.com", phone: "9876543210" },
-      ],
-    },
-    {
-      id: 2,
-      title: "Residential Plot Available",
-      propertyType: "Sell",
-      price: "$15,000",
-      roomSize: "2400 sq.ft",
-      datePosted: "2025-06-03",
-      counter: "1",
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwzFfGI42o3Gj9goEHVWwjbwla84LnBx7w1w&s",
-        "https://s3.ap-south-1.amazonaws.com/www.cimg.in/images/2022/09/08/34/_16626388441_large.jpg"
-      ],
-      contacts: [
-        { name: "Charlie", email: "charlie@example.com", phone: "9999999999" },
-      ],
-    },
-    {
-      id: 3,
-      title: "Commercial Shop Space for Lease",
-      propertyType: "Lease",
-      price: "$2,000/month",
-      roomSize: "400 sq.ft",
-      datePosted: "2025-06-05",
-      counter: "1",
-      images: ["https://static.360realtors.com/properties/photos/7247/mini/1727417831_0propertyimage.webp",
-        "https://5.imimg.com/data5/XH/NE/SW/SELLER-48886426/shop-for-sale-in-jaipur-commercial.jpg"
-      ],
-      contacts: [{ name: "David", email: "david@example.com", phone: "8888888888" },],
-    },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedItemContacts, setSelectedItemContacts] = useState([]);
   const [selectedItemName, setSelectedItemName] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const handleViewDetails = (itemName, contacts) => {
     setSelectedItemName(itemName);
@@ -74,14 +25,16 @@ const ContactedUsersList = () => {
     setShowModal(true);
   };
 
+
+  
   const handleAdd = () => {
     setShowAddModal(true); // Open add modal
   };
   const handleEdit = (item) => {
     setItemToEdit({
       title: item.title,
-      propertyType:item.propertyType,
-      roomSize:item.roomSize,
+      propertyType: item.propertyType,
+      roomSize: item.roomSize,
       price: item.price,
       description: "Sample description here", // fallback if not present
       images: item.images || [],
@@ -90,6 +43,25 @@ const ContactedUsersList = () => {
   };
 
   const filteredUsers = users;
+
+
+    const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/api/rent-lease/list-room");
+
+      setUsers(response.data.items);
+
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false); 
+    }
+  };
+
+    useEffect(() => {
+      fetchUsers();
+    }, []);
 
   return (
     <>
@@ -115,7 +87,7 @@ const ContactedUsersList = () => {
 
                 <div className="container my-4">
                   {/* Add New Button */}
-                  <div className="mb-3 text-end">
+                  <div className="mb-3 text-end mb-5">
                     <button
                       type="button"
                       className="btn btn-primary "
@@ -137,6 +109,7 @@ const ContactedUsersList = () => {
                         <tr>
                           <th>#</th>
                           <th>Title</th>
+                          <th>Room Image</th>
                           <th>Property Type</th>
                           <th>Price</th>
                           <th>Room Size</th>
@@ -146,22 +119,56 @@ const ContactedUsersList = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredUsers.length > 0 ? (
+
+                           {loading ? (
+                          <tr>
+                            <td colSpan="10">
+                              <div
+                                className="d-flex justify-content-center align-items-center"
+                                style={{ minHeight: "200px" }}
+                              >
+                                <div
+                                  className="spinner-border text-danger"
+                                  role="status"
+                                >
+                                  <span className="visually-hidden">
+                                    Loading...
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        ) :
+                        filteredUsers.length > 0 ? (
                           filteredUsers.map((user, index) => (
                             <tr key={user.id}>
                               <td>{index + 1}</td>
-                              <td>{user.title}</td>
-                              <td>{user.propertyType}</td>
+                             <td>
+                                {user.title.split(" ").length > 12
+                                  ? user.title
+                                      .split(" ")
+                                      .slice(0, 12)
+                                      .join(" ") + "..."
+                                  : user.title}
+                              </td>
+                              <td><img
+                                  src={user?.images?.[0] }
+                                  alt="User"
+                                  width={80}
+                                  height={60}
+                                  style={{ objectFit: "cover" }}
+                                /></td>
+                              <td>{user.propertyType?.name || "N/A"}</td>
                               <td>{user.price}</td>
                               <td>{user.roomSize}</td>
 
-                              <td>
-                                {new Date(user.datePosted).toLocaleDateString(
-                                  "en-IN"
+                                 <td>
+                                {new Date(user.createdAt).toLocaleDateString(
+                                  "en-GB"
                                 )}
                               </td>
-                    
-                              <td>
+
+                          <td>
                                 <button
                                   className="btn btn-sm btn-outline-info"
                                   title="View Details"
@@ -170,13 +177,13 @@ const ContactedUsersList = () => {
                                     handleViewDetails(user.title, user.contacts)
                                   }
                                 >
-                                  {user.counter}
+                                  {user.contactCount}
                                 </button>
                               </td>
                               <td>
                                 <div className="d-flex justify-content-center gap-1">
                                   <button
-                                    className="btn btn-sm btn-outline-warning"
+                                    className="btn btn-sm btn-outline-warning "
                                     title="Edit"
                                     type="button"
                                     onClick={() => handleEdit(user)}
@@ -197,8 +204,8 @@ const ContactedUsersList = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan="7" className="text-center text-muted">
-                              No users found.
+                            <td colSpan="9" className="text-center text-muted">
+                              No Room found.
                             </td>
                           </tr>
                         )}

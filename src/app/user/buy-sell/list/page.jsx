@@ -112,7 +112,7 @@ const ContactedUsersList = () => {
 
                 <div className="container my-4">
                   {/* Add New Button */}
-                  <div className="mb-3 text-end">
+                  <div className="mb-5 text-end">
                     <button
                       type="button"
                       className="btn btn-primary "
