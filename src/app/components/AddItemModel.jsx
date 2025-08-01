@@ -38,28 +38,40 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
 
   const [imagePreviews, setImagePreviews] = useState([]);
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "price") {
-      if (!/^\d*\.?\d*$/.test(value)) return; // ✅ blocks invalid input
-      setFormData((prev) => ({ ...prev, [name]: value }));
-      return;
-    }
+const handleChange = (e) => {
+  const { name, value, files } = e.target;
 
-    if (name === "images") {
-      const newFiles = Array.from(files);
-      const updatedImages = [...formData.images, ...newFiles];
+  if (name === "price") {
+    if (!/^\d*\.?\d*$/.test(value)) return;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    return;
+  }
 
-      const uniqueImages = Array.from(
-        new Map(updatedImages.map((file) => [file.name, file])).values()
-      );
+  if (name === "images" && files.length > 0) {
+    const newFiles = Array.from(files);
 
-      setFormData((prev) => ({ ...prev, images: uniqueImages }));
-      setImagePreviews(uniqueImages.map((file) => URL.createObjectURL(file)));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
+    // Filter duplicates by name
+    const existingNames = new Set(formData.images.map((f) => f.name));
+    const filteredNewFiles = newFiles.filter((file) => !existingNames.has(file.name));
+
+    const updatedImages = [...formData.images, ...filteredNewFiles];
+
+    // Revoke old preview URLs
+    imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+
+    // Create new previews
+    const newPreviews = updatedImages.map((file) => URL.createObjectURL(file));
+
+    setFormData((prev) => ({ ...prev, images: updatedImages }));
+    setImagePreviews(newPreviews);
+
+    // ✅ Clear file input so selecting same file again works
+    e.target.value = "";
+  } else {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+};
+
 
   const validateForm = () => {
     const { title, price, description, images, category, city, state } =
@@ -95,17 +107,26 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
     return true;
   };
 
-  const handleRemoveImage = (index) => {
-    const updatedImages = [...formData.images];
-    updatedImages.splice(index, 1);
-    setFormData((prev) => ({ ...prev, images: updatedImages }));
-    setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
-  };
+const handleRemoveImage = (index) => {
+  // Clean up old object URL
+  URL.revokeObjectURL(imagePreviews[index]);
+
+  const updatedImages = [...formData.images];
+  updatedImages.splice(index, 1);
+
+  setFormData((prev) => ({ ...prev, images: updatedImages }));
+  setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+   if (!validateForm()) {
+  setLoading(false); // 👈 stop the spinner
+  return;
+}
+
     setLoading(true);
-    if (!validateForm()) return;
     const {
       title,
       price,

@@ -52,11 +52,14 @@ const ContactedUsersList = () => {
   };
   const handleEdit = (item) => {
     setItemToEdit({
-      title: item.item, // map 'item' to 'title'
+      title: item.title, // map 'item' to 'title'
       price: item.price,
-      description: "Sample description here", // fallback if not present
-      images: item.images || [],
-      category: item.category,
+      description: item.description, // fallback if not present
+   gallery: item.gallery || [],
+      category: item.category.id,
+      city: item.city,
+      state: item.state,  
+      shortDesc: item.shortDesc || "",
     });
     setShowEditModal(true);
   };

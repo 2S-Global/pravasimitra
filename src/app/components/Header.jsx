@@ -232,6 +232,7 @@ const handleLogout = async () => {
                         <button
                           onClick={handleLogout}
                           className="dropdown-item"
+                          
                         >
                           Logout
                         </button>
