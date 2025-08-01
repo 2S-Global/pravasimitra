@@ -186,11 +186,28 @@ const handleRemoveImage = (index) => {
   };
 
   
+  const resetForm = () => {
+  setFormData({
+    title: "",
+    price: "",
+    description: "",
+    images: [],
+    shortDesc: "",
+    category: "",
+    city: "",
+    state: "",
+  });
+  setImagePreviews([]);
+};
+
 
   return (
     <Modal
       show={show}
-      onHide={onClose}
+       onHide={() => {
+    resetForm();
+    onClose();
+  }}
       centered
       size="lg"
       dialogClassName="custom-modal"
@@ -316,19 +333,34 @@ const handleRemoveImage = (index) => {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">
-              Upload Images <Required />
-            </Form.Label>
-            <Form.Control
-              type="file"
-              name="images"
-              accept="image/*"
-              multiple
-              onChange={handleChange}
-              className="rounded-3 shadow-sm"
-            />
-          </Form.Group>
+<Form.Group className="mb-3">
+  <Form.Label className="fw-semibold">
+    Upload Images <Required />
+  </Form.Label>
+
+  {/* Hidden native input */}
+  <Form.Control
+    type="file"
+    id="imageUpload"
+    name="images"
+    accept="image/*"
+    multiple
+    onChange={handleChange}
+    className="d-none" // hides input
+  />
+
+  {/* Custom trigger button */}
+  <label htmlFor="imageUpload" className="btn btn-outline-secondary rounded-3 ml-3 shadow-sm">
+    Choose Images
+  </label>
+
+  {/* Optional: show file count or names */}
+  {formData.images.length > 0 && (
+    <div className="mt-2 small text-muted">
+      {formData.images.length} file(s) selected
+    </div>
+  )}
+</Form.Group>
 
           {imagePreviews.length > 0 && (
             <div className="d-flex flex-wrap gap-3 mt-3">
