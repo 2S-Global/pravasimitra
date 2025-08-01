@@ -17,6 +17,10 @@ import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
  * @error {object} 500 - Database query failed or server error
  */
 
+export async function OPTIONS() {
+  return optionsResponse();
+}
+
 export const GET = withAuth(async function (req, user) {
   await connectDB();
   const userId = user?.id;
