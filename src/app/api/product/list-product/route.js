@@ -58,6 +58,14 @@ export const GET = withAuth(async function (req, user) {
           image: contact.userId?.image || "/assets/images/default-user.png",
         }));
 
+        // Encode category ID if present
+        const category = item.category?._id
+          ? {
+              id: encodeObjectId(item.category._id),
+              name: item.category.name,
+            }
+          : null;
+
         return {
           ...item,
           id: encodeObjectId(item._id),
@@ -66,6 +74,7 @@ export const GET = withAuth(async function (req, user) {
           gallery: Array.isArray(item.gallery) ? item.gallery : [],
           contactCount: contactDocs.length,
           contacts,
+          category,
         };
       })
     );
