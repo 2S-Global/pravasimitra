@@ -17,8 +17,6 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [categories, setCategories] = useState([]);
 
-
-
   useEffect(() => {
     const fetchAndSet = async () => {
       try {
@@ -63,84 +61,84 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
   }, [itemData]);
 
   console.log("Selected category:", formData.category);
-console.log("Categories:", categories);
+  console.log("Categories:", categories);
   const Required = () => <span className="text-danger">*</span>;
 
-const handleChange = (e) => {
-  const { name, value, files } = e.target;
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
 
-  if (name === "images" && files.length > 0) {
-    const newFiles = Array.from(files);
+    if (name === "images" && files.length > 0) {
+      const newFiles = Array.from(files);
 
-    // Filter out duplicates by name
-    const existingFileNames = new Set(formData.images.map((f) => f.name));
-    const filteredNewFiles = newFiles.filter(
-      (file) => !existingFileNames.has(file.name)
-    );
+      // Filter out duplicates by name
+      const existingFileNames = new Set(formData.images.map((f) => f.name));
+      const filteredNewFiles = newFiles.filter(
+        (file) => !existingFileNames.has(file.name)
+      );
 
-    const updatedImages = [...formData.images, ...filteredNewFiles];
-    setFormData((prev) => ({ ...prev, images: updatedImages }));
+      const updatedImages = [...formData.images, ...filteredNewFiles];
+      setFormData((prev) => ({ ...prev, images: updatedImages }));
 
-    setImagePreviews((prev) => [
-      ...prev,
-      ...filteredNewFiles.map((file) => ({
-        url: URL.createObjectURL(file),
-        isExisting: false,
-        file,
-      })),
-    ]);
-  } else {
-    // ✅ For category, title, etc.
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-};
+      setImagePreviews((prev) => [
+        ...prev,
+        ...filteredNewFiles.map((file) => ({
+          url: URL.createObjectURL(file),
+          isExisting: false,
+          file,
+        })),
+      ]);
+    } else {
+      // ✅ For category, title, etc.
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
 
-const handleRemoveImage = (index, isExisting = false) => {
-  if (isExisting) {
-    const updated = [...existingImages];
-    updated.splice(index, 1);
-    setExistingImages(updated);
+  const handleRemoveImage = (index, isExisting = false) => {
+    if (isExisting) {
+      const updated = [...existingImages];
+      updated.splice(index, 1);
+      setExistingImages(updated);
 
-    // Remove corresponding existing preview
-    let existingIndex = -1;
-    let count = -1;
-    setImagePreviews((prev) =>
-      prev.filter((img) => {
-        if (img.isExisting) {
-          count++;
-          if (count === index) {
-            existingIndex = count;
-            return false;
+      // Remove corresponding existing preview
+      let existingIndex = -1;
+      let count = -1;
+      setImagePreviews((prev) =>
+        prev.filter((img) => {
+          if (img.isExisting) {
+            count++;
+            if (count === index) {
+              existingIndex = count;
+              return false;
+            }
           }
-        }
-        return true;
-      })
-    );
-  } else {
-    const updated = [...formData.images];
-    updated.splice(index, 1);
-    setFormData((prev) => ({ ...prev, images: updated }));
+          return true;
+        })
+      );
+    } else {
+      const updated = [...formData.images];
+      updated.splice(index, 1);
+      setFormData((prev) => ({ ...prev, images: updated }));
 
-    // Remove corresponding new preview
-    let newIndex = -1;
-    let count = -1;
-    setImagePreviews((prev) =>
-      prev.filter((img) => {
-        if (!img.isExisting) {
-          count++;
-          if (count === index) {
-            newIndex = count;
-            return false;
+      // Remove corresponding new preview
+      let newIndex = -1;
+      let count = -1;
+      setImagePreviews((prev) =>
+        prev.filter((img) => {
+          if (!img.isExisting) {
+            count++;
+            if (count === index) {
+              newIndex = count;
+              return false;
+            }
           }
-        }
-        return true;
-      })
-    );
-  }
-};
+          return true;
+        })
+      );
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -227,18 +225,18 @@ const handleRemoveImage = (index, isExisting = false) => {
                   Category <Required />
                 </Form.Label>
                 <Form.Select
-      name="category"
-      value={formData.category}
-      onChange={handleChange}
-      className="rounded-3 shadow-sm"
-    >
-      <option value="">Select</option>
-      {categories.map((cat) => (
-        <option key={cat._id} value={cat.id}>
-          {cat.name}
-        </option>
-      ))}
-    </Form.Select>
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="rounded-3 shadow-sm"
+                >
+                  <option value="">Select</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </Form.Select>
               </Form.Group>
             </Col>
 
@@ -317,18 +315,37 @@ const handleRemoveImage = (index, isExisting = false) => {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">
-              Upload New Images <Required />
-            </Form.Label>
-            <Form.Control
-              type="file"
-              name="images"
-              accept="image/*"
-              multiple
-              onChange={handleChange}
-            />
-          </Form.Group>
+   <Form.Group className="mb-3">
+              <Form.Label className="fw-semibold">
+                Upload Images <Required />
+              </Form.Label>
+  
+              {/* Hidden native input */}
+              <Form.Control
+                type="file"
+                id="imageUpload"
+                name="images"
+                accept="image/*"
+                multiple
+                onChange={handleChange}
+                className="d-none" // hides input
+              />
+  
+              {/* Custom trigger button */}
+              <label
+                htmlFor="imageUpload"
+                className="btn btn-outline-secondary rounded-3 ml-3 shadow-sm"
+              >
+                Choose Images
+              </label>
+  
+              {/* Optional: show file count or names */}
+              {formData.images.length > 0 && (
+                <div className="mt-2 small text-muted">
+                  {formData.images.length} file(s) selected
+                </div>
+              )}
+            </Form.Group>
 
           {existingImages.length > 0 && (
             <>

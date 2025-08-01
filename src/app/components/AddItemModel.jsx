@@ -38,40 +38,43 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
 
   const [imagePreviews, setImagePreviews] = useState([]);
 
-const handleChange = (e) => {
-  const { name, value, files } = e.target;
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
 
-  if (name === "price") {
-    if (!/^\d*\.?\d*$/.test(value)) return;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    return;
-  }
+    if (name === "price") {
+      if (!/^\d*\.?\d*$/.test(value)) return;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      return;
+    }
 
-  if (name === "images" && files.length > 0) {
-    const newFiles = Array.from(files);
+    if (name === "images" && files.length > 0) {
+      const newFiles = Array.from(files);
 
-    // Filter duplicates by name
-    const existingNames = new Set(formData.images.map((f) => f.name));
-    const filteredNewFiles = newFiles.filter((file) => !existingNames.has(file.name));
+      // Filter duplicates by name
+      const existingNames = new Set(formData.images.map((f) => f.name));
+      const filteredNewFiles = newFiles.filter(
+        (file) => !existingNames.has(file.name)
+      );
 
-    const updatedImages = [...formData.images, ...filteredNewFiles];
+      const updatedImages = [...formData.images, ...filteredNewFiles];
 
-    // Revoke old preview URLs
-    imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+      // Revoke old preview URLs
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
 
-    // Create new previews
-    const newPreviews = updatedImages.map((file) => URL.createObjectURL(file));
+      // Create new previews
+      const newPreviews = updatedImages.map((file) =>
+        URL.createObjectURL(file)
+      );
 
-    setFormData((prev) => ({ ...prev, images: updatedImages }));
-    setImagePreviews(newPreviews);
+      setFormData((prev) => ({ ...prev, images: updatedImages }));
+      setImagePreviews(newPreviews);
 
-    // ✅ Clear file input so selecting same file again works
-    e.target.value = "";
-  } else {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-};
-
+      // ✅ Clear file input so selecting same file again works
+      e.target.value = "";
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
 
   const validateForm = () => {
     const { title, price, description, images, category, city, state } =
@@ -107,24 +110,24 @@ const handleChange = (e) => {
     return true;
   };
 
-const handleRemoveImage = (index) => {
-  // Clean up old object URL
-  URL.revokeObjectURL(imagePreviews[index]);
+  const handleRemoveImage = (index) => {
+    // Clean up old object URL
+    URL.revokeObjectURL(imagePreviews[index]);
 
-  const updatedImages = [...formData.images];
-  updatedImages.splice(index, 1);
+    const updatedImages = [...formData.images];
+    updatedImages.splice(index, 1);
 
-  setFormData((prev) => ({ ...prev, images: updatedImages }));
-  setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
-};
+    setFormData((prev) => ({ ...prev, images: updatedImages }));
+    setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-   if (!validateForm()) {
-  setLoading(false); // 👈 stop the spinner
-  return;
-}
+    if (!validateForm()) {
+      setLoading(false); // 👈 stop the spinner
+      return;
+    }
 
     setLoading(true);
     const {
@@ -185,29 +188,27 @@ const handleRemoveImage = (index) => {
     }
   };
 
-  
   const resetForm = () => {
-  setFormData({
-    title: "",
-    price: "",
-    description: "",
-    images: [],
-    shortDesc: "",
-    category: "",
-    city: "",
-    state: "",
-  });
-  setImagePreviews([]);
-};
-
+    setFormData({
+      title: "",
+      price: "",
+      description: "",
+      images: [],
+      shortDesc: "",
+      category: "",
+      city: "",
+      state: "",
+    });
+    setImagePreviews([]);
+  };
 
   return (
     <Modal
       show={show}
-       onHide={() => {
-    resetForm();
-    onClose();
-  }}
+      onHide={() => {
+        resetForm();
+        onClose();
+      }}
       centered
       size="lg"
       dialogClassName="custom-modal"
@@ -333,34 +334,37 @@ const handleRemoveImage = (index) => {
             />
           </Form.Group>
 
-<Form.Group className="mb-3">
-  <Form.Label className="fw-semibold">
-    Upload Images <Required />
-  </Form.Label>
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-semibold">
+              Upload Images <Required />
+            </Form.Label>
 
-  {/* Hidden native input */}
-  <Form.Control
-    type="file"
-    id="imageUpload"
-    name="images"
-    accept="image/*"
-    multiple
-    onChange={handleChange}
-    className="d-none" // hides input
-  />
+            {/* Hidden native input */}
+            <Form.Control
+              type="file"
+              id="imageUpload"
+              name="images"
+              accept="image/*"
+              multiple
+              onChange={handleChange}
+              className="d-none" // hides input
+            />
 
-  {/* Custom trigger button */}
-  <label htmlFor="imageUpload" className="btn btn-outline-secondary rounded-3 ml-3 shadow-sm">
-    Choose Images
-  </label>
+            {/* Custom trigger button */}
+            <label
+              htmlFor="imageUpload"
+              className="btn btn-outline-secondary rounded-3 ml-3 shadow-sm"
+            >
+              Choose Images
+            </label>
 
-  {/* Optional: show file count or names */}
-  {formData.images.length > 0 && (
-    <div className="mt-2 small text-muted">
-      {formData.images.length} file(s) selected
-    </div>
-  )}
-</Form.Group>
+            {/* Optional: show file count or names */}
+            {formData.images.length > 0 && (
+              <div className="mt-2 small text-muted">
+                {formData.images.length} file(s) selected
+              </div>
+            )}
+          </Form.Group>
 
           {imagePreviews.length > 0 && (
             <div className="d-flex flex-wrap gap-3 mt-3">
