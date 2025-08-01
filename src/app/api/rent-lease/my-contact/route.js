@@ -33,7 +33,7 @@ export const GET = withAuth(async (req, user) => {
     // }));
 
     const result = contacts.map((contact) => ({
-      roomTitle: contact.roomId?.title || "Untitled",
+      roomTitle: contact.roomId?.title,
       roomImages:
         Array.isArray(contact.roomId?.images) &&
         contact.roomId.images.length > 0
