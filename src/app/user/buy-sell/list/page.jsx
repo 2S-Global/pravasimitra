@@ -52,6 +52,7 @@ const ContactedUsersList = () => {
   };
   const handleEdit = (item) => {
     setItemToEdit({
+      id: item.id, // map 'item' to 'id'
       title: item.title, // map 'item' to 'title'
       price: item.price,
       description: item.description, // fallback if not present
