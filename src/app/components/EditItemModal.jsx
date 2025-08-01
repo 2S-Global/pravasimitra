@@ -13,6 +13,8 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
     state: "",
   });
 
+  const [loading, setLoading] = useState(true);
+
   const [existingImages, setExistingImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -20,6 +22,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
   useEffect(() => {
     const fetchAndSet = async () => {
       try {
+        setLoading(true);
         const res = await axios.get("/api/product/category-list");
         const cats = res.data.categories || [];
         setCategories(cats);
@@ -53,6 +56,9 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
       } catch (err) {
         console.error("Error fetching categories:", err);
       }
+       finally {
+      setLoading(false); // stop loading after everything
+    }
     };
 
     if (itemData) {
@@ -206,6 +212,14 @@ const handleChange = (e) => {
       </Modal.Header>
 
       <Modal.Body>
+        {loading ? (
+    <div className="text-center py-5">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+      <p className="mt-3 text-muted">Loading item details...</p>
+    </div>
+  ) : (
         <Form onSubmit={handleSubmit} encType="multipart/form-data">
           <Form.Group className="mb-3">
             <Form.Label className="fw-semibold">
@@ -234,7 +248,7 @@ const handleChange = (e) => {
                 >
                   <option value="">Select</option>
                   {categories.map((cat) => (
-                    <option key={cat._id} value={cat.id}>
+                    <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
                   ))}
@@ -425,6 +439,7 @@ const handleChange = (e) => {
             </Button>
           </div>
         </Form>
+  )}
       </Modal.Body>
     </Modal>
   );
