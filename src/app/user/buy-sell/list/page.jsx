@@ -20,25 +20,23 @@ const ContactedUsersList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
- 
     fetchUsers();
   }, []);
 
-     const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("/api/product/list-product");
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/api/product/list-product");
 
-        setUsers(response.data.items);
+      setUsers(response.data.items);
 
-        // console.log("Fetched users:", response.data.items);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false); // end loading
-      }
-    };
-
+      // console.log("Fetched users:", response.data.items);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false); // end loading
+    }
+  };
 
   const handleViewDetails = (itemName, contacts) => {
     setSelectedItemName(itemName);
@@ -56,25 +54,24 @@ const ContactedUsersList = () => {
       title: item.title, // map 'item' to 'title'
       price: item.price,
       description: item.description, // fallback if not present
-   gallery: item.gallery || [],
+      gallery: item.gallery || [],
       category: item.category.id,
       city: item.city,
-      state: item.state,  
+      state: item.state,
       shortDesc: item.shortDesc || "",
     });
     setShowEditModal(true);
   };
 
-
-
-   const handleDelete = async (id) => {
+  const handleDelete = async (id) => {
     AlertService.confirm(
       "Remove Item",
       "Are you sure you want to remove this item?",
       async () => {
         try {
-          const response = await axios.patch("/api/product/delete-product", { id },
-          );
+          const response = await axios.patch("/api/product/delete-product", {
+            id,
+          });
 
           AlertService.success("Item removed successfully!");
           setUsers((prevUsers) => prevUsers.filter((item) => item.id !== id));
@@ -88,8 +85,6 @@ const ContactedUsersList = () => {
       }
     );
   };
-
-
 
   const filteredUsers = users;
 
@@ -222,8 +217,8 @@ const ContactedUsersList = () => {
                                   <button
                                     className="btn btn-sm btn-outline-danger"
                                     title="Delete"
-                                     type="button"
-                                 onClick={() => handleDelete(user.id)}
+                                    type="button"
+                                    onClick={() => handleDelete(user.id)}
                                   >
                                     <i className="bi bi-trash" />
                                   </button>
@@ -271,6 +266,7 @@ const ContactedUsersList = () => {
                   show={showEditModal}
                   onClose={() => setShowEditModal(false)}
                   itemData={itemToEdit}
+                  onItemAdded={fetchUsers}
                   onSave={(formData) => {
                     console.log("Submit updated item", formData);
                   }}

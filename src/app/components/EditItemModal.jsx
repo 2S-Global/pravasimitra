@@ -177,10 +177,13 @@ const handleChange = (e) => {
       AlertService.error("State is required");
       return false;
     }
-    // if (images.length === 0) {
-    //   AlertService.error("Please upload at least one image");
-    //   return false;
-    // }
+  const hasNewImages = images.length > 0;
+  const hasExistingImages = existingImages.length > 0;
+
+  if (!hasNewImages && !hasExistingImages) {
+    AlertService.error("Please upload at least one image");
+    return false;
+  }
 
     return true;
   };
@@ -223,9 +226,8 @@ const handleSubmit = async (e) => {
     });
 
     // ✅ Append existing image URLs
-    existingImages.forEach((url) => {
-      data.append("existingImageRaw", url);
-    });
+data.append("existingImageRaw", JSON.stringify(existingImages));
+
 
     setSubmiting(true);
 
@@ -234,16 +236,18 @@ const handleSubmit = async (e) => {
       data,
       {
         headers: {
-          "Content-Type": "multipart/form-data",
+         
         },
           withCredentials: true,
       }
     );
 
-    AlertService.success(response.data.message);
+    AlertService.success(response.data.msg);
     setSubmiting(false);
-
-    onClose(); // close modal
+        onClose();
+      if (typeof onItemAdded === "function") {
+        onItemAdded();
+      }
   } catch (error) {
     console.error("Edit error:", error);
     AlertService.error(error?.response?.data?.message || "Something went wrong.");
