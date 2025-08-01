@@ -34,12 +34,15 @@ export const GET = withAuth(async (req, user) => {
 
     const result = contacts.map((contact) => ({
       roomTitle: contact.roomId?.title,
-      roomImages: Array.isArray(contact.roomId?.images)
-        ? contact.roomId.images
-        : [contact.roomId?.image || "/assets/images/default-user.png"],
+      roomImages:
+        Array.isArray(contact.roomId?.images) &&
+        contact.roomId.images.length > 0
+          ? contact.roomId.images
+          : ["/assets/images/noimage.jpg"],
+
       ownerName: contact.ownerId?.name,
       ownerEmail: contact.ownerId?.email,
-      ownerPhone: contact.ownerId?.phone || "N/A",
+      ownerPhone: contact.ownerId?.phone,
       contactedAt: contact.createdAt,
     }));
 
