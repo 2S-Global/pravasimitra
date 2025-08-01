@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
+import AlertService from "../components/alertService";
 const EditItemModal = ({ show, onClose, itemData, onSave }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -12,7 +13,7 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
     city: "",
     state: "",
   });
-
+  const [submiting, setSubmiting] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [existingImages, setExistingImages] = useState([]);
@@ -66,9 +67,10 @@ const EditItemModal = ({ show, onClose, itemData, onSave }) => {
     }
   }, [itemData]);
 
-  // console.log("Selected category:", formData.category);
-  // console.log("Categories:", categories);
+
   const Required = () => <span className="text-danger">*</span>;
+
+  
 
 const handleChange = (e) => {
   const { name, value, files } = e.target;
@@ -148,34 +150,108 @@ const handleChange = (e) => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const { title, price, description, images } = formData;
 
-    if (
-      !title ||
-      !price ||
-      !description ||
-      (images.length === 0 && existingImages.length === 0)
-    ) {
-      alert("Please fill all fields and have at least one image.");
-      return;
+ const validateForm = () => {
+    const { title, price, description, images, category, city, state } =
+      formData;
+
+    if (!title) {
+      AlertService.error("Title is required");
+      return false;
     }
 
+    if (!category) {
+      AlertService.error("Category is required");
+      return false;
+    }
+    if (!price) {
+      AlertService.error("Price is required");
+      return false;
+    }
+    if (!city) {
+      AlertService.error("City is required");
+      return false;
+    }
+
+    if (!state) {
+      AlertService.error("State is required");
+      return false;
+    }
+    // if (images.length === 0) {
+    //   AlertService.error("Please upload at least one image");
+    //   return false;
+    // }
+
+    return true;
+  };
+
+
+  
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!validateForm()) {
+    setSubmiting(false);
+    return;
+  }
+
+  try {
+    const {
+      title,
+      price,
+      description,
+      images,
+      category,
+      city,
+      shortDesc,
+      state,
+    } = formData;
+
     const data = new FormData();
+    data.append("id", itemData.id); // Make sure to include the item's ID
     data.append("title", title);
     data.append("price", price);
     data.append("description", description);
-    data.append("existingImages", JSON.stringify(existingImages));
-    images.forEach((img) => data.append("images[]", img));
+    data.append("category", category);
+    data.append("city", city);
+    data.append("shortDesc", shortDesc);
+    data.append("state", state);
 
-    onSave(data);
+    // ✅ Append new image files
+    images.forEach((img) => {
+      data.append("images", img);
+    });
 
-    setFormData({ title: "", price: "", description: "", images: [] });
-    setImagePreviews([]);
-    setExistingImages([]);
-    onClose();
-  };
+    // ✅ Append existing image URLs
+    existingImages.forEach((url) => {
+      data.append("existingImageRaw", url);
+    });
+
+    setSubmiting(true);
+
+    const response = await axios.patch(
+      "/api/product/edit-product",
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+          withCredentials: true,
+      }
+    );
+
+    AlertService.success(response.data.message);
+    setSubmiting(false);
+
+    onClose(); // close modal
+  } catch (error) {
+    console.error("Edit error:", error);
+    AlertService.error(error?.response?.data?.message || "Something went wrong.");
+    setSubmiting(false);
+  }
+};
+
+
 
   const imageBoxStyle = {
     position: "relative",
@@ -426,17 +502,27 @@ const handleChange = (e) => {
           )}
 
           <div className="text-end">
-            <Button
-              type="submit"
-              className="mt-4 px-4 py-2 fw-medium rounded-pill"
-              style={{
-                background: "#c12020",
-                color: "#fff",
-                border: "none",
-              }}
-            >
-              Submit
-            </Button>
+          <Button
+                type="submit"
+                disabled={loading}
+                style={{
+                  background: "#c12020",
+                  color: "#fff",
+                  border: "none",
+                  opacity: loading ? 0.7 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+                 className="mt-4 px-4 py-2 fw-medium rounded-pill mt-5 mb-2"
+              >
+                {submiting && (
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                )}
+                {submiting ? "Updating..." : "Update"}
+              </Button>
           </div>
         </Form>
   )}

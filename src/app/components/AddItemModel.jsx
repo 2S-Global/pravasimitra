@@ -9,6 +9,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+
   const [formData, setFormData] = useState({
     title: "",
     price: "",
