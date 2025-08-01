@@ -29,12 +29,13 @@ export const GET = async (req) => {
   try {
     const contacts = await RoomContact.find({ roomId })
       .sort({ createdAt: -1 })
-      .populate("userId", "name email")
+      .populate("userId", "name email image")
       .lean();
 
     const response = contacts.map((entry) => ({
       name: entry.userId?.name,
       email: entry.userId?.email,
+      image: entry.userId?.image || "/assets/images/default-user.png",
       contactedAt: entry.createdAt,
     }));
 
