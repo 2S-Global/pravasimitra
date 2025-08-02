@@ -24,6 +24,7 @@ async function parseFormData(req) {
   const category = form.get("category");
   const city = form.get("city");
   const state = form.get("state");
+  const location = form.get("location");
   const price = form.get("price");
   const shortDesc = form.get("shortDesc") || "";
   const description = form.get("description") || "";
@@ -48,6 +49,7 @@ async function parseFormData(req) {
     category,
     city,
     state,
+    location,
     price,
     shortDesc,
     description,
@@ -132,6 +134,7 @@ export const POST = withAuth(async function (req, user) {
       category: decodedCategoryId,
       city: data.city,
       state: data.state,
+      location: data.location,
       price: parseFloat(data.price),
       shortDesc: data.shortDesc,
       description: data.description,
@@ -151,6 +154,7 @@ export const POST = withAuth(async function (req, user) {
             price: newProduct.price,
             city: newProduct.city,
             state: newProduct.state,
+            location: newProduct.location,
             shortDesc: newProduct.shortDesc,
             description: newProduct.description,
             image: newProduct.image,

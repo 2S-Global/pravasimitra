@@ -25,6 +25,7 @@ async function parseFormData(req) {
   const category = form.get("category");
   const city = form.get("city");
   const state = form.get("state");
+  const location = form.get("location");
   const price = form.get("price");
   const shortDesc = form.get("shortDesc") || "";
   const description = form.get("description") || "";
@@ -64,6 +65,7 @@ async function parseFormData(req) {
     category,
     city,
     state,
+    location,
     price,
     shortDesc,
     description,
@@ -134,6 +136,7 @@ export const PATCH = withAuth(async (req, user) => {
     category,
     city,
     state,
+    location,
     price,
     shortDesc,
     description,
@@ -220,6 +223,7 @@ export const PATCH = withAuth(async (req, user) => {
           category: decodedCategoryId,
           city,
           state,
+          location,
           price: parseFloat(price),
           shortDesc,
           description,

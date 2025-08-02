@@ -22,7 +22,6 @@ const RentItemSchema = new mongoose.Schema(
     bedrooms: {
       type: Number,
     },
-
     bathrooms: {
       type: Number,
     },
@@ -41,13 +40,13 @@ const RentItemSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    location: {
-      type: String,
-    },
     city: {
       type: String,
     },
     state: {
+      type: String,
+    },
+    location: {
       type: String,
     },
     amenities: [
