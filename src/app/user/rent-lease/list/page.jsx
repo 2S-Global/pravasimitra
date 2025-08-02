@@ -236,6 +236,7 @@ const ContactedUsersList = () => {
                 <AddRoomModel
                   show={showAddModal}
                   onClose={() => setShowAddModal(false)}
+                      onItemAdded={fetchUsers}
                 />
                 <EditRoomModal
                   show={showEditModal}

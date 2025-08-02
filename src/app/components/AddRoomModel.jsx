@@ -4,7 +4,7 @@ import { Modal, Button, Form, Col, Row } from "react-bootstrap";
 import AlertService from "../components/alertService";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-const AddRoomModal = ({ show, onClose, onSave }) => {
+const AddRoomModal = ({ show, onClose, onItemAdded }) => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
@@ -20,12 +20,15 @@ const AddRoomModal = ({ show, onClose, onSave }) => {
     bathrooms: "",
     address: "",
     furnished: "",
+    location: "", // Added for address
   });
 
   const [existingImages, setExistingImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [categories, setCategories] = useState([]);
   const [amneties, setAmneties] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -89,26 +92,50 @@ const AddRoomModal = ({ show, onClose, onSave }) => {
     }
   };
 
-  const handleRemoveImage = (index, isExisting = false) => {
-    if (isExisting) {
-      const updated = [...existingImages];
-      updated.splice(index, 1);
-      setExistingImages(updated);
-    } else {
-      const updated = [...formData.images];
-      updated.splice(index, 1);
-      setFormData((prev) => ({ ...prev, images: updated }));
-      setImagePreviews(updated.map((file) => URL.createObjectURL(file)));
-    }
-  };
 
+    const resetForm = () => {
+    setFormData({
+      title: "",
+      price: "",
+      description: "",
+      images: [],
+      shortDesc: "",
+      category: "",
+      city: "",
+      state: "",
+    });
+    setImagePreviews([]);
+  };
+  const handleRemoveImage = (index) => {
+    // Clean up old object URL
+    URL.revokeObjectURL(imagePreviews[index]);
+
+    const updatedImages = [...formData.images];
+    updatedImages.splice(index, 1);
+
+    setFormData((prev) => ({ ...prev, images: updatedImages }));
+    setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
+  };
 
 
   const Required = () => <span className="text-danger">*</span>;
 
   const validateForm = () => {
-    const { title, price, description, images, propertyType, city, state } =
-      formData;
+    const {
+      title,
+      propertyType,
+      price,
+      bedrooms,
+      bathrooms,
+      description,
+      images,
+      roomSize,
+      city,
+      shortDesc,
+      state,
+      location,
+      furnished,
+    } = formData;
 
     if (!title) {
       AlertService.error("Title is required");
@@ -116,17 +143,31 @@ const AddRoomModal = ({ show, onClose, onSave }) => {
     }
 
     if (!propertyType) {
-      AlertService.error("Category is required");
+      AlertService.error("Property Type is required");
       return false;
     }
-    if (!bedrooms) {
-      AlertService.error("Price is required");
+    if (!roomSize) {
+      AlertService.error("Room Size is required");
       return false;
     }
+
     if (!price) {
       AlertService.error("Price is required");
       return false;
     }
+    if (!bedrooms) {
+      AlertService.error("Bedroom is required");
+      return false;
+    }
+    if (!bathrooms) {
+      AlertService.error("Bathroom is required");
+      return false;
+    }
+    if (!furnished) {
+      AlertService.error("Furnished is required");
+      return false;
+    }
+
     if (!city) {
       AlertService.error("City is required");
       return false;
@@ -134,6 +175,10 @@ const AddRoomModal = ({ show, onClose, onSave }) => {
 
     if (!state) {
       AlertService.error("State is required");
+      return false;
+    }
+    if (!location) {
+      AlertService.error("Address is required");
       return false;
     }
     if (images.length === 0) {
@@ -144,44 +189,92 @@ const AddRoomModal = ({ show, onClose, onSave }) => {
     return true;
   };
 
-const handleAmenityChange = (e) => {
-  const value = String(e.target.value); // ✅ force string
-  const isChecked = e.target.checked;
+  const handleAmenityChange = (e) => {
+    const value = String(e.target.value); // ✅ force string
+    const isChecked = e.target.checked;
 
-  setFormData((prev) => ({
-    ...prev,
-    amenities: isChecked
-      ? [...prev.amenities, value]
-      : prev.amenities.filter((a) => a !== value),
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      amenities: isChecked
+        ? [...prev.amenities, value]
+        : prev.amenities.filter((a) => a !== value),
+    }));
+  };
 
-
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { title, price, description, images } = formData;
-
-    if (
-      !title ||
-      !price ||
-      !description ||
-      (images.length === 0 && existingImages.length === 0)
-    ) {
-      alert("Please fill all fields and provide at least one image.");
+    if (!validateForm()) {
+      setLoading(false); // 👈 stop the spinner
       return;
     }
+        setLoading(true);
+    const {
+      title,
+      propertyType,
+      price,
+      bedrooms,
+      bathrooms,
+      description,
+      images,
+      roomSize,
+      city,
+      shortDesc,
+      state,
+      location,
+      furnished,
+      amenities,
+    } = formData;
 
     const data = new FormData();
     data.append("title", title);
+    data.append("propertyType", propertyType);
     data.append("price", price);
+    data.append("bedrooms", bedrooms);
+    data.append("bathrooms", bathrooms);
     data.append("description", description);
-    data.append("propertyType", formData.propertyType);
-    data.append("roomSize", formData.roomSize);
-    data.append("existingImages", JSON.stringify(existingImages));
-    images.forEach((img) => data.append("images[]", img));
+    data.append("roomSize", roomSize);
+    data.append("city", city);
+    data.append("shortDesc", shortDesc);
+    data.append("state", state);
+    data.append("location", location);
+    data.append("furnished", furnished);
+    amenities.forEach((amenityId) => {
+      data.append("amenities", amenityId); // send each amenity ID separately
+    });
 
-    onSave(data);
+    images.forEach((img) => data.append("images", img));
+
+    try {
+      const response = await axios.post("/api/rent-lease/create-room", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+
+      AlertService.success(response.data.msg);
+
+      setFormData({
+        title: "",
+        price: "",
+        description: "",
+        images: [],
+        shortDesc: "",
+        category: "",
+        city: "",
+        state: "",
+        location: "",
+      });
+      setImagePreviews([]);
+      onClose();
+      if (typeof onItemAdded === "function") {
+        onItemAdded();
+      }
+    } catch (error) {
+      console.error("❌ Error uploading product:", error);
+    } finally {
+      setLoading(false); // re-enable button after process
+    }
 
     setFormData({
       title: "",
@@ -190,10 +283,23 @@ const handleAmenityChange = (e) => {
       propertyType: "",
       roomSize: "",
       images: [],
+      amenities: [],
+      city: "",
+      state: "",
+      shortDesc: "",
+      bedrooms: "",
+      bathrooms: "",
+      address: "",
+      furnished: "",
+      location: "", // ✅ added this if used separately
     });
+
     setImagePreviews([]);
     setExistingImages([]);
     onClose();
+    if (typeof onItemAdded === "function") {
+      onItemAdded();
+    }
   };
 
   return (
@@ -237,9 +343,11 @@ const handleAmenityChange = (e) => {
                   className="rounded-3 shadow-sm"
                 >
                   <option value="">Select</option>
-                  <option value="Rent">Rent</option>
-                  <option value="Lease">Lease</option>
-                  <option value="Sell">Sell</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -332,8 +440,8 @@ const handleAmenityChange = (e) => {
                   className="rounded-3 shadow-sm"
                 >
                   <option value="">Select</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -381,8 +489,8 @@ const handleAmenityChange = (e) => {
                 </Form.Label>
                 <Form.Control
                   type="text"
-                  name="address"
-                  value={formData.address}
+                  name="location"
+                  value={formData.location}
                   onChange={handleChange}
                   placeholder="e.g. 721 Broadway, New York, NY 10003, USA"
                   className="rounded-3 shadow-sm"
@@ -391,26 +499,36 @@ const handleAmenityChange = (e) => {
             </Col>
           </Row>
 
-    <Form.Group className="mb-3">
-  <Form.Label>Amenities</Form.Label>
-  <div className="d-flex flex-wrap">
-    {amneties.map((amenity) => {
-      const amenityId = String(amenity._id); // 💥 force to string
-      return (
-        <Form.Check
-          key={amenityId}
-          type="checkbox"
-          label={amenity.name}
-          value={amenityId}
-          checked={formData.amenities.includes(amenityId)} // ✅ compare string
-          onChange={handleAmenityChange}
-          className="me-3"
-        />
-      );
-    })}
-  </div>
-</Form.Group>
-
+          <Form.Group className="mb-3">
+            <Form.Label>Amenities</Form.Label>
+            <div className="d-flex flex-wrap">
+              {amneties.map((amenity) => {
+                const amenityId = String(amenity._id); // 💥 force to string
+                return (
+                  <div
+                    key={amenityId}
+                    className="me-3 d-flex align-items-center"
+                    style={{ gap: "4px" }}
+                  >
+                    <Form.Check
+                      type="checkbox"
+                      value={amenityId}
+                      checked={formData.amenities.includes(amenityId)}
+                      onChange={handleAmenityChange}
+                      style={{
+                        transform: "scale(0.8)",
+                        transformOrigin: "center",
+                        marginTop: "-2px", // fine-tune vertical position
+                      }}
+                    />
+                    <label style={{ marginBottom: 0, fontSize: "0.9rem" }}>
+                      {amenity.name}
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+          </Form.Group>
 
           <Form.Group className="mb-4">
             <Form.Label className="fw-semibold">Short Description</Form.Label>
@@ -513,18 +631,28 @@ const handleAmenityChange = (e) => {
           )}
 
           <div className="d-flex justify-content-end mt-4">
-            <Button
-              type="submit"
-              style={{
-                background: "#c12020",
-                color: "#fff",
-                border: "none",
-              }}
-              className="px-4 py-2 fw-medium rounded-pill"
-            >
-              Submit
-            </Button>
-          </div>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  style={{
+                    background: "#c12020",
+                    color: "#fff",
+                    border: "none",
+                    opacity: loading ? 0.7 : 1,
+                    cursor: loading ? "not-allowed" : "pointer",
+                  }}
+                  className="px-4 py-2 fw-medium rounded-pill d-flex align-items-center justify-content-center gap-2"
+                >
+                  {loading && (
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {loading ? "Submitting..." : "Submit"}
+                </Button>
+              </div>
         </Form>
       </Modal.Body>
     </Modal>

@@ -40,8 +40,6 @@ const BuySellCategoryPage = () => {
     }
   };
 
-  
-
   useEffect(() => {
     fetchCategories();
     fetchProducts(id);
@@ -75,7 +73,9 @@ const BuySellCategoryPage = () => {
   };
 
   const handleClick = (categoryName, categoryId) => {
-    const slug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, "-"));
+    const slug = encodeURIComponent(
+      categoryName.toLowerCase().replace(/\s+/g, "-")
+    );
     const scrollY = window.scrollY;
 
     // Update state and fetch products
@@ -83,7 +83,7 @@ const BuySellCategoryPage = () => {
     fetchProducts(categoryId);
 
     // Use router.replace to avoid adding to history stack
-      //  router.replace(`/buy-sell/${slug}/${categoryId}`, { scroll: false });
+    //  router.replace(`/buy-sell/${slug}/${categoryId}`, { scroll: false });
 
     // Restore scroll position
     window.scrollTo(0, scrollY);
@@ -104,7 +104,10 @@ const BuySellCategoryPage = () => {
         </button>
       ))
     ) : (
-      <button className="btn btn-sm px-4 py-2 btn-outline-danger shadow-sm" disabled>
+      <button
+        className="btn btn-sm px-4 py-2 btn-outline-danger shadow-sm"
+        disabled
+      >
         Loading Categories...
       </button>
     );
@@ -170,7 +173,9 @@ const BuySellCategoryPage = () => {
                     style={{ minHeight: "300px" }}
                   >
                     <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading products...</span>
+                      <span className="visually-hidden">
+                        Loading products...
+                      </span>
                     </div>
                   </div>
                 ) : (
@@ -182,7 +187,11 @@ const BuySellCategoryPage = () => {
                             src="/assets/images/empty-box.png"
                             alt="No Records"
                             className="mx-auto d-block"
-                            style={{ width: "120px", opacity: 0.5, marginBottom: "20px" }}
+                            style={{
+                              width: "120px",
+                              opacity: 0.5,
+                              marginBottom: "20px",
+                            }}
                           />
                           <h4 className="fw-bold text-muted">No Items Found</h4>
                           <p className="text-secondary">
@@ -190,7 +199,7 @@ const BuySellCategoryPage = () => {
                           </p>
                         </div>
                       </div>
-                    ) : ( 
+                    ) : (
                       allItems.map((item, index) => (
                         <div className="col-md-4" key={index}>
                           <div className="card h-100 shadow-sm border-0 position-relative">
@@ -217,20 +226,35 @@ const BuySellCategoryPage = () => {
                               <p className="card-text text-muted">
                                 {item.city} | {item.state}
                               </p>
-                              <p className="card-text text-muted">
+                              <p
+                                className="card-text text-muted"
+                                style={{
+                                  height: "60px",
+                                }}
+                              >
                                 {item.shortDesc
                                   ? item.shortDesc
                                       .split(" ")
-                                      .slice(0, 10)
+                                      .slice(0, 9)
                                       .join(" ") +
-                                    (item.shortDesc.split(" ").length > 10 ? "..." : "")
+                                    (item.shortDesc.split(" ").length > 9
+                                      ? "..."
+                                      : "")
                                   : ""}
                               </p>
-                              <p className="fw-bold text-primary fs-5">${item.price}</p>
+                              <p className="fw-bold text-primary fs-5">
+                                ${item.price}
+                              </p>
                               <button
                                 className="btn btn-outline-primary btn-sm"
-                                onClick={() => router.push(`/buy-sell/details/${item.id}`)}
-                                style={{ background: "#c12020", color: "#fff", border: "#c12020" }}
+                                onClick={() =>
+                                  router.push(`/buy-sell/details/${item.id}`)
+                                }
+                                style={{
+                                  background: "#c12020",
+                                  color: "#fff",
+                                  border: "#c12020",
+                                }}
                               >
                                 View Details
                               </button>
@@ -248,7 +272,11 @@ const BuySellCategoryPage = () => {
                 className="btn btn-danger rounded-circle position-fixed"
                 style={{ bottom: 20, right: 20, width: 50, height: 50 }}
               >
-                <img src="/assets/images/icon-sos.png" alt="SOS" style={{ maxWidth: 25 }} />
+                <img
+                  src="/assets/images/icon-sos.png"
+                  alt="SOS"
+                  style={{ maxWidth: 25 }}
+                />
               </button>
             </div>
           </div>

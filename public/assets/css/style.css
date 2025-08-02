@@ -774,9 +774,9 @@ input[type="radio"] ~ label:before {
 /* input[type="checkbox"]:checked ~ label,
 input[type="radio"]:checked ~ label {
   color: #c30707;
-}
+} */
 
-input[type="checkbox"]:checked ~ label:before,
+/* input[type="checkbox"]:checked ~ label:before,
 input[type="radio"]:checked ~ label:before {
   content: "\f00c";
   color: #c30707;
