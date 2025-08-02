@@ -37,7 +37,7 @@ export const GET = withAuth(async (req, user) => {
       roomImages:
         Array.isArray(contact.roomId?.images) &&
         contact.roomId.images.length > 0
-          ? contact.roomId.images
+          ? contact.roomId.images[0]
           : ["/assets/images/noimage.jpg"],
 
       ownerName: contact.ownerId?.name,
