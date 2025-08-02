@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import path from "path";
 import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
@@ -185,9 +186,31 @@ export const PATCH = withAuth(async (req, user) => {
     );
   }
 
-  const amenityObjectIds = amenities.map(
-    (id) => new mongoose.Types.ObjectId(id)
-  );
+  // const amenityObjectIds = amenities.map(
+  //   (id) => new mongoose.Types.ObjectId(id)
+  // );
+
+  // ✅ Decode and convert propertyType
+  let decodedPropertyType;
+  try {
+    decodedPropertyType = new mongoose.Types.ObjectId(
+      decodeObjectId(propertyType)
+    );
+  } catch {
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Invalid propertyType ID" }, { status: 400 })
+    );
+  }
+
+  // ✅ Decode and Convert amenity IDs to ObjectIds
+  let amenityObjectIds = [];
+  try {
+    amenityObjectIds = amenities.map((id) => new mongoose.Types.ObjectId(id));
+  } catch (err) {
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Invalid amenity ID(s)" }, { status: 400 })
+    );
+  }
 
   const allowedTypes = [
     "image/jpeg",
@@ -223,6 +246,7 @@ export const PATCH = withAuth(async (req, user) => {
   //   }
   // }
 
+  // ✅ Cloudinary image uploads
   for (const file of newImages) {
     if (!file || !file.mime || !allowedTypes.includes(file.mime)) {
       return addCorsHeaders(
@@ -289,7 +313,7 @@ export const PATCH = withAuth(async (req, user) => {
       {
         $set: {
           title,
-          propertyType,
+          propertyType: new mongoose.Types.ObjectId(decodedPropertyType),
           roomSize,
           price: parseFloat(price),
           shortDesc,
@@ -323,8 +347,12 @@ export const PATCH = withAuth(async (req, user) => {
       )
     );
   } catch (err) {
+    console.error("Update failed:", err);
     return addCorsHeaders(
-      NextResponse.json({ msg: "Update failed" }, { status: 500 })
+      NextResponse.json(
+        { msg: "Update failed", error: err.message },
+        { status: 500 }
+      )
     );
   }
 });
