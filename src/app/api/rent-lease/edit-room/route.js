@@ -6,6 +6,7 @@ import RoomItem from "../../../../../models/Room";
 import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
+import cloudinary from "../../../../../lib/cloudinary";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
@@ -183,39 +184,106 @@ export const PATCH = withAuth(async (req, user) => {
     );
   }
 
-  const amenityObjectIds = amenities.map((id) => new mongoose.Types.ObjectId(id));
+  const amenityObjectIds = amenities.map(
+    (id) => new mongoose.Types.ObjectId(id)
+  );
 
-
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/avif",
+  ];
   const savedFilenames = [...existingImages];
 
-  const uploadDir = path.join(process.cwd(), "public/assets/images/rent-items");
-  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+  // const uploadDir = path.join(process.cwd(), "public/assets/images/rent-items");
+  // if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+  // for (const file of newImages) {
+  //   if (!allowedTypes.includes(file.mime)) {
+  //     return addCorsHeaders(
+  //       NextResponse.json(
+  //         { msg: "Only JPG,PNG,AVIF,WEBP Allowed" },
+  //         { status: 200 }
+  //       )
+  //     );
+  //   }
+  //   const newFilename = `${Date.now()}_${file.filename}`;
+  //   const savePath = path.join(uploadDir, newFilename);
+
+  //   try {
+  //     fs.writeFileSync(savePath, file.buffer);
+  //     savedFilenames.push(newFilename);
+  //   } catch (err) {
+  //     return addCorsHeaders(
+  //       NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+  //     );
+  //   }
+  // }
 
   for (const file of newImages) {
-    if (!allowedTypes.includes(file.mime)) {
+    if (!file || !file.mime || !allowedTypes.includes(file.mime)) {
       return addCorsHeaders(
         NextResponse.json(
-          { msg: "Only JPG,PNG,AVIF,WEBP Allowed" },
-          { status: 200 }
+          { error: "Only JPG, PNG, WEBP, AVIF allowed" },
+          { status: 400 }
         )
       );
     }
-    const newFilename = `${Date.now()}_${file.filename}`;
-    const savePath = path.join(uploadDir, newFilename);
 
     try {
-      fs.writeFileSync(savePath, file.buffer);
-      savedFilenames.push(newFilename);
+      await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "room-items",
+            resource_type: "image",
+            public_id: `${Date.now()}_${file.filename}`,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            savedFilenames.push(result.secure_url); // for Cloudinary URLs
+            resolve();
+          }
+        );
+        stream.end(file.buffer);
+      });
     } catch (err) {
+      console.error("Cloudinary upload failed:", err);
       return addCorsHeaders(
         NextResponse.json({ error: "Image upload failed" }, { status: 500 })
       );
     }
   }
 
+  //   try {
+  //     const updated = await RoomItem.findByIdAndUpdate(
+  //       { _id: decodedId, createdBy: user.id },
+  //       {
+  //         $set: {
+  //           title,
+  //           propertyType,
+  //           roomSize,
+  //           price: parseFloat(price),
+  //           shortDesc,
+  //           description,
+  //           bedrooms: parseInt(bedrooms, 10),
+  //           bathrooms: parseInt(bathrooms, 10),
+  //           furnished,
+  //           location,
+  //           city,
+  //           state,
+  //           amenities: amenityObjectIds,
+  //           frequency,
+  //           images: savedFilenames,
+  //         },
+  //       },
+  //       { new: true }
+  //     );
+
+  // ✅ usage of findOneAndUpdate with both _id and createdBy
   try {
-    const updated = await RoomItem.findByIdAndUpdate(
+    const updated = await RoomItem.findOneAndUpdate(
       { _id: decodedId, createdBy: user.id },
       {
         $set: {
@@ -231,8 +299,8 @@ export const PATCH = withAuth(async (req, user) => {
           location,
           city,
           state,
-          amenities: amenityObjectIds,
           frequency,
+          amenities: amenityObjectIds,
           images: savedFilenames,
         },
       },
