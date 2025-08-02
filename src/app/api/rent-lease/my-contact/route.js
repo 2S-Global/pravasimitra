@@ -23,13 +23,24 @@ export const GET = withAuth(async (req, user) => {
       })
       .lean();
 
+    // const result = contacts.map((contact) => ({
+    //   roomTitle: contact.roomId?.title,
+    //   roomImage: contact.roomId?.image,
+    //   ownerName: contact.ownerId?.name,
+    //   ownerEmail: contact.ownerId?.email,
+    //   ownerPhone: contact.ownerId?.phone || "N/A",
+    //   contactedAt: contact.createdAt,
+    // }));
+
+    const baseImageUrl = process.env.IMAGE_URL;
+
     const result = contacts.map((contact) => ({
       roomTitle: contact.roomId?.title,
       roomImages:
         Array.isArray(contact.roomId?.images) &&
         contact.roomId.images.length > 0
           ? contact.roomId.images[0]
-          : ["/assets/images/noimage.jpg"],
+          : [`${baseImageUrl}noimage.jpg`],
 
       ownerName: contact.ownerId?.name,
       ownerEmail: contact.ownerId?.email,
