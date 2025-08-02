@@ -26,7 +26,8 @@ const RentItemSchema = new mongoose.Schema(
       type: Number,
     },
     furnished: {
-      type: Boolean,
+      type: String,
+      enum: ["Yes", "No"],
     },
     price: {
       type: Number,

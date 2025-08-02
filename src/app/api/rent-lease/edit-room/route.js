@@ -33,7 +33,8 @@ async function parseFormData(req) {
   const description = form.get("description");
   const bedrooms = form.get("bedrooms");
   const bathrooms = form.get("bathrooms");
-  const furnished = form.get("furnished") === "true";
+  const furnishedValue = form.get("furnished");
+  const furnished = furnishedValue === "Yes" ? "Yes" : "No";
   const location = form.get("location");
   const city = form.get("city");
   const state = form.get("state");
