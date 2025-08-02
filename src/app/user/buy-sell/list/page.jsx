@@ -59,6 +59,7 @@ const ContactedUsersList = () => {
       city: item.city,
       state: item.state,
       shortDesc: item.shortDesc || "",
+      location: item.location || "", // Ensure location is included
     });
     setShowEditModal(true);
   };

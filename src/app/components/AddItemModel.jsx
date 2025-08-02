@@ -19,6 +19,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
     category: "",
     city: "",
     state: "",
+    location: "",
   });
 
   const [categories, setCategories] = useState([]);
@@ -140,6 +141,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
       city,
       shortDesc,
       state,
+      location
     } = formData;
 
     // if (!title || !price || !description || images.length === 0) {
@@ -155,6 +157,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
     data.append("shortDesc", shortDesc);
     data.append("state", state);
     data.append("description", description);
+    data.append("location", location);
     images.forEach((img) => data.append("images", img));
 
     try {
@@ -176,6 +179,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
         category: "",
         city: "",
         state: "",
+         location: "",
       });
       setImagePreviews([]);
       onClose();
@@ -308,6 +312,26 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
                 />
               </Form.Group>
             </Col>
+          </Row>
+
+                <Row className="mb-4">
+            <Col md={12}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  Address <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  placeholder="e.g. 721 Broadway, New York, NY 10003, USA"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+
+   
           </Row>
 
           <Form.Group className="mb-4">

@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Col, Row } from "react-bootstrap";
-
+import AlertService from "../components/alertService";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -10,39 +12,80 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
     propertyType: "",
     roomSize: "",
     images: [],
+    amenities: [],
+    city: "",
+    state: "",
+    shortDesc: "",
+    bedrooms: "",
+    bathrooms: "",  
+    address: "",
+    furnished: "",
   });
 
   const [existingImages, setExistingImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
-
+  const [categories, setCategories] = useState([]);
+  const [amneties, setAmneties] = useState([]);
   useEffect(() => {
-    if (itemData) {
-      setFormData({
-        title: itemData.title || "",
-        price: itemData.price || "",
-        description: itemData.description || "",
-        propertyType: itemData.propertyType || "",
-        roomSize: itemData.roomSize || "",
-        images: [],
-      });
-      setExistingImages(itemData.images || []);
-      setImagePreviews([]);
-    }
-  }, [itemData]);
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("/api/rent-lease/category-list");
+        setCategories(response.data.categories);
+        // console.log("Categories fetched:", response.data.categories);
+      } 
+      catch (error) 
+      {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    const fetchAmenities = async () => {
+      try {
+        const response = await axios.get("/api/amenity/list-amenity");
+        setAmneties(response.data.amenities);
+        // console.log("Amneities fetched:", response.data.amenities);
+      } catch (error) {
+        console.error("Error fetching amenities:", error);
+      }
+    };
+
+    fetchCategories();
+    fetchAmenities();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name === "images[]") {
-      const newFiles = Array.from(files);
-      const updatedImages = [...formData.images, ...newFiles];
+    if (name === "price") {
+      if (!/^\d*\.?\d*$/.test(value)) return;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      return;
+    }
 
-      const uniqueImages = Array.from(
-        new Map(updatedImages.map((file) => [file.name, file])).values()
+    if (name === "images" && files.length > 0) {
+      const newFiles = Array.from(files);
+
+      // Filter duplicates by name
+      const existingNames = new Set(formData.images.map((f) => f.name));
+      const filteredNewFiles = newFiles.filter(
+        (file) => !existingNames.has(file.name)
       );
 
-      setFormData((prev) => ({ ...prev, images: uniqueImages }));
-      setImagePreviews(uniqueImages.map((file) => URL.createObjectURL(file)));
+      const updatedImages = [...formData.images, ...filteredNewFiles];
+
+      // Revoke old preview URLs
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+
+      // Create new previews
+      const newPreviews = updatedImages.map((file) =>
+        URL.createObjectURL(file)
+      );
+
+      setFormData((prev) => ({ ...prev, images: updatedImages }));
+      setImagePreviews(newPreviews);
+
+      // ✅ Clear file input so selecting same file again works
+      e.target.value = "";
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -61,11 +104,19 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
     }
   };
 
+
+  const Required = () => <span className="text-danger">*</span>;
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const { title, price, description, images } = formData;
 
-    if (!title || !price || !description || (images.length === 0 && existingImages.length === 0)) {
+    if (
+      !title ||
+      !price ||
+      !description ||
+      (images.length === 0 && existingImages.length === 0)
+    ) {
       alert("Please fill all fields and provide at least one image.");
       return;
     }
@@ -103,9 +154,13 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
       </Modal.Header>
 
       <Modal.Body className="bg-white">
-        <Form onSubmit={handleSubmit} encType="multipart/form-data" className="p-3">
+        <Form
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+          className="p-3"
+        >
           <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">Property Title</Form.Label>
+            <Form.Label className="fw-semibold">Property Title <Required/></Form.Label>
             <Form.Control
               type="text"
               name="title"
@@ -119,7 +174,7 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
           <Row className="mb-4">
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Property Type</Form.Label>
+                <Form.Label className="fw-semibold">Property Type <Required/></Form.Label>
                 <Form.Select
                   name="propertyType"
                   value={formData.propertyType}
@@ -136,7 +191,7 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
 
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Room Size</Form.Label>
+                <Form.Label className="fw-semibold">Room Size <Required/></Form.Label>
                 <Form.Control
                   type="text"
                   name="roomSize"
@@ -150,9 +205,11 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
 
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Price</Form.Label>
+                <Form.Label className="fw-semibold">
+                  Price ($) <Required />
+                </Form.Label>
                 <Form.Control
-                  type="number"
+                  type="text"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
@@ -162,6 +219,156 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
               </Form.Group>
             </Col>
           </Row>
+
+                <Row className="mb-4">
+               <Col md={4}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Bedrooms <Required/></Form.Label>
+                <Form.Select
+                  name="bedrooms"
+                  value={formData.bedrooms}
+                  onChange={handleChange}
+                  className="rounded-3 shadow-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+
+                <Col md={4}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">Bathrooms <Required/></Form.Label>
+                <Form.Select
+                  name="bathrooms"
+                  value={formData.bathrooms}
+                  onChange={handleChange}
+                  className="rounded-3 shadow-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+
+            <Col md={4}>
+            <Form.Group>
+                <Form.Label className="fw-semibold">Furnished <Required/></Form.Label>
+                <Form.Select
+                  name="furnished"
+                  value={formData.furnished}
+                  onChange={handleChange}
+                  className="rounded-3 shadow-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row className="mb-4">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  City <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="e.g. Houston"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  State <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  placeholder="e.g. New Jersey"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+               <Row className="mb-4">
+                      <Col md={12}>
+                        <Form.Group>
+                          <Form.Label className="fw-semibold">
+                            Address <Required />
+                          </Form.Label>
+                          <Form.Control
+                            type="text"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            placeholder="e.g. 721 Broadway, New York, NY 10003, USA"
+                            className="rounded-3 shadow-sm"
+                          />
+                        </Form.Group>
+                      </Col>
+          
+             
+                    </Row>
+
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-semibold">Amenities </Form.Label>
+            <Row>
+              {amneties.map((amenity, idx) => (
+                <Col xs={6} md={4} key={idx}>
+                  <Form.Check
+                    type="checkbox"
+                    label={amenity.name}
+                    value={amenity.id}
+                    checked={formData.amenities.includes(amenity.id)}
+                  name="amenities"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const isChecked = e.target.checked;
+                      setFormData((prev) => ({
+                        ...prev,
+                        amenities: isChecked
+                          ? [...prev.amenities, value]
+                          : prev.amenities.filter((a) => a !== value),
+                      }));
+                    }}
+                  />
+                </Col>
+              ))}
+            </Row>
+          </Form.Group>
+
+          <Form.Group className="mb-4">
+            <Form.Label className="fw-semibold">Short Description</Form.Label>
+            <Form.Control
+              as="textarea"
+              name="shortDesc"
+              rows={2}
+              value={formData.shortDesc}
+              onChange={handleChange}
+              placeholder="Short description about the Room..."
+              className="rounded-3 shadow-sm"
+            />
+          </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label className="fw-semibold">Description</Form.Label>
@@ -176,101 +383,81 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">Upload New Images</Form.Label>
-            <Form.Control
-              type="file"
-              name="images[]"
-              accept="image/*"
-              multiple
-              onChange={handleChange}
-              className="rounded-3 shadow-sm"
-            />
-          </Form.Group>
-
-          {existingImages.length > 0 && (
-            <>
-              <p className="fw-bold mt-3">Existing Images</p>
-              <div className="d-flex flex-wrap gap-3">
-                {existingImages.map((src, idx) => (
-                  <div
-                    key={idx}
-                    className="position-relative"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      border: "1px solid #ddd",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <img
-                      src={src}
-                      alt={`Existing ${idx + 1}`}
-                      className="w-100 h-100 object-fit-cover"
-                    />
-                    <Button
-                      variant="light"
-                      size="sm"
-                      className="position-absolute top-0 end-0 translate-middle rounded-circle"
-                      style={{
-                        width: "22px",
-                        height: "22px",
-                        padding: 0,
-                        fontSize: "14px",
-                      }}
-                      onClick={() => handleRemoveImage(idx, true)}
-                    >
-                      ×
-                    </Button>
+        <Form.Group className="mb-3">
+                <Form.Label className="fw-semibold">
+                  Upload Images <Required />
+                </Form.Label>
+    
+                {/* Hidden native input */}
+                <Form.Control
+                  type="file"
+                  id="imageUpload"
+                  name="images"
+                  accept="image/*"
+                  multiple
+                  onChange={handleChange}
+                  className="d-none" // hides input
+                />
+    
+                {/* Custom trigger button */}
+                <label
+                  htmlFor="imageUpload"
+                  className="btn btn-outline-secondary rounded-3 ml-3 shadow-sm"
+                >
+                  Choose Images
+                </label>
+    
+                {/* Optional: show file count or names */}
+                {formData.images.length > 0 && (
+                  <div className="mt-2 small text-muted">
+                    {formData.images.length} file(s) selected
                   </div>
-                ))}
-              </div>
-            </>
-          )}
+                )}
+              </Form.Group>
 
-          {imagePreviews.length > 0 && (
-            <>
-              <p className="fw-bold mt-3">New Image Previews</p>
-              <div className="d-flex flex-wrap gap-3">
-                {imagePreviews.map((src, idx) => (
-                  <div
-                    key={idx}
-                    className="position-relative"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      border: "1px solid #ddd",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <img
-                      src={src}
-                      alt={`Preview ${idx + 1}`}
-                      className="w-100 h-100 object-fit-cover"
-                    />
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      className="position-absolute top-0 end-0 translate-middle rounded-circle"
+    
+
+              {imagePreviews.length > 0 && (
+                <div className="d-flex flex-wrap gap-3 mt-3">
+                  {imagePreviews.map((src, idx) => (
+                    <div
+                      key={idx}
+                      className="position-relative"
                       style={{
-                        width: "22px",
-                        height: "22px",
-                        padding: 0,
-                        fontSize: "14px",
+                        width: "100px",
+                        height: "100px",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        border: "1px solid #ddd",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                       }}
-                      onClick={() => handleRemoveImage(idx)}
                     >
-                      ×
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+                      <img
+                        src={src}
+                        alt={`Preview ${idx + 1}`}
+                        className="w-100 h-100 object-fit-cover"
+                      />
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        className="position-absolute"
+                        style={{
+                          top: "1px",
+                          right: "1px",
+                          width: "28px", // Ensure equal width & height
+                          height: "28px !important",
+                          fontSize: "14px",
+                          borderRadius: "100%", // Fully round
+                          boxShadow: "0 0 4px rgba(0,0,0,0.2)",
+                        }}
+                        onClick={() => handleRemoveImage(idx)}
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
           <div className="d-flex justify-content-end mt-4">
             <Button
@@ -282,7 +469,7 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
               }}
               className="px-4 py-2 fw-medium rounded-pill"
             >
-             Submit
+              Submit
             </Button>
           </div>
         </Form>

@@ -12,6 +12,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
     category: "",
     city: "",
     state: "",
+    location
   });
   const [submiting, setSubmiting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,8 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
             state: itemData.state || "",
             shortDesc: itemData.shortDesc || "",
             images: [],
+        location  : itemData.location || "",
+
           });
 
           const gallery = itemData.gallery || [];
@@ -71,7 +74,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-        if (name === "price") {
+    if (name === "price") {
       if (!/^\d*\.?\d*$/.test(value)) return;
       setFormData((prev) => ({ ...prev, [name]: value }));
       return;
@@ -206,6 +209,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
         city,
         shortDesc,
         state,
+        location
       } = formData;
 
       const data = new FormData();
@@ -217,6 +221,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
       data.append("city", city);
       data.append("shortDesc", shortDesc);
       data.append("state", state);
+      data.append("location", location);
 
       // ✅ Append new image files
       images.forEach((img) => {
@@ -372,6 +377,24 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
                     value={formData.state}
                     onChange={handleChange}
                     placeholder="e.g. New Jersey"
+                    className="rounded-3 shadow-sm"
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row className="mb-4">
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label className="fw-semibold">
+                    Address <Required />
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="e.g. 721 Broadway, New York, NY 10003, USA"
                     className="rounded-3 shadow-sm"
                   />
                 </Form.Group>

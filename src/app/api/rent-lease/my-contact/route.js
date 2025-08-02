@@ -23,15 +23,6 @@ export const GET = withAuth(async (req, user) => {
       })
       .lean();
 
-    // const result = contacts.map((contact) => ({
-    //   roomTitle: contact.roomId?.title,
-    //   roomImage: contact.roomId?.image,
-    //   ownerName: contact.ownerId?.name,
-    //   ownerEmail: contact.ownerId?.email,
-    //   ownerPhone: contact.ownerId?.phone || "N/A",
-    //   contactedAt: contact.createdAt,
-    // }));
-
     const result = contacts.map((contact) => ({
       roomTitle: contact.roomId?.title,
       roomImages:
