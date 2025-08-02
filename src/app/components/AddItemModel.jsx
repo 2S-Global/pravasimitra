@@ -311,7 +311,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
                   className="rounded-3 shadow-sm"
                 />
               </Form.Group>
-            </Col>
+            </Col> 
           </Row>
 
                 <Row className="mb-4">

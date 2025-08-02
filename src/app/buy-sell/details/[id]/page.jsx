@@ -181,7 +181,7 @@ const ProductDetails = () => {
                 <small className="ms-2 text-muted">(112 reviews)</small>
               </div> */}
                 <h3 className="text-primary fw-bold mb-4">${item.price}</h3>
-                <p className="text-muted mb-4">{item.shortDesc}</p>
+                <p className="text-muted mb-4" style={{ textAlign:"justify" }}>{item.shortDesc}</p>
 
                 <div className="d-flex gap-2">
                   <button

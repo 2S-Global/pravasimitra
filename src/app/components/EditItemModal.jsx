@@ -12,7 +12,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
     category: "",
     city: "",
     state: "",
-    location
+    location:""
   });
   const [submiting, setSubmiting] = useState(false);
   const [loading, setLoading] = useState(true);

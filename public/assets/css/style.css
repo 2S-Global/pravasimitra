@@ -738,7 +738,7 @@ blockquote footer a:hover {
 }
 
 /* Checkbox & Radio Styles */
-input[type="checkbox"],
+/* input[type="checkbox"],
 input[type="radio"] {
   visibility: hidden;
   opacity: 0;
@@ -747,16 +747,16 @@ input[type="radio"] {
   width: 0;
   height: 0;
   display: none;
-}
+} */
 
-input[type="checkbox"] ~ label,
+/* input[type="checkbox"] ~ label,
 input[type="radio"] ~ label {
   position: relative;
   padding-left: 24px;
   cursor: pointer;
-}
+} */
 
-input[type="checkbox"] ~ label:before,
+/* input[type="checkbox"] ~ label:before,
 input[type="radio"] ~ label:before {
   content: "";
   font-family: "Font Awesome 5 free";
@@ -769,9 +769,9 @@ input[type="radio"] ~ label:before {
   width: 15px;
   line-height: 1;
   font-size: 13px;
-}
+} */
 
-input[type="checkbox"]:checked ~ label,
+/* input[type="checkbox"]:checked ~ label,
 input[type="radio"]:checked ~ label {
   color: #c30707;
 }
@@ -781,7 +781,7 @@ input[type="radio"]:checked ~ label:before {
   content: "\f00c";
   color: #c30707;
   border-color: #c30707;
-}
+} */
 
 input[type="radio"] ~ label::before {
   content: "";

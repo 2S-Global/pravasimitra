@@ -4,7 +4,7 @@ import { Modal, Button, Form, Col, Row } from "react-bootstrap";
 import AlertService from "../components/alertService";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
+const AddRoomModal = ({ show, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
@@ -17,7 +17,7 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
     state: "",
     shortDesc: "",
     bedrooms: "",
-    bathrooms: "",  
+    bathrooms: "",
     address: "",
     furnished: "",
   });
@@ -32,9 +32,7 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
         const response = await axios.get("/api/rent-lease/category-list");
         setCategories(response.data.categories);
         // console.log("Categories fetched:", response.data.categories);
-      } 
-      catch (error) 
-      {
+      } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
@@ -105,7 +103,60 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
   };
 
 
+
   const Required = () => <span className="text-danger">*</span>;
+
+  const validateForm = () => {
+    const { title, price, description, images, propertyType, city, state } =
+      formData;
+
+    if (!title) {
+      AlertService.error("Title is required");
+      return false;
+    }
+
+    if (!propertyType) {
+      AlertService.error("Category is required");
+      return false;
+    }
+    if (!bedrooms) {
+      AlertService.error("Price is required");
+      return false;
+    }
+    if (!price) {
+      AlertService.error("Price is required");
+      return false;
+    }
+    if (!city) {
+      AlertService.error("City is required");
+      return false;
+    }
+
+    if (!state) {
+      AlertService.error("State is required");
+      return false;
+    }
+    if (images.length === 0) {
+      AlertService.error("Please upload at least one image");
+      return false;
+    }
+
+    return true;
+  };
+
+const handleAmenityChange = (e) => {
+  const value = String(e.target.value); // ✅ force string
+  const isChecked = e.target.checked;
+
+  setFormData((prev) => ({
+    ...prev,
+    amenities: isChecked
+      ? [...prev.amenities, value]
+      : prev.amenities.filter((a) => a !== value),
+  }));
+};
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -160,7 +211,9 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
           className="p-3"
         >
           <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">Property Title <Required/></Form.Label>
+            <Form.Label className="fw-semibold">
+              Property Title <Required />
+            </Form.Label>
             <Form.Control
               type="text"
               name="title"
@@ -174,7 +227,9 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
           <Row className="mb-4">
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Property Type <Required/></Form.Label>
+                <Form.Label className="fw-semibold">
+                  Property Type <Required />
+                </Form.Label>
                 <Form.Select
                   name="propertyType"
                   value={formData.propertyType}
@@ -191,7 +246,9 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
 
             <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Room Size <Required/></Form.Label>
+                <Form.Label className="fw-semibold">
+                  Room Size <Required />
+                </Form.Label>
                 <Form.Control
                   type="text"
                   name="roomSize"
@@ -220,10 +277,12 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
             </Col>
           </Row>
 
-                <Row className="mb-4">
-               <Col md={4}>
+          <Row className="mb-4">
+            <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Bedrooms <Required/></Form.Label>
+                <Form.Label className="fw-semibold">
+                  Bedrooms <Required />
+                </Form.Label>
                 <Form.Select
                   name="bedrooms"
                   value={formData.bedrooms}
@@ -240,9 +299,11 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
               </Form.Group>
             </Col>
 
-                <Col md={4}>
+            <Col md={4}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Bathrooms <Required/></Form.Label>
+                <Form.Label className="fw-semibold">
+                  Bathrooms <Required />
+                </Form.Label>
                 <Form.Select
                   name="bathrooms"
                   value={formData.bathrooms}
@@ -260,8 +321,10 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
             </Col>
 
             <Col md={4}>
-            <Form.Group>
-                <Form.Label className="fw-semibold">Furnished <Required/></Form.Label>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  Furnished <Required />
+                </Form.Label>
                 <Form.Select
                   name="furnished"
                   value={formData.furnished}
@@ -310,52 +373,44 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
             </Col>
           </Row>
 
-               <Row className="mb-4">
-                      <Col md={12}>
-                        <Form.Group>
-                          <Form.Label className="fw-semibold">
-                            Address <Required />
-                          </Form.Label>
-                          <Form.Control
-                            type="text"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            placeholder="e.g. 721 Broadway, New York, NY 10003, USA"
-                            className="rounded-3 shadow-sm"
-                          />
-                        </Form.Group>
-                      </Col>
-          
-             
-                    </Row>
+          <Row className="mb-4">
+            <Col md={12}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  Address <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="e.g. 721 Broadway, New York, NY 10003, USA"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">Amenities </Form.Label>
-            <Row>
-              {amneties.map((amenity, idx) => (
-                <Col xs={6} md={4} key={idx}>
-                  <Form.Check
-                    type="checkbox"
-                    label={amenity.name}
-                    value={amenity.id}
-                    checked={formData.amenities.includes(amenity.id)}
-                  name="amenities"
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      const isChecked = e.target.checked;
-                      setFormData((prev) => ({
-                        ...prev,
-                        amenities: isChecked
-                          ? [...prev.amenities, value]
-                          : prev.amenities.filter((a) => a !== value),
-                      }));
-                    }}
-                  />
-                </Col>
-              ))}
-            </Row>
-          </Form.Group>
+    <Form.Group className="mb-3">
+  <Form.Label>Amenities</Form.Label>
+  <div className="d-flex flex-wrap">
+    {amneties.map((amenity) => {
+      const amenityId = String(amenity._id); // 💥 force to string
+      return (
+        <Form.Check
+          key={amenityId}
+          type="checkbox"
+          label={amenity.name}
+          value={amenityId}
+          checked={formData.amenities.includes(amenityId)} // ✅ compare string
+          onChange={handleAmenityChange}
+          className="me-3"
+        />
+      );
+    })}
+  </div>
+</Form.Group>
+
 
           <Form.Group className="mb-4">
             <Form.Label className="fw-semibold">Short Description</Form.Label>
@@ -383,81 +438,79 @@ const AddRoomModal = ({ show, onClose, itemData, onSave }) => {
             />
           </Form.Group>
 
-        <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold">
-                  Upload Images <Required />
-                </Form.Label>
-    
-                {/* Hidden native input */}
-                <Form.Control
-                  type="file"
-                  id="imageUpload"
-                  name="images"
-                  accept="image/*"
-                  multiple
-                  onChange={handleChange}
-                  className="d-none" // hides input
-                />
-    
-                {/* Custom trigger button */}
-                <label
-                  htmlFor="imageUpload"
-                  className="btn btn-outline-secondary rounded-3 ml-3 shadow-sm"
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-semibold">
+              Upload Images <Required />
+            </Form.Label>
+
+            {/* Hidden native input */}
+            <Form.Control
+              type="file"
+              id="imageUpload"
+              name="images"
+              accept="image/*"
+              multiple
+              onChange={handleChange}
+              className="d-none" // hides input
+            />
+
+            {/* Custom trigger button */}
+            <label
+              htmlFor="imageUpload"
+              className="btn btn-outline-secondary rounded-3 ml-3 shadow-sm"
+            >
+              Choose Images
+            </label>
+
+            {/* Optional: show file count or names */}
+            {formData.images.length > 0 && (
+              <div className="mt-2 small text-muted">
+                {formData.images.length} file(s) selected
+              </div>
+            )}
+          </Form.Group>
+
+          {imagePreviews.length > 0 && (
+            <div className="d-flex flex-wrap gap-3 mt-3">
+              {imagePreviews.map((src, idx) => (
+                <div
+                  key={idx}
+                  className="position-relative"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    border: "1px solid #ddd",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
                 >
-                  Choose Images
-                </label>
-    
-                {/* Optional: show file count or names */}
-                {formData.images.length > 0 && (
-                  <div className="mt-2 small text-muted">
-                    {formData.images.length} file(s) selected
-                  </div>
-                )}
-              </Form.Group>
-
-    
-
-              {imagePreviews.length > 0 && (
-                <div className="d-flex flex-wrap gap-3 mt-3">
-                  {imagePreviews.map((src, idx) => (
-                    <div
-                      key={idx}
-                      className="position-relative"
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        borderRadius: "12px",
-                        overflow: "hidden",
-                        border: "1px solid #ddd",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      <img
-                        src={src}
-                        alt={`Preview ${idx + 1}`}
-                        className="w-100 h-100 object-fit-cover"
-                      />
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        className="position-absolute"
-                        style={{
-                          top: "1px",
-                          right: "1px",
-                          width: "28px", // Ensure equal width & height
-                          height: "28px !important",
-                          fontSize: "14px",
-                          borderRadius: "100%", // Fully round
-                          boxShadow: "0 0 4px rgba(0,0,0,0.2)",
-                        }}
-                        onClick={() => handleRemoveImage(idx)}
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  ))}
+                  <img
+                    src={src}
+                    alt={`Preview ${idx + 1}`}
+                    className="w-100 h-100 object-fit-cover"
+                  />
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="position-absolute"
+                    style={{
+                      top: "1px",
+                      right: "1px",
+                      width: "28px", // Ensure equal width & height
+                      height: "28px !important",
+                      fontSize: "14px",
+                      borderRadius: "100%", // Fully round
+                      boxShadow: "0 0 4px rgba(0,0,0,0.2)",
+                    }}
+                    onClick={() => handleRemoveImage(idx)}
+                  >
+                    ×
+                  </Button>
                 </div>
-              )}
+              ))}
+            </div>
+          )}
 
           <div className="d-flex justify-content-end mt-4">
             <Button
