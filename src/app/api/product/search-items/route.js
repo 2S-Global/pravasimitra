@@ -35,7 +35,7 @@ export const GET = async (req) => {
   // Keyword filter
   if (keyword) {
     query.$or = [
-      { name: { $regex: keyword, $options: "i" } },
+      { title: { $regex: keyword, $options: "i" } },
       { description: { $regex: keyword, $options: "i" } },
     ];
   }
