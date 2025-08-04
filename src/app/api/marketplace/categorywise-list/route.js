@@ -22,9 +22,10 @@ export const GET = async (req) => {
   await connectDB();
 
   const { searchParams } = new URL(req.url);
-  const category = searchParams.get("id");
+  // const category = searchParams.get("id");
+  const categoryIdEncoded = searchParams.get("id");
 
-  if (!category) {
+  if (!categoryIdEncoded) {
     return addCorsHeaders(
       NextResponse.json(
         { error: "Missing Category ID in query" },
@@ -36,7 +37,7 @@ export const GET = async (req) => {
   let query = { isDel: false };
 
   try {
-    const categoryId = decodeObjectId(category);
+    const categoryId = decodeObjectId(categoryIdEncoded);
     // console.log(categoryId);
 
     if (
@@ -70,21 +71,22 @@ export const GET = async (req) => {
       );
     }
 
-    const baseImageUrl = process.env.IMAGE_URL + "/e-marketplace";
+    //const baseImageUrl = process.env.IMAGE_URL + "/e-marketplace";
 
     const updatedItems = items.map((item) => ({
       ...item,
       id: encodeObjectId(item._id),
       _id: undefined,
-      images: Array.isArray(item.images)
-       ? item.images.map((img) => `${baseImageUrl}/${img}`)
-        : [],
+      // images: Array.isArray(item.images)
+      //  ? item.images.map((img) => `${baseImageUrl}/${img}`)
+      //   : [],
+      images: Array.isArray(item.images) ? item.images.map((img) => img) : [],
     }));
 
     return addCorsHeaders(
       NextResponse.json(
         {
-          msg: "Product category items loaded successfully",
+          msg: "Marketplace items loaded successfully",
           itemList: updatedItems,
         },
         { status: 200 }

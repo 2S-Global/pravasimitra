@@ -24,22 +24,23 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET =withAuth (async function (req,user) {
+export const GET = withAuth (async function (req,user) {
   await connectDB();
     const userId = user?.id;
+
   try {
     const items = await MarketProduct.find({ isDel: false,createdBy:userId })
       .sort({ createdAt: -1 })
       .select("-__v -isDel")
       .populate("category","name")
-      .populate("createdBy","name")
+      .populate("createdBy","name email mobile image")
       .lean();
 
       if(!items || items.length===0){
           return addCorsHeaders(NextResponse.json({msg:"No Items Found",items:[]},{status:200}))
       }
 
-      const baseImageUrl = `${process.env.IMAGE_URL}/e-marketplace`;
+      //const baseImageUrl = `${process.env.IMAGE_URL}/e-marketplace`;
 
       const updatedItems=items.map(item=>({
         ...item,
