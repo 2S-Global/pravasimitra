@@ -4,6 +4,7 @@ import MarketCategory from "../../../../../models/MarketCategory";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import MarketProduct from "../../../../../models/MarketProduct";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+import cloudinary from "../../../../../lib/cloudinary";
 
 /**
  * @description Get all MarketProduct items for a given category ID (only those not marked as deleted)

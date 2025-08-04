@@ -8,6 +8,7 @@ import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId,encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+import cloudinary from "../../../../../lib/cloudinary";
 
 
 /**
