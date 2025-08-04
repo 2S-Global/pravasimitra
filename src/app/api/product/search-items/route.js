@@ -16,8 +16,6 @@ export const GET = async (req) => {
   const categoryEncoded = searchParams.get("categoryId");
   const keyword = searchParams.get("keyword");
 
-  
-
   let query = {
     is_del: false,
   };
@@ -48,16 +46,27 @@ export const GET = async (req) => {
       .populate("category", "name")
       .lean();
 
-    const baseImageUrl = `${
-      process.env.IMAGE_URL || "http://localhost:3000/assets/images"
-    }/product-items`;
+    // const baseImageUrl = `${
+    //   process.env.IMAGE_URL || "http://localhost:3000/assets/images"
+    // }/product-items`;
 
     const updatedItems = products.map((product) => ({
       ...product,
       id: encodeObjectId(product._id),
-      image: product.image ? `${baseImageUrl}/${product.image}` : null,
+      // image: product.image ? `${baseImageUrl}/${product.image}` : null,
+      // gallery: Array.isArray(product.gallery)
+      //   ? product.gallery.map((img) => `${baseImageUrl}/${img}`)
+      //   : [],
+      image: product.image
+        ? product.image.startsWith("http")
+          ? product.image
+          : `${baseImageUrl}/${product.image}`
+        : null,
+
       gallery: Array.isArray(product.gallery)
-        ? product.gallery.map((img) => `${baseImageUrl}/${img}`)
+        ? product.gallery.map((img) =>
+            img.startsWith("http") ? img : `${baseImageUrl}/${img}`
+          )
         : [],
       _id: undefined,
     }));

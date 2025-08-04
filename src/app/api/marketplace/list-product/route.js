@@ -42,18 +42,53 @@ export const GET = withAuth (async function (req,user) {
 
       //const baseImageUrl = `${process.env.IMAGE_URL}/e-marketplace`;
 
-      const updatedItems=items.map(item=>({
-        ...item,
-        id:encodeObjectId(item._id),
-        images: Array.isArray(item.images)
-        ? item.images.map(img => `${baseImageUrl}/${img}`)
-        : [],
-        _id: undefined
-      }))
+      // const updatedItems=items.map(item=>({
+      //   ...item,
+      //   id:encodeObjectId(item._id),
+      //   images: Array.isArray(item.images)
+      //   ? item.images.map(img => `${baseImageUrl}/${img}`)
+      //   : [],
+      //   _id: undefined
+      // }))
 
-    return addCorsHeaders(NextResponse.json({ items: updatedItems }, { status: 200 }));
+      const updatedItems = await Promise.all(
+      items.map(async (item) => {
+
+        const category = item.category?._id
+          ? {
+              id: encodeObjectId(item.category._id),
+              name: item.category.name,
+            }
+          : null;
+
+        const createdBy = item.createdBy?._id
+          ? {
+              id: encodeObjectId(item.createdBy._id),
+              name: item.createdBy.name,
+              email: item.createdBy.email,
+              phone: item.createdBy.mobile,
+              image: item.createdBy.image || "/assets/images/default-user.png",
+            }
+          : null;
+
+        return {
+          ...item,
+          id: encodeObjectId(item._id),
+          _id: undefined,
+          images: Array.isArray(item.images) ? item.images : [],
+          category,
+          createdBy,
+        };
+      })
+    );
+
+     return addCorsHeaders(
+      NextResponse.json({ items: updatedItems }, { status: 200 })
+    );
   } catch (err) {
     console.error("DB fetch failed:", err);
-    return addCorsHeaders(NextResponse.json({ error: "Failed to fetch rent items" }, { status: 500 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
+    );
   }
-})
+});

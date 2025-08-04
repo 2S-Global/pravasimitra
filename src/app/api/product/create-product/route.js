@@ -146,7 +146,7 @@ export const POST = withAuth(async function (req, user) {
     return addCorsHeaders(
       NextResponse.json(
         {
-          msg: "Teko is 39yrs old now",
+          msg: "Product added successfully",
           product: {
             id: newProduct._id,
             title: newProduct.title,

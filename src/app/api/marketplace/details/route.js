@@ -41,15 +41,19 @@ export const GET = async (req) => {
     const item = await MarketProduct.findOne({ _id: decodedId, isDel: false })
       .select("-__v -isDel")
       .populate("category", "name")
+      .populate("createdBy", "name email mobile")
       .lean();
 
     if (!item) {
       return addCorsHeaders(NextResponse.json({ msg: "Item not found" }, { status: 404 }));
     }
 
-    item.images = item.images.map(filename => {
-      return `${process.env.IMAGE_URL}/e-marketplace/${filename}`;
-    });
+    // item.images = item.images.map(filename => {
+    //   return `${process.env.IMAGE_URL}/e-marketplace/${filename}`;
+    // });
+
+    // ✅ Use Cloudinary URLs directly if already present
+    item.images = Array.isArray(item.images) ? item.images.map(img => img) : [];
 
     const updatedItem = {
       ...item,
