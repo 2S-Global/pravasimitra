@@ -58,8 +58,6 @@ export async function GET(req) {
     }
   }
 
-  
-
   // Bedrooms
   if (bedrooms) {
     if (bedrooms.includes("+")) {
@@ -87,9 +85,15 @@ export async function GET(req) {
     const formattedRooms = rooms.map((room) => ({
       ...room.toObject(),
       id: encodeObjectId(room._id),
+      // images: Array.isArray(room.images)
+      //   ? room.images.map((img) => `${baseImageUrl}/rent-items/${img}`)
+      //   : [],
       images: Array.isArray(room.images)
-        ? room.images.map((img) => `${baseImageUrl}/rent-items/${img}`)
+        ? room.images.map((img) =>
+            img.startsWith("http") ? img : `${baseImageUrl}/rent-items/${img}`
+          )
         : [],
+
       _id: undefined,
     }));
 
