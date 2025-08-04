@@ -4,20 +4,20 @@ import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { useAuthStore } from "@/app/store/authStore";
 import AlertService from "@/app/components/alertService";
 
 const ProductDetails = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState([]);
-  const [item, setItem] = useState("");
+const [selectedImage, setSelectedImage] = useState("");
+const [item, setItem] = useState({});
   const { id } = useParams();
-
+  const thumbnailRefs = useRef([]);
   const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-
+const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const handleContactSeller = async () => {
     if (!isLoggedIn) {
       AlertService.error("Please login first to contact the seller.");
@@ -68,20 +68,40 @@ const ProductDetails = () => {
     fetchDetails();
   }, [id]);
 
+
+useEffect(() => {
+  if (item?.gallery && selectedImage) {
+    const index = item.gallery.indexOf(selectedImage);
+    setSelectedImageIndex(index);
+  }
+}, [selectedImage, item.gallery]);
+
+
+  useEffect(() => {
+    const currentThumb = thumbnailRefs.current[selectedImageIndex];
+    if (currentThumb) {
+      currentThumb.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, [selectedImageIndex]);
   const handlePrevImage = () => {
-    const currentIndex = item.gallery.indexOf(selectedImage);
-    if (currentIndex > 0) {
-      setSelectedImage(item.gallery[currentIndex - 1]);
+    if (selectedImageIndex > 0) {
+      const newIndex = selectedImageIndex - 1;
+      setSelectedImage(item.gallery[newIndex]);
+      setSelectedImageIndex(newIndex);
     }
   };
 
   const handleNextImage = () => {
-    const currentIndex = item.gallery.indexOf(selectedImage);
-    if (currentIndex < item.gallery.length - 1) {
-      setSelectedImage(item.gallery[currentIndex + 1]);
+    if (selectedImageIndex < item.gallery.length - 1) {
+      const newIndex = selectedImageIndex + 1;
+      setSelectedImage(item.gallery[newIndex]);
+      setSelectedImageIndex(newIndex);
     }
   };
-
   return (
     <>
       <Header />
@@ -135,25 +155,29 @@ const ProductDetails = () => {
                       scrollSnapType: "x mandatory",
                     }}
                   >
-                    {item.gallery.map((img, index) => (
-                      <img
-                        key={index}
-                        src={img}
-                        alt={`Thumbnail ${index}`}
-                        className={`img-thumbnail ${
-                          selectedImage === img ? "border border-danger" : ""
-                        }`}
-                        style={{
-                          height: "80px",
-                          width: "100px",
-                          objectFit: "cover",
-                          cursor: "pointer",
-                          scrollSnapAlign: "center",
-                          flex: "0 0 auto",
-                        }}
-                        onClick={() => setSelectedImage(img)}
-                      />
-                    ))}
+               {item.gallery.map((img, index) => (
+  <img
+    key={index}
+    ref={(el) => (thumbnailRefs.current[index] = el)}
+    src={img}
+    alt={`Thumbnail ${index}`}
+    className={`img-thumbnail ${
+      selectedImage === img ? "border border-danger" : ""
+    }`}
+    style={{
+      height: "80px",
+      width: "100px",
+      objectFit: "cover",
+      cursor: "pointer",
+      scrollSnapAlign: "center",
+      flex: "0 0 auto",
+    }}
+    onClick={() => {
+      setSelectedImage(img);
+      setSelectedImageIndex(index);
+    }}
+  />
+))}
                   </div>
 
                   {/* Next Button */}

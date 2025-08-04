@@ -20,7 +20,8 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
     bathrooms: "",
     address: "",
     furnished: "",
-    location: "", // Added for address
+    location: "",
+    frequency: "",
   });
 
   const [existingImages, setExistingImages] = useState([]);
@@ -92,17 +93,23 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
     }
   };
 
-
-    const resetForm = () => {
+  const resetForm = () => {
     setFormData({
       title: "",
       price: "",
       description: "",
       images: [],
       shortDesc: "",
-      category: "",
       city: "",
       state: "",
+      location: "",
+      roomSize: "",
+      bedrooms: "",
+      bathrooms: "",
+      furnished: "",
+      amenities: [],
+      propertyType: "",
+      frequency: "",
     });
     setImagePreviews([]);
   };
@@ -116,7 +123,6 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
     setFormData((prev) => ({ ...prev, images: updatedImages }));
     setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
   };
-
 
   const Required = () => <span className="text-danger">*</span>;
 
@@ -135,6 +141,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
       state,
       location,
       furnished,
+      frequency,
     } = formData;
 
     if (!title) {
@@ -150,11 +157,16 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
       AlertService.error("Room Size is required");
       return false;
     }
+    if (!frequency) {
+      AlertService.error("Frequency is required");
+      return false;
+    }
 
     if (!price) {
       AlertService.error("Price is required");
       return false;
     }
+
     if (!bedrooms) {
       AlertService.error("Bedroom is required");
       return false;
@@ -207,7 +219,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
       setLoading(false); // 👈 stop the spinner
       return;
     }
-        setLoading(true);
+    setLoading(true);
     const {
       title,
       propertyType,
@@ -223,6 +235,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
       location,
       furnished,
       amenities,
+      frequency,
     } = formData;
 
     const data = new FormData();
@@ -238,6 +251,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
     data.append("state", state);
     data.append("location", location);
     data.append("furnished", furnished);
+    data.append("frequency", frequency); // send address separately
     amenities.forEach((amenityId) => {
       data.append("amenities", amenityId); // send each amenity ID separately
     });
@@ -260,10 +274,16 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
         description: "",
         images: [],
         shortDesc: "",
-        category: "",
         city: "",
         state: "",
         location: "",
+        roomSize: "",
+        bedrooms: "",
+        bathrooms: "",
+        furnished: "",
+        amenities: [],
+        propertyType: "",
+        frequency: "",
       });
       setImagePreviews([]);
       onClose();
@@ -271,6 +291,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
         onItemAdded();
       }
     } catch (error) {
+      AlertService.error(response.data.msg);
       console.error("❌ Error uploading product:", error);
     } finally {
       setLoading(false); // re-enable button after process
@@ -291,7 +312,8 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
       bathrooms: "",
       address: "",
       furnished: "",
-      location: "", // ✅ added this if used separately
+      location: "",
+      frequency: "",
     });
 
     setImagePreviews([]);
@@ -303,7 +325,15 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
   };
 
   return (
-    <Modal show={show} onHide={onClose} centered size="lg">
+    <Modal
+      show={show}
+      onHide={() => {
+        resetForm();
+        onClose();
+      }}
+      centered
+      size="lg"
+    >
       <Modal.Header closeButton>
         <Modal.Title className="fw-semibold fs-4">
           🛠️ Add Property Details
@@ -331,7 +361,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
           </Form.Group>
 
           <Row className="mb-4">
-            <Col md={4}>
+            <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
                   Property Type <Required />
@@ -352,7 +382,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
               </Form.Group>
             </Col>
 
-            <Col md={4}>
+            <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
                   Room Size <Required />
@@ -367,8 +397,28 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
                 />
               </Form.Group>
             </Col>
+          </Row>
 
-            <Col md={4}>
+          <Row className="mb-4">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  Frequency <Required />
+                </Form.Label>
+                <Form.Select
+                  name="frequency"
+                  value={formData.frequency}
+                  onChange={handleChange}
+                  className="rounded-3 shadow-sm"
+                >
+                  <option value="">Select</option>
+                  <option value="Month">Month</option>
+                  <option value="Year">Year</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+
+            <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
                   Price ($) <Required />
@@ -631,28 +681,28 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
           )}
 
           <div className="d-flex justify-content-end mt-4">
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    background: "#c12020",
-                    color: "#fff",
-                    border: "none",
-                    opacity: loading ? 0.7 : 1,
-                    cursor: loading ? "not-allowed" : "pointer",
-                  }}
-                  className="px-4 py-2 fw-medium rounded-pill d-flex align-items-center justify-content-center gap-2"
-                >
-                  {loading && (
-                    <span
-                      className="spinner-border spinner-border-sm"
-                      role="status"
-                      aria-hidden="true"
-                    />
-                  )}
-                  {loading ? "Submitting..." : "Submit"}
-                </Button>
-              </div>
+            <Button
+              type="submit"
+              disabled={loading}
+              style={{
+                background: "#c12020",
+                color: "#fff",
+                border: "none",
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+              }}
+              className="px-4 py-2 fw-medium rounded-pill d-flex align-items-center justify-content-center gap-2"
+            >
+              {loading && (
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              )}
+              {loading ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
         </Form>
       </Modal.Body>
     </Modal>

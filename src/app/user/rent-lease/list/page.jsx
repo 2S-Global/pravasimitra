@@ -25,43 +25,72 @@ const ContactedUsersList = () => {
     setShowModal(true);
   };
 
-
-  
   const handleAdd = () => {
     setShowAddModal(true); // Open add modal
   };
   const handleEdit = (item) => {
     setItemToEdit({
-      title: item.title,
-      propertyType: item.propertyType,
-      roomSize: item.roomSize,
-      price: item.price,
-      description: "Sample description here", // fallback if not present
-      images: item.images || [],
+      title: item.title || "",
+      price: item.price || "",
+      description: item.description || "" ,
+      shortDesc: item.shortDesc || "",
+      images: item.images || "",
+      propertyType: item.propertyType.id || "",
+      roomSize: item.roomSize || "",
+      frequency: item.frequency || "",
+      location: item.location || "",
+      bathrooms: item.bathrooms || "" ,
+      furnished: item.furnished || "",
+      id: item.id,
+      bedrooms: item.bedrooms || "",
+      amenities: item.amenities || "",
+     city: item.city || "",
+      state: item.state || "",
     });
     setShowEditModal(true);
   };
 
+    const handleDelete = async (id) => {
+    AlertService.confirm(
+      "Remove Item",
+      "Are you sure you want to remove this item?",
+      async () => {
+        try {
+          const response = await axios.patch("/api/rent-lease/delete-room", {
+            id,
+          });
+
+          AlertService.success("Property removed successfully!");
+          setUsers((prevUsers) => prevUsers.filter((item) => item.id !== id));
+        } catch (error) {
+          console.error("Error deleting:", error);
+          AlertService.error("Failed to remove item.");
+        }
+      },
+      () => {
+        AlertService.message("Item not removed");
+      }
+    );
+  };
+
   const filteredUsers = users;
 
-
-    const fetchUsers = async () => {
+  const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await axios.get("/api/rent-lease/list-room");
 
       setUsers(response.data.items);
-
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
-    useEffect(() => {
-      fetchUsers();
-    }, []);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <>
@@ -119,8 +148,7 @@ const ContactedUsersList = () => {
                         </tr>
                       </thead>
                       <tbody>
-
-                           {loading ? (
+                        {loading ? (
                           <tr>
                             <td colSpan="10">
                               <div
@@ -138,12 +166,11 @@ const ContactedUsersList = () => {
                               </div>
                             </td>
                           </tr>
-                        ) :
-                        filteredUsers.length > 0 ? (
+                        ) : filteredUsers.length > 0 ? (
                           filteredUsers.map((user, index) => (
                             <tr key={user.id}>
                               <td>{index + 1}</td>
-                             <td>
+                              <td>
                                 {user.title.split(" ").length > 12
                                   ? user.title
                                       .split(" ")
@@ -151,24 +178,26 @@ const ContactedUsersList = () => {
                                       .join(" ") + "..."
                                   : user.title}
                               </td>
-                              <td><img
-                                  src={user?.images?.[0] }
+                              <td>
+                                <img
+                                  src={user?.images?.[0]}
                                   alt="User"
                                   width={80}
                                   height={60}
                                   style={{ objectFit: "cover" }}
-                                /></td>
+                                />
+                              </td>
                               <td>{user.propertyType?.name || "N/A"}</td>
                               <td>{user.price}</td>
                               <td>{user.roomSize}</td>
 
-                                 <td>
+                              <td>
                                 {new Date(user.createdAt).toLocaleDateString(
                                   "en-GB"
                                 )}
                               </td>
 
-                          <td>
+                              <td>
                                 <button
                                   className="btn btn-sm btn-outline-info"
                                   title="View Details"
@@ -194,6 +223,7 @@ const ContactedUsersList = () => {
                                   <button
                                     className="btn btn-sm btn-outline-danger"
                                     title="Delete"
+                                    type="button"
                                     onClick={() => handleDelete(user.id)}
                                   >
                                     <i className="bi bi-trash" />
@@ -236,12 +266,13 @@ const ContactedUsersList = () => {
                 <AddRoomModel
                   show={showAddModal}
                   onClose={() => setShowAddModal(false)}
-                      onItemAdded={fetchUsers}
+                  onItemAdded={fetchUsers}
                 />
                 <EditRoomModal
                   show={showEditModal}
                   onClose={() => setShowEditModal(false)}
                   itemData={itemToEdit}
+                        onItemAdded={fetchUsers}
                   onSave={(formData) => {
                     // You can handle formData submission to your API here
                     console.log("Submit updated item", formData);
