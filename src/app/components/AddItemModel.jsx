@@ -168,7 +168,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
         withCredentials: true,
       });
 
-      AlertService.error(response.data.msg);
+      AlertService.success(response.data.msg);
 
       setFormData({
         title: "",
