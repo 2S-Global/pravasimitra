@@ -8,7 +8,7 @@ if (typeof window !== "undefined") {
 
   // Global settings
   alertify.set('notifier', 'position', 'top-right');
-  alertify.set('notifier', 'delay', 3);
+  alertify.set('notifier', 'delay', 0);
 }
 
 const AlertService = {
