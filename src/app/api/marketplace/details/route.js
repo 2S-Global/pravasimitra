@@ -58,7 +58,7 @@ export const GET = async (req) => {
 
     const updatedItem = {
       ...item,
-      id: encodeObjectId(item._id), 
+      id: encodeObjectId(item._id),
     };
     delete updatedItem._id;
 

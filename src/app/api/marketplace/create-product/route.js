@@ -3,9 +3,11 @@ import path from "path";
 import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
 import MarketProduct from "../../../../../models/MarketProduct";
+import MarketCategory from "../../../../../models/MarketCategory";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+import cloudinary from "../../../../../lib/cloudinary";
 
 // Handle preflight CORS
 export async function OPTIONS() {
@@ -24,10 +26,12 @@ async function parseFormData(req) {
   const city = form.get("city");
   const state = form.get("state");
   const location = form.get("location") || "";
-  const ingredients = form.get("ingredients") || "";
+  // const ingredients = form.get("ingredients") || "";
   const price = form.get("price");
-  const shortDesc = form.get("shortDesc") || "";
+  // const shortDesc = form.get("shortDesc") || "";
   const description = form.get("description") || "";
+  const quantity = form.get("quantity");
+  const unit = form.get("unit");
   const files = form.getAll("images");
 
   const images = await Promise.all(
@@ -42,7 +46,20 @@ async function parseFormData(req) {
     })
   );
 
-  return { title, category, city, state, location, ingredients, price, shortDesc, description, images };
+  return {
+    title,
+    category,
+    city,
+    state,
+    location,
+    //ingredients,
+    price,
+    // shortDesc,
+    description,
+    quantity,
+    unit,
+    images,
+  };
 }
 
 export const POST = withAuth(async function (req, user) {
@@ -58,33 +75,63 @@ export const POST = withAuth(async function (req, user) {
     );
   }
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-  const savedFilenames = [];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/avif",
+  ];
+  const uploadedImageUrls = [];
 
-  const uploadDir = path.join(
-    process.cwd(),
-    "public/assets/images/e-marketplace"
-  );
-  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+  // const uploadDir = path.join(
+  //   process.cwd(),
+  //   "public/assets/images/e-marketplace"
+  // );
+  // if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of data.images) {
-    if (!allowedTypes.includes(file.mime)) {
+    if (!file || !allowedTypes.includes(file.mime)) {
       return addCorsHeaders(
         NextResponse.json(
-          { error: "Only JPG, PNG, WEBP allowed" },
-          { status: 200 }
+          { error: "Only JPG, JPEG, PNG, WEBP allowed" },
+          { status: 400 }
         )
       );
     }
 
-    const newFilename = `${Date.now()}_${file.filename}`;
-    const savePath = path.join(uploadDir, newFilename);
+    // const newFilename = `${Date.now()}_${file.filename}`;
+    // const savePath = path.join(uploadDir, newFilename);
 
-    try {
-      fs.writeFileSync(savePath, file.buffer);
-      savedFilenames.push(newFilename);
+  //   try {
+  //     fs.writeFileSync(savePath, file.buffer);
+  //     savedFilenames.push(newFilename);
+  //   } catch (err) {
+  //     console.error("Image save failed:", err);
+  //     return addCorsHeaders(
+  //       NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+  //     );
+  //   }
+  // }
+
+ try {
+      await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "e-marketplace",
+            resource_type: "image",
+            public_id: `${Date.now()}_${file.filename}`,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            uploadedImageUrls.push(result.secure_url);
+            resolve();
+          }
+        );
+        stream.end(file.buffer);
+      });
     } catch (err) {
-      console.error("Image save failed:", err);
+      console.error("Cloudinary upload failed:", err);
       return addCorsHeaders(
         NextResponse.json({ error: "Image upload failed" }, { status: 500 })
       );
@@ -103,20 +150,25 @@ export const POST = withAuth(async function (req, user) {
   try {
     const newItem = await MarketProduct.create({
       title: data.title,
-      images: savedFilenames,
+      images: uploadedImageUrls,
       category: decodedCategoryId,
       city: data.city,
       state: data.state,
       location: data.location,
-      ingredients: data.ingredients,
+      //ingredients: data.ingredients,
       price: parseFloat(data.price),
-      shortDesc: data.shortDesc,
+      // shortDesc: data.shortDesc,
       description: data.description,
+      quantity: parseInt(data.quantity, 10),
+      unit: parseInt(data.unit, 10),
       createdBy: userId,
     });
 
     return addCorsHeaders(
-      NextResponse.json({ msg: "Successfully Saved it", item: newItem }, { status: 200 })
+      NextResponse.json(
+        { msg: "Product created successfully", item: newItem },
+        { status: 200 }
+      )
     );
   } catch (err) {
     console.error("DB insert failed:", err);

@@ -21,17 +21,23 @@ const MarketProductSchema = new mongoose.Schema(
     state: {
       type: String,
     },
-    ingredients: {
-      type: String,
-    },
+    // ingredients: {
+    //   type: String,
+    // },
     price: {
       type: Number,
     },
-    shortDesc: {
-      type: String,
-    },
+    // shortDesc: {
+    //   type: String,
+    // },
     description: {
       type: String,
+    },
+    quantity: {
+      type: Number,
+    },
+    unit: {
+      type: Number,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
