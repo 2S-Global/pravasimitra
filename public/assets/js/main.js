@@ -1062,7 +1062,7 @@
       sasna.portfolioFilter();
       sasna.blogMasonryActive();
       sasna.rangeSlider();
-      sasna.niceSelectActive();
+      // sasna.niceSelectActive();
       sasna.productDetailsZoom();
       sasna.productQuantityBox();
       sasna.productDetailsImageZoomChange();

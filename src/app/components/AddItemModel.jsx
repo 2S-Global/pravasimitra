@@ -203,6 +203,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
       category: "",
       city: "",
       state: "",
+       location: "",
     });
     setImagePreviews([]);
   };

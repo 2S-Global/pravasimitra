@@ -180,13 +180,13 @@ const ProductDetails = () => {
                   <strong className="text-dark">{item.category.name}</strong>
                 </p>
 
-                {(ingredient === "Cooked Food" ||
+                {/* {(ingredient === "Cooked Food" ||
                   ingredient === "Packaged Food") && (
                   <p className="text-secondary mb-3 mt-2">
                     Ingredients:{" "}
                     <strong className="text-dark">{item.ingredients}</strong>
                   </p>
-                )}
+                )} */}
                 {/* <div className="d-flex align-items-center mb-3">
                   <span className="badge bg-success me-2">In Stock</span>
                   <span className="text-warning fw-semibold fs-5">★★★★☆</span>

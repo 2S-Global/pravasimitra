@@ -1,72 +1,151 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Col, Row } from "react-bootstrap";
-
+import axios from "axios";
+import AlertService from "../components/alertService";
 const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
   const [formData, setFormData] = useState({
     title: "",
     price: "",
     description: "",
-    propertyType: "",
-    roomSize: "",
+    category: "",
+    city: "",
+    state: "",
+    location: "",
+    quantity: "",
+    unit: "",
     images: [],
   });
-
-  const [existingImages, setExistingImages] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const Required = () => <span className="text-danger">*</span>;
 
   useEffect(() => {
-    if (itemData) {
-      setFormData({
-        title: itemData.title || "",
-        price: itemData.price || "",
-        description: itemData.description || "",
-        propertyType: itemData.propertyType || "",
-        roomSize: itemData.roomSize || "",
-        images: [],
-      });
-      setExistingImages(itemData.images || []);
-      setImagePreviews([]);
-    }
-  }, [itemData]);
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("/api/marketplace/category-list");
+        setCategories(response.data.categories);
+        // console.log("Categories fetched:", response.data.categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
 
+    fetchCategories();
+  }, []);
+
+  const validateForm = () => {
+    const { title, price, description, images, category, city, state,location,unit,quantity } =
+      formData;
+
+    if (!title) {
+      AlertService.error("Title is required");
+      return false;
+    }
+
+    if (!category) {
+      AlertService.error("Category is required");
+      return false;
+    }
+    if (!price) {
+      AlertService.error("Price is required");
+      return false;
+    }
+
+    if (!quantity) {
+      AlertService.error("Quantity is required");
+      return false;
+    }
+
+    if (!unit) {
+      AlertService.error("Unit Description is required");
+      return false;
+    }
+    if (!city) {
+      AlertService.error("City is required");
+      return false;
+    }
+
+    if (!state) {
+      AlertService.error("State is required");
+      return false;
+    }
+
+        if (!location) {
+      AlertService.error("Address is required");
+      return false;
+    }
+
+    if (images.length === 0) {
+      AlertService.error("Please upload at least one image");
+      return false;
+    }
+
+    return true;
+  };
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name === "images[]") {
-      const newFiles = Array.from(files);
-      const updatedImages = [...formData.images, ...newFiles];
+    if (name === "price") {
+      if (!/^\d*\.?\d*$/.test(value)) return;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      return;
+    }
 
-      const uniqueImages = Array.from(
-        new Map(updatedImages.map((file) => [file.name, file])).values()
+    if (name === "quantity") {
+      if (!/^\d*\.?\d*$/.test(value)) return;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      return;
+    }
+
+    if (name === "images" && files.length > 0) {
+      const newFiles = Array.from(files);
+
+      // Filter duplicates by name
+      const existingNames = new Set(formData.images.map((f) => f.name));
+      const filteredNewFiles = newFiles.filter(
+        (file) => !existingNames.has(file.name)
       );
 
-      setFormData((prev) => ({ ...prev, images: uniqueImages }));
-      setImagePreviews(uniqueImages.map((file) => URL.createObjectURL(file)));
+      const updatedImages = [...formData.images, ...filteredNewFiles];
+
+      // Revoke old preview URLs
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+
+      // Create new previews
+      const newPreviews = updatedImages.map((file) =>
+        URL.createObjectURL(file)
+      );
+
+      setFormData((prev) => ({ ...prev, images: updatedImages }));
+      setImagePreviews(newPreviews);
+
+      // ✅ Clear file input so selecting same file again works
+      e.target.value = "";
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleRemoveImage = (index, isExisting = false) => {
-    if (isExisting) {
-      const updated = [...existingImages];
-      updated.splice(index, 1);
-      setExistingImages(updated);
-    } else {
-      const updated = [...formData.images];
-      updated.splice(index, 1);
-      setFormData((prev) => ({ ...prev, images: updated }));
-      setImagePreviews(updated.map((file) => URL.createObjectURL(file)));
-    }
+  const handleRemoveImage = (index) => {
+    // Clean up old object URL
+    URL.revokeObjectURL(imagePreviews[index]);
+
+    const updatedImages = [...formData.images];
+    updatedImages.splice(index, 1);
+
+    setFormData((prev) => ({ ...prev, images: updatedImages }));
+    setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { title, price, description, images } = formData;
 
-    if (!title || !price || !description || (images.length === 0 && existingImages.length === 0)) {
-      alert("Please fill all fields and provide at least one image.");
+
+    if (!validateForm()) {
+      setLoading(false);
       return;
     }
 
@@ -94,18 +173,51 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
     onClose();
   };
 
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      price: "",
+      description: "",
+      images: [],
+      shortDesc: "",
+      city: "",
+      state: "",
+      location: "",
+      roomSize: "",
+      bedrooms: "",
+      bathrooms: "",
+      furnished: "",
+      amenities: [],
+      propertyType: "",
+      frequency: "",
+    });
+    setImagePreviews([]);
+  };
+
   return (
-    <Modal show={show} onHide={onClose} centered size="lg">
+    <Modal
+      show={show}
+      onHide={() => {
+        resetForm();
+        onClose();
+      }}
+      centered
+      size="lg"
+    >
       <Modal.Header closeButton>
-        <Modal.Title className="fw-semibold fs-4">
-          🛠️ Add Item
-        </Modal.Title>
+        <Modal.Title className="fw-semibold fs-4">🛠️ Add Item</Modal.Title>
       </Modal.Header>
 
       <Modal.Body className="bg-white">
-        <Form onSubmit={handleSubmit} encType="multipart/form-data" className="p-3">
+        <Form
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+          className="p-3"
+        >
           <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">Title</Form.Label>
+            <Form.Label className="fw-semibold">
+              Title <Required />
+            </Form.Label>
             <Form.Control
               type="text"
               name="title"
@@ -119,7 +231,9 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
           <Row className="mb-4">
             <Col md={6}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Category</Form.Label>
+                <Form.Label className="fw-semibold">
+                  Category <Required />
+                </Form.Label>
                 <Form.Select
                   name="category"
                   value={formData.category}
@@ -127,27 +241,112 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
                   className="rounded-3 shadow-sm"
                 >
                   <option value="">Select</option>
-                  <option value="Cooked Food">Cooked Food</option>
-                  <option value="Package Food">Package Food</option>
-                  <option value="Clothing">Clothing</option>
-                  <option value="Fruites">Fruites</option>
-                  <option value="Religious Items">Religious Items</option>
-                  <option value="Ayurvedic and herbal products">Ayurvedic and Herbal Products</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </Form.Select>
               </Form.Group>
             </Col>
 
-         
-
             <Col md={6}>
               <Form.Group>
-                <Form.Label className="fw-semibold">Price</Form.Label>
+                <Form.Label className="fw-semibold">
+                  Price ($) <Required />
+                </Form.Label>
                 <Form.Control
-                  type="number"
+                  type="text"
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
                   placeholder="e.g. 4999"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row className="mb-4">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  Unit <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleChange}
+                  placeholder="e.g. 1"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  Unit Description <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="unit"
+                  value={formData.unit}
+                  onChange={handleChange}
+                  placeholder="e.g. Plate, Bowl,Piece etc."
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row className="mb-4">
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  City <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="e.g. Houston"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  State <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  placeholder="e.g. New Jersey"
+                  className="rounded-3 shadow-sm"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row className="mb-4">
+            <Col md={12}>
+              <Form.Group>
+                <Form.Label className="fw-semibold">
+                  Address <Required />
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  placeholder="e.g. 721 Broadway, New York, NY 10003, USA"
                   className="rounded-3 shadow-sm"
                 />
               </Form.Group>
@@ -168,112 +367,100 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="fw-semibold">Upload New Images</Form.Label>
+            <Form.Label className="fw-semibold">
+              Upload Images <Required />
+            </Form.Label>
+
+            {/* Hidden native input */}
             <Form.Control
               type="file"
-              name="images[]"
+              id="imageUpload"
+              name="images"
               accept="image/*"
               multiple
               onChange={handleChange}
-              className="rounded-3 shadow-sm"
+              className="d-none" // hides input
             />
+
+            {/* Custom trigger button */}
+            <label
+              htmlFor="imageUpload"
+              className="btn btn-outline-secondary rounded-3 ml-3 shadow-sm"
+            >
+              Choose Images
+            </label>
+
+            {/* Optional: show file count or names */}
+            {formData.images.length > 0 && (
+              <div className="mt-2 small text-muted">
+                {formData.images.length} file(s) selected
+              </div>
+            )}
           </Form.Group>
 
-          {existingImages.length > 0 && (
-            <>
-              <p className="fw-bold mt-3">Existing Images</p>
-              <div className="d-flex flex-wrap gap-3">
-                {existingImages.map((src, idx) => (
-                  <div
-                    key={idx}
-                    className="position-relative"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      border: "1px solid #ddd",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                  >
-                    <img
-                      src={src}
-                      alt={`Existing ${idx + 1}`}
-                      className="w-100 h-100 object-fit-cover"
-                    />
-                    <Button
-                      variant="light"
-                      size="sm"
-                      className="position-absolute top-0 end-0 translate-middle rounded-circle"
-                      style={{
-                        width: "22px",
-                        height: "22px",
-                        padding: 0,
-                        fontSize: "14px",
-                      }}
-                      onClick={() => handleRemoveImage(idx, true)}
-                    >
-                      ×
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
           {imagePreviews.length > 0 && (
-            <>
-              <p className="fw-bold mt-3">New Image Previews</p>
-              <div className="d-flex flex-wrap gap-3">
-                {imagePreviews.map((src, idx) => (
-                  <div
-                    key={idx}
-                    className="position-relative"
+            <div className="d-flex flex-wrap gap-3 mt-3">
+              {imagePreviews.map((src, idx) => (
+                <div
+                  key={idx}
+                  className="position-relative"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    border: "1px solid #ddd",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt={`Preview ${idx + 1}`}
+                    className="w-100 h-100 object-fit-cover"
+                  />
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="position-absolute"
                     style={{
-                      width: "100px",
-                      height: "100px",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      border: "1px solid #ddd",
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                      top: "1px",
+                      right: "1px",
+                      width: "28px", // Ensure equal width & height
+                      height: "28px !important",
+                      fontSize: "14px",
+                      borderRadius: "100%", // Fully round
+                      boxShadow: "0 0 4px rgba(0,0,0,0.2)",
                     }}
+                    onClick={() => handleRemoveImage(idx)}
                   >
-                    <img
-                      src={src}
-                      alt={`Preview ${idx + 1}`}
-                      className="w-100 h-100 object-fit-cover"
-                    />
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      className="position-absolute top-0 end-0 translate-middle rounded-circle"
-                      style={{
-                        width: "22px",
-                        height: "22px",
-                        padding: 0,
-                        fontSize: "14px",
-                      }}
-                      onClick={() => handleRemoveImage(idx)}
-                    >
-                      ×
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </>
+                    ×
+                  </Button>
+                </div>
+              ))}
+            </div>
           )}
 
           <div className="d-flex justify-content-end mt-4">
             <Button
               type="submit"
+              disabled={loading}
               style={{
                 background: "#c12020",
                 color: "#fff",
                 border: "none",
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
               }}
-              className="px-4 py-2 fw-medium rounded-pill"
+              className="px-4 py-2 fw-medium rounded-pill d-flex align-items-center justify-content-center gap-2"
             >
-              Submit
+              {loading && (
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              )}
+              {loading ? "Submitting..." : "Submit"}
             </Button>
           </div>
         </Form>

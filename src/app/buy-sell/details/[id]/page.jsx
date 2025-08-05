@@ -4,20 +4,20 @@ import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuthStore } from "@/app/store/authStore";
 import AlertService from "@/app/components/alertService";
 
 const ProductDetails = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-const [selectedImage, setSelectedImage] = useState("");
-const [item, setItem] = useState({});
+  const [selectedImage, setSelectedImage] = useState("");
+  const [item, setItem] = useState({});
   const { id } = useParams();
   const thumbnailRefs = useRef([]);
   const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const handleContactSeller = async () => {
     if (!isLoggedIn) {
       AlertService.error("Please login first to contact the seller.");
@@ -42,7 +42,6 @@ const [selectedImageIndex, setSelectedImageIndex] = useState(0);
       AlertService.error("Failed to contact the seller. Please try again.");
     } finally {
       setContactLoading(false);
-
     }
   };
 
@@ -68,14 +67,12 @@ const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     fetchDetails();
   }, [id]);
 
-
-useEffect(() => {
-  if (item?.gallery && selectedImage) {
-    const index = item.gallery.indexOf(selectedImage);
-    setSelectedImageIndex(index);
-  }
-}, [selectedImage, item.gallery]);
-
+  useEffect(() => {
+    if (item?.gallery && selectedImage) {
+      const index = item.gallery.indexOf(selectedImage);
+      setSelectedImageIndex(index);
+    }
+  }, [selectedImage, item.gallery]);
 
   useEffect(() => {
     const currentThumb = thumbnailRefs.current[selectedImageIndex];
@@ -155,29 +152,29 @@ useEffect(() => {
                       scrollSnapType: "x mandatory",
                     }}
                   >
-               {item.gallery.map((img, index) => (
-  <img
-    key={index}
-    ref={(el) => (thumbnailRefs.current[index] = el)}
-    src={img}
-    alt={`Thumbnail ${index}`}
-    className={`img-thumbnail ${
-      selectedImage === img ? "border border-danger" : ""
-    }`}
-    style={{
-      height: "80px",
-      width: "100px",
-      objectFit: "cover",
-      cursor: "pointer",
-      scrollSnapAlign: "center",
-      flex: "0 0 auto",
-    }}
-    onClick={() => {
-      setSelectedImage(img);
-      setSelectedImageIndex(index);
-    }}
-  />
-))}
+                    {item.gallery.map((img, index) => (
+                      <img
+                        key={index}
+                        ref={(el) => (thumbnailRefs.current[index] = el)}
+                        src={img}
+                        alt={`Thumbnail ${index}`}
+                        className={`img-thumbnail ${
+                          selectedImage === img ? "border border-danger" : ""
+                        }`}
+                        style={{
+                          height: "80px",
+                          width: "100px",
+                          objectFit: "cover",
+                          cursor: "pointer",
+                          scrollSnapAlign: "center",
+                          flex: "0 0 auto",
+                        }}
+                        onClick={() => {
+                          setSelectedImage(img);
+                          setSelectedImageIndex(index);
+                        }}
+                      />
+                    ))}
                   </div>
 
                   {/* Next Button */}
@@ -205,7 +202,9 @@ useEffect(() => {
                 <small className="ms-2 text-muted">(112 reviews)</small>
               </div> */}
                 <h3 className="text-primary fw-bold mb-4">${item.price}</h3>
-                <p className="text-muted mb-4" style={{ textAlign:"justify" }}>{item.shortDesc}</p>
+                <p className="text-muted mb-4" style={{ textAlign: "justify" }}>
+                  {item.shortDesc}
+                </p>
 
                 <div className="d-flex gap-2">
                   <button
@@ -229,7 +228,6 @@ useEffect(() => {
                       </>
                     )}
                   </button>
-           
                 </div>
               </div>
             </div>
