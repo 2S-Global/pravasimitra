@@ -261,7 +261,7 @@ export const PATCH = withAuth(async (req, user) => {
           price: parseFloat(price),
           description,
           quantity: parseInt(quantity, 10),
-          unit: parseInt(unit, 10),
+          unit,
           images: savedUrls,
         },
       },
