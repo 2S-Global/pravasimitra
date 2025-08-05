@@ -190,6 +190,15 @@ export const PATCH = withAuth(async (req, user) => {
     );
   }
 
+  let decodedCategoryId;
+  try {
+    decodedCategoryId = decodeObjectId(category);
+  } catch {
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Invalid encoded category ID" }, { status: 400 })
+    );
+  }
+
   const allowedTypes = [
     "image/jpeg",
     "image/jpg",
@@ -257,7 +266,7 @@ export const PATCH = withAuth(async (req, user) => {
       {
         $set: {
           title,
-          category,
+          category: decodedCategoryId,
           price: parseFloat(price),
           description,
           quantity: parseInt(quantity, 10),
