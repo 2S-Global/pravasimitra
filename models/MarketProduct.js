@@ -37,7 +37,7 @@ const MarketProductSchema = new mongoose.Schema(
       type: Number,
     },
     unit: {
-      type: Number,
+      type: String,
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

@@ -8,6 +8,7 @@ import MarketCategory from "../../../../../models/MarketCategory";
 import User from "../../../../../models/User";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
+import cloudinary from "../../../../../lib/cloudinary";
 
 export async function OPTIONS() {
   return optionsResponse();
@@ -28,8 +29,11 @@ async function parseFormData(req) {
   const price = form.get("price");
   const description = form.get("description") || "";
   const files = form.getAll("images");
+  const quantity = form.get("quantity");
+  const unit = form.get("unit");
+
   const existingImageRaw = form.get("existingImageRaw");
-  
+
   let existingImages = [];
   if (existingImageRaw) {
     try {
@@ -42,7 +46,19 @@ async function parseFormData(req) {
     }
   }
 
-  const images = await Promise.all(
+  // const images = await Promise.all(
+  //   files.map(async (file) => {
+  //     if (typeof file === "string") return null;
+  //     const buffer = Buffer.from(await file.arrayBuffer());
+  //     return {
+  //       buffer,
+  //       filename: file.name,
+  //       mime: file.type,
+  //     };
+  //   })
+  // );
+
+  const newImages = await Promise.all(
     files.map(async (file) => {
       if (typeof file === "string") return null;
       const buffer = Buffer.from(await file.arrayBuffer());
@@ -60,11 +76,12 @@ async function parseFormData(req) {
     category,
     price,
     description,
-    newImages: images.filter(Boolean),
+    quantity,
+    unit,
     existingImages,
+    newImages: newImages.filter(Boolean),
   };
 }
-
 
 /**
  * @description Handle single MarketProduct item fetch and update (only for authenticated users)
@@ -96,13 +113,16 @@ export const GET = withAuth(async (req, user) => {
   let id = searchParams.get("id");
 
   if (!id)
-    return addCorsHeaders(NextResponse.json({ error: "Missing item ID" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Missing item ID" }, { status: 400 })
+    );
 
   try {
     id = decodeObjectId(id);
-  
   } catch {
-    return addCorsHeaders(NextResponse.json({ error: "Invalid encoded ID" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Invalid encoded ID" }, { status: 400 })
+    );
   }
 
   try {
@@ -112,19 +132,20 @@ export const GET = withAuth(async (req, user) => {
       .lean();
 
     if (!item) {
-      return addCorsHeaders(NextResponse.json(
-        { error: "Item not found or unauthorized" },
-        { status: 404 }
-      ));
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "Item not found or unauthorized" },
+          { status: 404 }
+        )
+      );
     }
 
     return addCorsHeaders(NextResponse.json({ item }, { status: 200 }));
   } catch (err) {
     console.error("GET single item error:", err);
-    return addCorsHeaders(NextResponse.json(
-      { error: "Failed to fetch item" },
-      { status: 500 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json({ error: "Failed to fetch item" }, { status: 500 })
+    );
   }
 });
 
@@ -135,56 +156,100 @@ export const PATCH = withAuth(async (req, user) => {
   try {
     data = await parseFormData(req);
   } catch (err) {
-    return addCorsHeaders(NextResponse.json({ msg: "Invalid Form Data" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Invalid Form Data" }, { status: 400 })
+    );
   }
 
-  const { id, title, category, price, description, newImages, existingImages } =
-    data;
+  const {
+    id,
+    title,
+    category,
+    price,
+    description,
+    quantity,
+    unit,
+    existingImages,
+    newImages,
+  } = data;
 
-    console.log(data);
+  // console.log(data);
 
   if (!id) {
-    return addCorsHeaders(NextResponse.json({ msg: "Missing item Id" }, { status: 200 }));
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Missing item Id" }, { status: 400 })
+    );
   }
 
   let decodedId;
   try {
     decodedId = decodeObjectId(id);
-   
   } catch {
-    return addCorsHeaders(NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 }));
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Invalid encoded ID" }, { status: 400 })
+    );
   }
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-  const savedFilenames = [...existingImages];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/avif",
+  ];
+  const savedUrls = [...existingImages];
 
-  const uploadDir = path.join(
-    process.cwd(),
-    "public/assets/images/e-marketplace"
-  );
-  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+  // const uploadDir = path.join(
+  //   process.cwd(),
+  //   "public/assets/images/e-marketplace"
+  // );
+  // if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
   for (const file of newImages) {
     if (!allowedTypes.includes(file.mime)) {
-      return addCorsHeaders(NextResponse.json(
-        { msg: "Only JPG,PNG,AVIF,WEBP Allowed" },
-        { status: 200 }
-      ));
+      return addCorsHeaders(
+        NextResponse.json(
+          { msg: "Only JPG, PNG, AVIF, WEBP Allowed" },
+          { status: 400 }
+        )
+      );
     }
-    const newFilename = `${Date.now()}_${file.filename}`;
-    const savePath = path.join(uploadDir, newFilename);
+    // const newFilename = `${Date.now()}_${file.filename}`;
+    // const savePath = path.join(uploadDir, newFilename);
 
-    try {
-      fs.writeFileSync(savePath, file.buffer);
-      savedFilenames.push(newFilename);
+  //   try {
+  //     fs.writeFileSync(savePath, file.buffer);
+  //     savedFilenames.push(newFilename);
+  //   } catch (err) {
+  //     return addCorsHeaders(
+  //       NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+  //     );
+  //   }
+  // }
+
+  try {
+      await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "e-marketplace",
+            resource_type: "image",
+            public_id: `${Date.now()}_${file.filename}`,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            savedUrls.push(result.secure_url);
+            resolve();
+          }
+        );
+        stream.end(file.buffer);
+      });
     } catch (err) {
-      return addCorsHeaders(NextResponse.json(
-        { error: "Image upload failed" },
-        { status: 500 }
-      ));
+      console.error("Cloudinary upload failed:", err);
+      return addCorsHeaders(
+        NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+      );
     }
   }
-
 
   try {
     const updated = await MarketProduct.findByIdAndUpdate(
@@ -195,23 +260,32 @@ export const PATCH = withAuth(async (req, user) => {
           category,
           price: parseFloat(price),
           description,
-          images: savedFilenames,
+          quantity: parseInt(quantity, 10),
+          unit: parseInt(unit, 10),
+          images: savedUrls,
         },
       },
       { new: true }
     );
 
     if (!updated) {
-      return addCorsHeaders(NextResponse.json(
-        { error: "Item not found or unauthorized" },
-        { status: 404 }
-      ));
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "Item not found or unauthorized" },
+          { status: 404 }
+        )
+      );
     }
-    return addCorsHeaders(NextResponse.json(
-      { msg: "Item updated successfully", item: updated },
-      { status: 200 }
-    ));
+    return addCorsHeaders(
+      NextResponse.json(
+        { msg: "Item updated successfully", item: updated },
+        { status: 200 }
+      )
+    );
   } catch (err) {
-    return addCorsHeaders(NextResponse.json({ msg: "Update failed" }, { status: 500 }));
+    console.error("Update failed:", err);
+    return addCorsHeaders(
+      NextResponse.json({ msg: "Update failed" }, { status: 500 })
+    );
   }
 });

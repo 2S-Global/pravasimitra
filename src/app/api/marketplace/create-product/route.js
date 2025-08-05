@@ -160,7 +160,7 @@ export const POST = withAuth(async function (req, user) {
       // shortDesc: data.shortDesc,
       description: data.description,
       quantity: parseInt(data.quantity, 10),
-      unit: parseInt(data.unit, 10),
+      unit: data.unit,
       createdBy: userId,
     });
 
