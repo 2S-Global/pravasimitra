@@ -247,7 +247,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
     } catch (error) {
       console.error("Edit error:", error);
       AlertService.error(
-        error?.response?.data?.message || "Something went wrong."
+        error?.response?.data?.msg || "Something went wrong."
       );
       setSubmiting(false);
     }
