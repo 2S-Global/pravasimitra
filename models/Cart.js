@@ -13,6 +13,11 @@ const cartItemSchema = new mongoose.Schema({
   price: {
     type: Number,
   
+  },
+  sellerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+
   }
 });
 

@@ -4,6 +4,7 @@ import { withAuth } from "../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../lib/cors";
 import Order from "../../../../models/Order";
 import MarketProduct from "../../../../models/MarketProduct";
+import Address from "../../../../models/Address";
 import { encodeObjectId } from "../../../../lib/idCodec";
 
 export async function OPTIONS() {

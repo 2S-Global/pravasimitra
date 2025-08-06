@@ -9,7 +9,6 @@ import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import MarketProduct from "../../../../../models/MarketProduct";
 import MarketCategory from "../../../../../models/MarketCategory";
 
-
 export async function OPTIONS() {
   return optionsResponse();
 }
@@ -32,7 +31,7 @@ export const POST = withAuth(async (req, user) => {
     );
   }
 
-  let { productId, quantity, price } = data;
+  let { productId, quantity, price,sellerId } = data;
 
   productId = decodeObjectId(productId);
 
@@ -48,7 +47,7 @@ export const POST = withAuth(async (req, user) => {
     if (!cart) {
       cart = new Cart({
         userId: user.id,
-        items: [{ productId, quantity, price }],
+        items: [{ productId, quantity, price,sellerId }],
       });
     } else {
       const existingItem = cart.items.find(
@@ -59,7 +58,7 @@ export const POST = withAuth(async (req, user) => {
         existingItem.quantity += quantity;
         existingItem.price = price;
       } else {
-        cart.items.push({ productId, quantity, price });
+        cart.items.push({ productId, quantity, price,sellerId });
       }
     }
 
@@ -88,10 +87,13 @@ export const GET = withAuth(async (req, user) => {
   try {
     const cart = await Cart.findOne({ userId: user.id }).populate({
       path: "items.productId",
-      populate: {
-        path: "category",
-        select: "name",
-      },
+      populate: 
+        {
+          path: "category",
+          select: "name",
+        },
+      
+      
     });
 
     if (!cart) {
@@ -121,7 +123,8 @@ export const GET = withAuth(async (req, user) => {
 
     // Calculate total
     const cartTotal = formattedItems.reduce(
-      (sum, item) => sum + item.subtotal,0
+      (sum, item) => sum + item.subtotal,
+      0
     );
 
     const formattedCart = {
@@ -140,4 +143,3 @@ export const GET = withAuth(async (req, user) => {
     );
   }
 });
-
