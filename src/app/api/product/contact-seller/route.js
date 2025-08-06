@@ -14,27 +14,21 @@ export async function OPTIONS() {
 
 export const POST = withAuth(async (req, authUser) => {
   await connectDB();
-  let data;
+  // let data;
 
   try {
-    data = await req.json();
-  } catch {
-    return addCorsHeaders(
-      NextResponse.json({ error: "Invalid JSON" }, { status: 400 })
-    );
-  }
+    const data = await req.json();
+    let { productId, sellerId } = data;
 
-  let { productId, sellerId } = data;
-  productId = decodeObjectId(productId);
-  const userId = authUser.id;
+    if (!productId || !sellerId) {
+      return addCorsHeaders(
+        NextResponse.json({ error: "Missing fields" }, { status: 400 })
+      );
+    }
 
-  if (!productId || !sellerId) {
-    return addCorsHeaders(
-      NextResponse.json({ error: "Missing fields" }, { status: 400 })
-    );
-  }
+    productId = decodeObjectId(productId);
+    const userId = authUser.id;
 
-  try {
     const [user, seller, product] = await Promise.all([
       User.findById(userId),
       User.findById(sellerId),
