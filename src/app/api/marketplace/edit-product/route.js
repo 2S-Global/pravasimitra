@@ -31,6 +31,9 @@ async function parseFormData(req) {
   const files = form.getAll("images");
   const quantity = form.get("quantity");
   const unit = form.get("unit");
+  const city = form.get("city");
+  const state = form.get("state");
+  const location = form.get("location");
 
   const existingImageRaw = form.get("existingImageRaw");
 
@@ -78,6 +81,9 @@ async function parseFormData(req) {
     description,
     quantity,
     unit,
+    city,
+    state,
+    location,
     existingImages,
     newImages: newImages.filter(Boolean),
   };
@@ -169,6 +175,9 @@ export const PATCH = withAuth(async (req, user) => {
     description,
     quantity,
     unit,
+    city,
+    state,
+    location,
     existingImages,
     newImages,
   } = data;
@@ -271,6 +280,9 @@ export const PATCH = withAuth(async (req, user) => {
           description,
           quantity: parseInt(quantity, 10),
           unit,
+          city,
+          state,
+          location,
           images: savedUrls,
         },
       },

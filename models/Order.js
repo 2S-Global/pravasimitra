@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Sue_Ellen_Francisco } from "next/font/google";
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -9,6 +10,12 @@ const orderItemSchema = new mongoose.Schema(
     },
     quantity: Number,
     price: Number,
+
+    sellerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { _id: true }
 );
@@ -27,8 +34,6 @@ const orderSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
- 
-
     },
     status: {
       type: String,
