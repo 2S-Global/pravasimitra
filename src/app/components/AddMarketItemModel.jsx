@@ -4,6 +4,7 @@ import { Modal, Button, Form, Col, Row } from "react-bootstrap";
 import axios from "axios";
 import AlertService from "../components/alertService";
 const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
+
   const [formData, setFormData] = useState({
     title: "",
     price: "",
@@ -37,8 +38,18 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
   }, []);
 
   const validateForm = () => {
-    const { title, price, description, images, category, city, state,location,unit,quantity } =
-      formData;
+    const {
+      title,
+      price,
+      description,
+      images,
+      category,
+      city,
+      state,
+      location,
+      unit,
+      quantity,
+    } = formData;
 
     if (!title) {
       AlertService.error("Title is required");
@@ -73,7 +84,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
       return false;
     }
 
-        if (!location) {
+    if (!location) {
       AlertService.error("Address is required");
       return false;
     }
@@ -140,39 +151,77 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
     setImagePreviews(updatedImages.map((file) => URL.createObjectURL(file)));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
 
     if (!validateForm()) {
       setLoading(false);
       return;
     }
+  setLoading(true);
+    const {
+      title,
+      price,
+      description,
+      images,
+      category,
+      city,
+      state,
+      location,
+      unit,
+      quantity,
+    } = formData;
 
     const data = new FormData();
     data.append("title", title);
     data.append("price", price);
     data.append("description", description);
-    data.append("propertyType", formData.propertyType);
-    data.append("roomSize", formData.roomSize);
-    data.append("existingImages", JSON.stringify(existingImages));
-    images.forEach((img) => data.append("images[]", img));
+    data.append("category", category);
+    data.append("city", city);
+    data.append("state", state);
+    data.append("location", location);
+    data.append("unit", unit);
+    data.append("quantity", quantity);
+    images.forEach((img) => data.append("images", img));
+    try {
+      const response = await axios.post(
+        "/api/marketplace/create-product",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
 
-    onSave(data);
+      AlertService.success(response.data.msg);
 
-    setFormData({
-      title: "",
-      price: "",
-      description: "",
-      propertyType: "",
-      roomSize: "",
-      images: [],
-    });
-    setImagePreviews([]);
-    setExistingImages([]);
-    onClose();
+      setFormData({
+        title: "",
+        price: "",
+        description: "",
+        images: [],
+        shortDesc: "",
+        category: "",
+        city: "",
+        state: "",
+        location: "",
+        unit: "",
+        quantity: "",
+      });
+      setImagePreviews([]);
+      onClose();
+      if (typeof onItemAdded === "function") {
+        onItemAdded();
+      }
+    } catch (error) {
+      console.error("❌ Error uploading product:", error);
+        AlertService.error(response.data.msg);
+    } finally {
+      setLoading(false); // re-enable button after process
+    }
   };
-
   const resetForm = () => {
     setFormData({
       title: "",
@@ -180,16 +229,12 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
       description: "",
       images: [],
       shortDesc: "",
+      category: "",
       city: "",
       state: "",
       location: "",
-      roomSize: "",
-      bedrooms: "",
-      bathrooms: "",
-      furnished: "",
-      amenities: [],
-      propertyType: "",
-      frequency: "",
+      unit: "",
+      quantity: "",
     });
     setImagePreviews([]);
   };
@@ -271,7 +316,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
-                  Unit <Required />
+                  Quantity <Required />
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -287,7 +332,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
-                  Unit Description <Required />
+                  Unit <Required />
                 </Form.Label>
                 <Form.Control
                   type="text"

@@ -1,72 +1,36 @@
 "use client";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
 // import Sidebar from "@/app/components/Sidebar"
 import ContactModal from "@/app/components/ContactModal";
 import AddMarketItemModel from "@/app/components/AddMarketItemModel";
-
+import axios from "axios";
 import EditMarketItemModal from "@/app/components/EditMarketItemModal";
 
 const ContactedUsersList = () => {
-  const [users] = useState([
-    {
-      id: 1,
-      title: "Homemade Chicken Biryani",
-      price: "$250/plate",
-      datePosted: "2025-06-01",
-      counter: "3",
-      category: "Cooked Food",
-      description:
-        "Aromatic basmati rice cooked with tender chicken and a blend of Indian spices, served fresh and hot.",
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4yjnaTVitHjdS2ySdQuRoodkwMvotP63G8w&s",
-        "https://c.ndtvimg.com/2020-12/uimt7tg8_biryani_625x300_30_December_20.jpg",
-        "https://www.foodiaq.com/wp-content/uploads/2025/01/chicken-biryani.jpg",
-      ],
-      contacts: [
-        { name: "Ravi", email: "ravi@example.com", phone: "9123456789" },
-        { name: "Meena", email: "meena@example.com", phone: "9988776655" },
-        { name: "Arun", email: "arun@example.com", phone: "9876543210" },
-      ],
-    },
-    {
-      id: 2,
-      title: "Organic Snacks Box",
-      price: "$500/box",
-      datePosted: "2025-06-03",
-      counter: "2",
-      category: "Package Food",
-      description:
-        "A curated box of healthy and organic snacks including roasted nuts, dried fruits, and millet chips.",
-      images: [
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzZPb2qm4Sd5u8grj7IfRdElANiTxXLAUF0Q&s",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmRYuY_OJK678zMBvBtmqeaMbme2VlMWfn6IqeEZVc_zPI1Pvem9xr017J_r41E_5wsng&usqp=CAU",
-      ],
-      contacts: [
-        { name: "Sneha", email: "sneha@example.com", phone: "9090909090" },
-        { name: "Karan", email: "karan@example.com", phone: "8080808080" },
-      ],
-    },
-    {
-      id: 3,
-      title: "Cotton Kurti for Women",
-      price: "$799",
-      datePosted: "2025-06-05",
-      counter: "1",
-      category: "Clothing",
-      description:
-        "Elegant and breathable cotton kurti ideal for daily wear, featuring floral prints and a stylish neckline.",
-      images: [
-        "https://www.samprada.in/cdn/shop/files/DSC08362-edited_1080x1080.jpg?v=1690352063",
-        "https://sootisyahi.com/cdn/shop/products/sootisyahi-blushing-betel-bagru-handblock-printed-pure-cotton-kurti-225622.jpg?v=1661347800&width=500",
-      ],
-      contacts: [
-        { name: "Priya", email: "priya@example.com", phone: "9988771122" },
-      ],
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      fetchUsers();
+    }, []);
+
+    const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("/api/marketplace/list-product");
+
+      setUsers(response.data.items);
+
+      // console.log("Fetched users:", response.data.items);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false); // end loading
+    }
+  };
 
   const [showModal, setShowModal] = useState(false);
   const [selectedItemContacts, setSelectedItemContacts] = useState([]);
@@ -145,31 +109,60 @@ const ContactedUsersList = () => {
                       <thead className="table-light">
                         <tr>
                           <th>#</th>
-                          <th>Title</th>
-
-                          <th>Price</th>
-
-                          <th>Date Posted</th>
-                          <th>Interested Users</th>
+                          <th>Item Title</th>
+                          <th>Item Image</th>
+                          <th>Price ($)</th>
+                           <th>Date Posted</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredUsers.length > 0 ? (
+                           {loading ? (
+                          <tr>
+                            <td colSpan="10">
+                              <div
+                                className="d-flex justify-content-center align-items-center"
+                                style={{ minHeight: "200px" }}
+                              >
+                                <div
+                                  className="spinner-border text-danger"
+                                  role="status"
+                                >
+                                  <span className="visually-hidden">
+                                    Loading...
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        ) :
+                        filteredUsers.length > 0 ? (
                           filteredUsers.map((user, index) => (
                             <tr key={user.id}>
                               <td>{index + 1}</td>
-                              <td>{user.title}</td>
+                              <td>{user.title.split(" ").length > 5
+                                  ? user.title
+                                      .split(" ")
+                                      .slice(0, 5)
+                                      .join(" ") + "..."
+                                  : user.title}</td>
 
+                              <td style={{ textAlign:"-webkit-center" }}><img
+                                  src={user?.images?.[0]}
+                                  alt="User"
+                                  width={80}
+                                  height={60}
+                                  style={{ objectFit: "cover" }}
+                                /></td>
                               <td>{user.price}</td>
 
-                              <td>
-                                {new Date(user.datePosted).toLocaleDateString(
-                                  "en-IN"
+                            <td>
+                                {new Date(user.createdAt).toLocaleDateString(
+                                  "en-GB"
                                 )}
                               </td>
 
-                              <td>
+                              {/* <td>
                                 <button
                                   className="btn btn-sm btn-outline-info"
                                   title="View Details"
@@ -180,7 +173,7 @@ const ContactedUsersList = () => {
                                 >
                                   {user.counter}
                                 </button>
-                              </td>
+                              </td> */}
                               <td>
                                 <div className="d-flex justify-content-center gap-1">
                                   <button
@@ -210,6 +203,7 @@ const ContactedUsersList = () => {
                             </td>
                           </tr>
                         )}
+
                       </tbody>
                     </table>
                   </div>
@@ -227,12 +221,12 @@ const ContactedUsersList = () => {
                   />
                 </button>
 
-                <ContactModal
+                {/* <ContactModal
                   show={showModal}
                   onClose={() => setShowModal(false)}
                   contacts={selectedItemContacts}
                   itemName={selectedItemName}
-                />
+                /> */}
 
                 <AddMarketItemModel
                   show={showAddModal}

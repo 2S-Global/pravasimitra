@@ -318,7 +318,9 @@ const ListHomes = () => {
                               </div>
                             </div>
                             <div className="card-body text-center">
-                              <h5 className="card-title">{property.title}</h5>
+                              <h5 className="card-title"> {property.title.length > 30
+                                  ? property.title.slice(0, 30) + "..."
+                                  : property.title}</h5>
                               <p>
                                 {property.city} | {property.state}
                               </p>
@@ -334,7 +336,7 @@ const ListHomes = () => {
                                   : ""}
                               </p>
                               <p className="fw-bold text-primary fs-5">
-                                ${property.price}/{property.frequency}
+                                ${property.price}/{property.frequency.charAt(0).toUpperCase() + property.frequency.slice(1)}
                               </p>
                               <button
                                 className="btn btn-outline-primary btn-sm"
