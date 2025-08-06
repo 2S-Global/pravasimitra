@@ -189,7 +189,14 @@ const handleLogout = async () => {
                             Profile
                           </Link>
                         </li>
-                   
+                      <li style={{ display:"block" }}>
+                          <Link
+                            className="dropdown-item"
+                            href="/user/buy-sell/buyer-list"
+                          >
+                           Apply List (Buy/Sell)
+                          </Link>
+                        </li>
                  
                
                         <li style={{ display:"block" }}>

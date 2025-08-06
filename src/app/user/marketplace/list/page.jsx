@@ -1,5 +1,5 @@
 "use client";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
@@ -8,16 +8,16 @@ import ContactModal from "@/app/components/ContactModal";
 import AddMarketItemModel from "@/app/components/AddMarketItemModel";
 import axios from "axios";
 import EditMarketItemModal from "@/app/components/EditMarketItemModal";
-
+import AlertService from "@/app/components/alertService";
 const ContactedUsersList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-      fetchUsers();
-    }, []);
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-    const fetchUsers = async () => {
+  const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await axios.get("/api/marketplace/list-product");
@@ -32,6 +32,30 @@ const ContactedUsersList = () => {
     }
   };
 
+
+   const handleDelete = async (id) => {
+    AlertService.confirm(
+      "Remove Item",
+      "Are you sure you want to remove this item?",
+      async () => {
+        try {
+          const response = await axios.patch("/api/marketplace/delete-product", {
+            id,
+          });
+
+          AlertService.success("Item removed successfully!");
+          setUsers((prevUsers) => prevUsers.filter((item) => item.id !== id));
+        } catch (error) {
+          console.error("Error deleting:", error);
+          AlertService.error("Failed to remove item.");
+        }
+      },
+      () => {
+        AlertService.message("Item not removed");
+      }
+    );
+  };
+
   const [showModal, setShowModal] = useState(false);
   const [selectedItemContacts, setSelectedItemContacts] = useState([]);
   const [selectedItemName, setSelectedItemName] = useState("");
@@ -39,12 +63,7 @@ const ContactedUsersList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
 
-  const handleViewDetails = (itemName, contacts) => {
-    setSelectedItemName(itemName);
-    setSelectedItemContacts(contacts);
 
-    setShowModal(true);
-  };
 
   const handleAdd = () => {
     setShowAddModal(true); // Open add modal
@@ -52,12 +71,17 @@ const ContactedUsersList = () => {
   const handleEdit = (item) => {
     setItemToEdit({
       title: item.title,
-      propertyType: item.propertyType,
-      roomSize: item.roomSize,
+      category: item.category.id,
+      description: item.description || "",
       price: item.price,
-      description: "Sample description here", // fallback if not present
       images: item.images || [],
-      category:item.category
+      category: item.category || "",
+      city: item.city || "",
+      state: item.state || "",
+      location: item.location || "",
+      quantity: item.quantity,
+      unit: item.unit,
+      id: item.id,
     });
     setShowEditModal(true);
   };
@@ -112,12 +136,12 @@ const ContactedUsersList = () => {
                           <th>Item Title</th>
                           <th>Item Image</th>
                           <th>Price ($)</th>
-                           <th>Date Posted</th>
+                          <th>Date Posted</th>
                           <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                           {loading ? (
+                        {loading ? (
                           <tr>
                             <td colSpan="10">
                               <div
@@ -135,28 +159,31 @@ const ContactedUsersList = () => {
                               </div>
                             </td>
                           </tr>
-                        ) :
-                        filteredUsers.length > 0 ? (
+                        ) : filteredUsers.length > 0 ? (
                           filteredUsers.map((user, index) => (
                             <tr key={user.id}>
                               <td>{index + 1}</td>
-                              <td>{user.title.split(" ").length > 5
+                              <td>
+                                {user.title.split(" ").length > 5
                                   ? user.title
                                       .split(" ")
                                       .slice(0, 5)
                                       .join(" ") + "..."
-                                  : user.title}</td>
+                                  : user.title}
+                              </td>
 
-                              <td style={{ textAlign:"-webkit-center" }}><img
+                              <td style={{ textAlign: "-webkit-center" }}>
+                                <img
                                   src={user?.images?.[0]}
                                   alt="User"
                                   width={80}
                                   height={60}
                                   style={{ objectFit: "cover" }}
-                                /></td>
+                                />
+                              </td>
                               <td>{user.price}</td>
 
-                            <td>
+                              <td>
                                 {new Date(user.createdAt).toLocaleDateString(
                                   "en-GB"
                                 )}
@@ -189,6 +216,7 @@ const ContactedUsersList = () => {
                                     className="btn btn-sm btn-outline-danger"
                                     title="Delete"
                                     onClick={() => handleDelete(user.id)}
+                                    type="button"
                                   >
                                     <i className="bi bi-trash" />
                                   </button>
@@ -203,7 +231,6 @@ const ContactedUsersList = () => {
                             </td>
                           </tr>
                         )}
-
                       </tbody>
                     </table>
                   </div>
@@ -231,11 +258,13 @@ const ContactedUsersList = () => {
                 <AddMarketItemModel
                   show={showAddModal}
                   onClose={() => setShowAddModal(false)}
+                  onItemAdded={fetchUsers}
                 />
                 <EditMarketItemModal
                   show={showEditModal}
                   onClose={() => setShowEditModal(false)}
                   itemData={itemToEdit}
+                  onItemAdded={fetchUsers}
                   onSave={(formData) => {
                     // You can handle formData submission to your API here
                     console.log("Submit updated item", formData);

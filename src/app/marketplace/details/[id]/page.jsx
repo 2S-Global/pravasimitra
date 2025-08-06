@@ -51,6 +51,7 @@ const ProductDetails = () => {
         productId: item.id,
         quantity: 1,
         price: item.price,
+        sellerId: item.createdBy._id,
       });
       AlertService.success(addToCart.data.message);
     } catch (error) {

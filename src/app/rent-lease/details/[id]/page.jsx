@@ -206,7 +206,7 @@ const RentLeaseDetails = () => {
                     <div className="col-md-3 col-6 mt-3 mt-md-0">
                       <div className="border p-3 text-center rounded bg-white">
                         <h6 className="text-muted mb-1">Furnished</h6>
-                        <strong>{item.furnished ? "Yes" : "No"}</strong>
+                        <strong>{item.furnished}</strong>
                       </div>
                     </div>
                   </div>
