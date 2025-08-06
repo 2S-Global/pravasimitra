@@ -109,9 +109,7 @@ export const GET = withAuth(async (req, user) => {
       productId: item.productId._id,
       product: {
         title: item.productId.title,
-        images: item.productId.images.map(
-          (img) => `${process.env.IMAGE_URL}/e-marketplace/${img}`
-        ),
+        images: item.productId.images,
         price: item.productId.price,
         description: item.productId.description,
         category: item.productId.category,

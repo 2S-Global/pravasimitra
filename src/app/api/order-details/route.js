@@ -18,7 +18,7 @@ export const GET = withAuth(async (req, user) => {
   const { searchParams } = new URL(req.url);
   const orderId = searchParams.get("orderId");
 
- if (!orderId) {
+  if (!orderId) {
     return NextResponse.json(
       { success: false, message: "Order ID is required" },
       { status: 400 }
@@ -29,7 +29,7 @@ export const GET = withAuth(async (req, user) => {
     const order = await Order.findById(orderId)
       .populate("userId")
       .populate("addressId")
-      .populate("items.product");
+      .populate("items.productId");
 
     if (!order) {
       return addCorsHeaders(
@@ -38,7 +38,20 @@ export const GET = withAuth(async (req, user) => {
     }
 
     // Allow only buyer to access this order
-    if (order.userId.toString() !== user.id) {
+    // if (order.userId.toString() !== user.id) {
+    //   return addCorsHeaders(
+    //     NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+    //   );
+    // }
+
+    const userIdStr = user.id.toString();
+
+    const isBuyer = order.userId?._id?.toString() === userIdStr;
+    const isSeller = order.items.some(
+      (item) => item.sellerId?.toString() === userIdStr
+    );
+
+    if (!isBuyer && !isSeller) {
       return addCorsHeaders(
         NextResponse.json({ error: "Unauthorized" }, { status: 403 })
       );
@@ -50,16 +63,17 @@ export const GET = withAuth(async (req, user) => {
       ? buyer.createdAt.toISOString().split("T")[0]
       : null;
 
-    // Get product details
-    const productIds = [
-      ...new Set(order.items.map((item) => item.productId?.toString())),
-    ];
-    const products = await MarketProduct.find({
-      _id: { $in: productIds },
-    }).lean();
-    const productMap = Object.fromEntries(
-      products.map((p) => [p._id.toString(), p])
-    );
+    // // Get product details
+    // const productIds = [
+    //   ...new Set(order.items.map((item) => item.productId?._id?.toString())),
+    // ];
+
+    // const products = await MarketProduct.find({
+    //   _id: { $in: productIds },
+    // }).lean();
+    // const productMap = Object.fromEntries(
+    //   products.map((p) => [p._id.toString(), p])
+    // );
 
     // Response
     const responseOrder = {
@@ -85,8 +99,8 @@ export const GET = withAuth(async (req, user) => {
           }
         : null,
       items: order.items.map((item) => {
-        const rawId = item.productId?.toString();
-        const product = productMap[rawId];
+        // const rawId = item.productId?.toString();
+        // const product = productMap[rawId];
 
         return {
           _id: encodeObjectId(item._id),
