@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Col, Row } from "react-bootstrap";
 import axios from "axios";
 import AlertService from "../components/alertService";
-const AddMarketItemModel = ({ show, onClose, itemData, onSave }) => {
+const AddMarketItemModel = ({ show, onClose, itemData, onItemAdded }) => {
 
   const [formData, setFormData] = useState({
     title: "",
