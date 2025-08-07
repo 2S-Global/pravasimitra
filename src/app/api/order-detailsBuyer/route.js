@@ -3,20 +3,18 @@ import { connectDB } from "../../../../lib/db";
 import { withAuth } from "../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../lib/cors";
 import Order from "../../../../models/Order";
-import Address from "../../../../models/Address";
 import User from "../../../../models/User";
-import MarketProduct from "../../../../models/MarketProduct";
 import { encodeObjectId } from "../../../../lib/idCodec";
 
 export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = withAuth(async (req, user) => {
+export const GET = withAuth(async (req) => {
   await connectDB();
 
   const { searchParams } = new URL(req.url);
-  const orderId = searchParams.get("orderId");
+  const orderId = searchParams.get("id");
 
   if (!orderId) {
     return NextResponse.json(
@@ -37,45 +35,11 @@ export const GET = withAuth(async (req, user) => {
       );
     }
 
-    // Allow only buyer to access this order
-    // if (order.userId.toString() !== user.id) {
-    //   return addCorsHeaders(
-    //     NextResponse.json({ error: "Unauthorized" }, { status: 403 })
-    //   );
-    // }
-
-    const userIdStr = user.id.toString();
-
-    const isBuyer = order.userId?._id?.toString() === userIdStr;
-    const isSeller = order.items.some(
-      (item) => item.sellerId?.toString() === userIdStr
-    );
-
-    if (!isBuyer && !isSeller) {
-      return addCorsHeaders(
-        NextResponse.json({ error: "Unauthorized" }, { status: 403 })
-      );
-    }
-
-    // Fetch buyer info
     const buyer = await User.findById(order.userId).lean();
     const buyerSince = buyer?.createdAt
       ? buyer.createdAt.toISOString().split("T")[0]
       : null;
 
-    // // Get product details
-    // const productIds = [
-    //   ...new Set(order.items.map((item) => item.productId?._id?.toString())),
-    // ];
-
-    // const products = await MarketProduct.find({
-    //   _id: { $in: productIds },
-    // }).lean();
-    // const productMap = Object.fromEntries(
-    //   products.map((p) => [p._id.toString(), p])
-    // );
-
-    // Response
     const responseOrder = {
       _id: encodeObjectId(order._id),
       orderId: order.orderId,
@@ -99,12 +63,11 @@ export const GET = withAuth(async (req, user) => {
           }
         : null,
       items: order.items.map((item) => {
-        // const rawId = item.productId?.toString();
-        // const product = productMap[rawId];
+        const product = item.productId;
 
         return {
           _id: encodeObjectId(item._id),
-          productId: encodeObjectId(item.productId),
+          productId: encodeObjectId(product?._id),
           quantity: item.quantity,
           price: item.price,
           productDetails: product
@@ -119,6 +82,13 @@ export const GET = withAuth(async (req, user) => {
         };
       }),
     };
+
+    const calculatedTotal = order.items.reduce((sum, item) => {
+  return sum + item.price * item.quantity;
+}, 0);
+
+responseOrder.calculatedTotal = calculatedTotal;
+
 
     return addCorsHeaders(
       NextResponse.json({ orderDetails: responseOrder }, { status: 200 })
