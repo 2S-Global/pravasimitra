@@ -75,9 +75,9 @@ export const PUT = withAuth(async (req, user) => {
     // Convert dd/mm/yyyy to Date object if frontend sends it in that format (optional)
     const convertToDate = (str) => {
       if (!str || typeof str !== "string") return str;
-      const [dd, mm, yyyy] = str.split("/");
+      const [dd, mm, yyyy] = str.split("-");
       if (!dd || !mm || !yyyy) return str;
-      return new Date(`${yyyy}-${mm}-${dd}`);
+      return new Date(`${dd}-${mm}-${yyyy}`);
     };
 
     if (body.dateOfBirth) {
