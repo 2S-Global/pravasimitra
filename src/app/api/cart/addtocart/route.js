@@ -75,6 +75,7 @@ export const POST = withAuth(async (req, user) => {
   }
 });
 
+//======== Fetch Cart details (GET) ================
 export const GET = withAuth(async (req, user) => {
   await connectDB();
 
