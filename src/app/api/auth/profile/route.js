@@ -9,11 +9,24 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-// Helper to format dates to dd/mm/yyyy
+// Helper to format dates to dd-mm-yyyy
 function formatDate(date) {
   if (!date) return null;
   const d = new Date(date);
-  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+  return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
+}
+
+// Helper: Convert dd-mm-yyyy or dd/mm/yyyy safely to Date object
+function convertToDate(str) {
+  if (!str || typeof str !== "string") return undefined;
+
+  const separator = str.includes("/") ? "/" : "-";
+  const [dd, mm, yyyy] = str.split(separator);
+
+  if (!dd || !mm || !yyyy) return undefined;
+
+  const parsed = new Date(`${yyyy}-${mm}-${dd}`);
+  return isNaN(parsed.getTime()) ? undefined : parsed;
 }
 
 
@@ -65,30 +78,26 @@ export const GET = withAuth(async (req, user) => {
   }
 });
 
-// Update user profile (PUT)
+//=========== Update user profile (PUT) ============
 export const PUT = withAuth(async (req, user) => {
   try {
     await connectDB();
     const userId = user.id;
     const body = await req.json();
 
-    // Convert dd/mm/yyyy to Date object if frontend sends it in that format (optional)
-    const convertToDate = (str) => {
-      if (!str || typeof str !== "string") return str;
-      const [dd, mm, yyyy] = str.split("-");
-      if (!dd || !mm || !yyyy) return str;
-      return new Date(`${dd}-${mm}-${yyyy}`);
-    };
+    // Cleanly parse each date field
+    const parsedDOB = convertToDate(body.dateOfBirth);
+    const parsedPassport = convertToDate(body.passportExpiry);
+    const parsedVisa = convertToDate(body.visaExpiry);
 
-    if (body.dateOfBirth) {
-      body.dateOfBirth = convertToDate(body.dateOfBirth);
-    }
-    if (body.passportExpiry) {
-      body.passportExpiry = convertToDate(body.passportExpiry);
-    }
-    if (body.visaExpiry) {
-      body.visaExpiry = convertToDate(body.visaExpiry);
-    }
+    if (parsedDOB) body.dateOfBirth = parsedDOB;
+    else delete body.dateOfBirth;
+
+    if (parsedPassport) body.passportExpiry = parsedPassport;
+    else delete body.passportExpiry;
+
+    if (parsedVisa) body.visaExpiry = parsedVisa;
+    else delete body.visaExpiry;
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
@@ -115,7 +124,7 @@ export const PUT = withAuth(async (req, user) => {
     return addCorsHeaders(
       NextResponse.json({
         msg: "User updated successfully",
-        user: updatedUser,
+        user: userToReturn,
       })
     );
   } catch (error) {
