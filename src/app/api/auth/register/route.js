@@ -35,11 +35,16 @@ export async function POST(req) {
     }
 
     const HashedPassword = await bcrypt.hash(password, 10);
+
+     // Set default image URL
+    const defaultImageUrl = "https://res.cloudinary.com/dwy9i2fqt/image/upload/v1754560507/default-user_hd6lwv.png";
+
     const newUser = new User({
       name,
       email,
       mobile,
       password: HashedPassword,
+      image: defaultImageUrl,
     });
 
     await newUser.save();
@@ -48,6 +53,7 @@ export async function POST(req) {
       NextResponse.json({ msg: "Registered Successfully" }, { status: 200 })
     );
   } catch (error) {
+    console.error("Registration Error:", error);
     return addCorsHeaders(
       NextResponse.json({ msg: "Server Error" }, { status: 500 })
     );
