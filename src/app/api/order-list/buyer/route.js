@@ -10,12 +10,11 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = withAuth(async (req, user ) => {
+export const GET = withAuth(async (req, user) => {
   await connectDB();
-  
- const userId = user?.id;
- //console.log("User ID:", userId);
- 
+
+  const userId = user?.id;
+
   if (!userId) {
     return addCorsHeaders(
       NextResponse.json(
@@ -26,7 +25,7 @@ export const GET = withAuth(async (req, user ) => {
   }
 
   try {
-    const orders = await Order.find({ userId: userId })
+    const orders = await Order.find({ userId })
       .sort({ createdAt: -1 })
       .populate({
         path: "items.productId",
@@ -39,15 +38,21 @@ export const GET = withAuth(async (req, user ) => {
       })
       .lean();
 
-  const ordersWithTotal = orders.map((order) => {
+    const ordersWithTotal = orders.map((order, index) => {
       let orderTotal = 0;
+
       for (const item of order.items) {
         const price = item.price || 0;
         const quantity = item.quantity || 0;
         orderTotal += price * quantity;
       }
+
+      // Add custom orderId if not present
+      const orderId = order.orderId || `pravasi-${String(index + 1).padStart(4, "0")}`;
+
       return {
         ...order,
+        orderId,
         orderTotal,
       };
     });
