@@ -5,6 +5,8 @@ import { withAuth } from "../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../lib/cors";
 import Cart from "../../../../models/Cart";
 import Order from "../../../../models/Order";
+import Counter from "../../../../models/Counter";
+
 
 export async function OPTIONS() {
   return optionsResponse();
@@ -34,6 +36,8 @@ export const POST = withAuth(async (req, user) => {
     );
   }
 
+
+  
   try {
     const newAddress = new Address({
       userId: user.id,
@@ -54,8 +58,17 @@ export const POST = withAuth(async (req, user) => {
       status = "pending";
     }
 
+
+    let counter = await Counter.findOneAndUpdate(
+  { name: "order" },
+  { $inc: { value: 1 } },
+  { new: true, upsert: true } // Create if doesn't exist
+);
+    const formattedOrderId = `pravasi-${String(counter.value).padStart(4, "0")}`;
+
     const newOrder = new Order({
       userId: user.id,
+      orderId: formattedOrderId,
       addressId: savedAddress._id,
       paymentMethod,
       status,

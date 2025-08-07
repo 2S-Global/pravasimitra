@@ -21,6 +21,11 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
+
+    orderId: {
+      type: String,
+      unique: true, // Ensures no duplicates
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
