@@ -66,7 +66,7 @@ export async function POST(req) {
 
     if (!user) {
       return addCorsHeaders(
-        NextResponse.json({ error: "No user found with this email" }, { status: 200 })
+        NextResponse.json({ error: "No user found with this email" }, { status: 401 })
       );
     }
 
