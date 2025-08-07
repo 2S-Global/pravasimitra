@@ -13,7 +13,9 @@ export async function OPTIONS() {
 function formatDate(date) {
   if (!date) return null;
   const d = new Date(date);
-  return `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
+  return `${String(d.getDate()).padStart(2, "0")}-${String(
+    d.getMonth() + 1
+  ).padStart(2, "0")}-${d.getFullYear()}`;
 }
 
 // Helper: Convert dd-mm-yyyy or dd/mm/yyyy safely to Date object
@@ -29,7 +31,6 @@ function convertToDate(str) {
   return isNaN(parsed.getTime()) ? undefined : parsed;
 }
 
-
 // ======== Fetch user profile (GET) ================
 export const GET = withAuth(async (req, user) => {
   try {
@@ -43,10 +44,11 @@ export const GET = withAuth(async (req, user) => {
       );
     }
 
-    const baseImageUrl = `${process.env.IMAGE_URL}/profile-img`;
-    
+    //const baseImageUrl = `${process.env.IMAGE_URL}/profile-img`;
+
     const imageUrl = existingUser.image
-      ? `${baseImageUrl}/${existingUser.image}`
+      ? //`${baseImageUrl}/${existingUser.image}`
+        existingUser.image
       : `${process.env.IMAGE_URL}/default-user.png`;
 
     // // Build the user object with new image path
@@ -113,7 +115,7 @@ export const PUT = withAuth(async (req, user) => {
       );
     }
 
-     // Format date fields before sending response
+    // Format date fields before sending response
     const userToReturn = {
       ...updatedUser,
       dateOfBirth: formatDate(updatedUser.dateOfBirth),

@@ -178,7 +178,7 @@ export const PUT = withAuth(async (req, user) => {
     return addCorsHeaders(
       NextResponse.json({
         msg: "Profile image updated successfully",
-        image: fullImagePath,
+        image: imageUrl,
       })
     );
   } catch (err) {
