@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import Order from "../../../../../models/Order";
+import MarketProduct from "../../../../../models/MarketProduct";
 import { withAuth } from "../../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
-
+import User from '../../../../../models/User';
 export async function OPTIONS() {
   return optionsResponse();
 }
@@ -11,7 +12,7 @@ export async function OPTIONS() {
 export const GET = withAuth(async (req, user) => {
   await connectDB();
 
-  const userId = user?.id; 
+  const userId = user?.id;   
 
   try {
     // Find orders where the logged-in user is a seller in any item
