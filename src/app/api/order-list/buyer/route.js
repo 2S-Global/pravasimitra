@@ -12,7 +12,7 @@ export async function OPTIONS() {
 
 export const GET = withAuth(async (req, user ) => {
   await connectDB();
-
+  
  const userId = user?.id;
  //console.log("User ID:", userId);
  
