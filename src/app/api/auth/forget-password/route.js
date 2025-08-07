@@ -56,7 +56,7 @@ export async function POST(req) {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return addCorsHeaders(NextResponse.json({ error: 'No user with this email' }, { status: 404 }));
+      return addCorsHeaders(NextResponse.json({ error: 'No user with this email' }, { status: 200 }));
     }
     
     //Generate new password
