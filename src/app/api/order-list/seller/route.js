@@ -30,7 +30,8 @@ export const GET = withAuth(async (req, user) => {
       if (relevantItems.length === 0) continue;
 
       const orderSummary = {
-        orderId: order._id,
+        id: order._id,
+        orderId: order.orderId,
         createdAt: order.createdAt,
         buyer: {
           name: order.userId?.name || "",

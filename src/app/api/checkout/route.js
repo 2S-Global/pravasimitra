@@ -84,7 +84,8 @@ export const POST = withAuth(async (req, user) => {
       NextResponse.json(
         {
           message: "Order created successfully",
-          orderId: savedOrder._id,
+          id: savedOrder._id,
+     orderId: savedOrder.orderId,
           addressId: savedAddress._id,
           order: savedOrder,
         },
