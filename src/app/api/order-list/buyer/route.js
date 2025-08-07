@@ -39,8 +39,21 @@ export const GET = withAuth(async (req, user ) => {
       })
       .lean();
 
+  const ordersWithTotal = orders.map((order) => {
+      let orderTotal = 0;
+      for (const item of order.items) {
+        const price = item.price || 0;
+        const quantity = item.quantity || 0;
+        orderTotal += price * quantity;
+      }
+      return {
+        ...order,
+        orderTotal,
+      };
+    });
+
     return addCorsHeaders(
-      NextResponse.json({ success: true, data: orders }, { status: 200 })
+      NextResponse.json({ success: true, data: ordersWithTotal }, { status: 200 })
     );
   } catch (error) {
     console.error("Error fetching buyer orders:", error);
