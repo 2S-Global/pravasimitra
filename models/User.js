@@ -23,6 +23,9 @@ const UserSchema = new mongoose.Schema(
     gender: {
       type: String,
     },
+    address: {
+      type: String,
+    },
     passportNumber: {
       type: String,
     },

@@ -9,7 +9,15 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-// Fetch user profile (GET)
+// Helper to format dates to dd/mm/yyyy
+function formatDate(date) {
+  if (!date) return null;
+  const d = new Date(date);
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+}
+
+
+// ======== Fetch user profile (GET) ================
 export const GET = withAuth(async (req, user) => {
   try {
     await connectDB();
@@ -28,10 +36,19 @@ export const GET = withAuth(async (req, user) => {
       ? `${baseImageUrl}/${existingUser.image}`
       : `${process.env.IMAGE_URL}/default-user.png`;
 
-    // Build the user object with new image path
+    // // Build the user object with new image path
+    // const userToReturn = {
+    //   ...existingUser,
+    //   image: imageUrl,
+    // };
+
+    // Format date fields
     const userToReturn = {
       ...existingUser,
       image: imageUrl,
+      dateOfBirth: formatDate(existingUser.dateOfBirth),
+      passportExpiry: formatDate(existingUser.passportExpiry),
+      visaExpiry: formatDate(existingUser.visaExpiry),
     };
 
     return addCorsHeaders(
@@ -55,6 +72,24 @@ export const PUT = withAuth(async (req, user) => {
     const userId = user.id;
     const body = await req.json();
 
+    // Convert dd/mm/yyyy to Date object if frontend sends it in that format (optional)
+    const convertToDate = (str) => {
+      if (!str || typeof str !== "string") return str;
+      const [dd, mm, yyyy] = str.split("/");
+      if (!dd || !mm || !yyyy) return str;
+      return new Date(`${yyyy}-${mm}-${dd}`);
+    };
+
+    if (body.dateOfBirth) {
+      body.dateOfBirth = convertToDate(body.dateOfBirth);
+    }
+    if (body.passportExpiry) {
+      body.passportExpiry = convertToDate(body.passportExpiry);
+    }
+    if (body.visaExpiry) {
+      body.visaExpiry = convertToDate(body.visaExpiry);
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: body },
@@ -68,6 +103,14 @@ export const PUT = withAuth(async (req, user) => {
         NextResponse.json({ error: "User not found" }, { status: 404 })
       );
     }
+
+     // Format date fields before sending response
+    const userToReturn = {
+      ...updatedUser,
+      dateOfBirth: formatDate(updatedUser.dateOfBirth),
+      passportExpiry: formatDate(updatedUser.passportExpiry),
+      visaExpiry: formatDate(updatedUser.visaExpiry),
+    };
 
     return addCorsHeaders(
       NextResponse.json({
