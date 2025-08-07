@@ -1,50 +1,71 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import Order from "../../../../../models/Order";
-import MarketProduct from "../../../../../models/MarketProduct";
-import Address from "../../../../../models/Address";
 import { withAuth } from "../../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
-
+import { encodeObjectId } from "../../../../../lib/idCodec";
 
 export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = withAuth(async (req, user ) => {
+export const GET = withAuth(async (req, user) => {
   await connectDB();
 
-  try {
-    // Get all products listed by the seller
-    const sellerProducts = await MarketProduct.find(
-      { sellerId: user._id },
-      "_id"
-    );
-    const sellerProductIds = sellerProducts.map((p) => p._id);
+  const userId = user?.id;
 
-    // Find orders that include any of these products
-    const orders = await Order.find({
-      "items.productId": { $in: sellerProductIds },
-    })
-      .sort({ createdAt: -1 })
-      .populate({
-        path: "items.productId",
-        model: MarketProduct,
-      })
-      .populate({
-        path: "addressId",
-        model: Address,
-      })
-      .lean();
+  try {
+    // Fetch orders where the logged-in user is a seller in any item
+    const orders = await Order.find({ "items.sellerId": userId }).populate("items.productId");
+
+    const sellerItems = [];
+
+    for (const order of orders) {
+      for (const item of order.items) {
+        if (item.sellerId?.toString() === userId.toString()) {
+          const product = item.productId;
+
+          sellerItems.push({
+            _id: (item._id),
+            orderId: (order._id),
+            productId: (product?._id),
+            title: product?.title || "",
+            price: item.price,
+            quantity: item.quantity,
+            images: product?.images || [],
+          });
+        }
+      }
+    }
+
+    // Group by orderId and calculate total per order
+    const groupedOrders = {};
+
+    for (const item of sellerItems) {
+      const orderId = item.orderId;
+
+      if (!groupedOrders[orderId]) {
+        groupedOrders[orderId] = {
+          orderId,
+          items: [],
+          orderTotal: 0,
+        };
+      }
+
+      groupedOrders[orderId].items.push(item);
+      groupedOrders[orderId].orderTotal += item.price * item.quantity;
+    }
+
+    const groupedItems = Object.values(groupedOrders); // convert object → array
 
     return addCorsHeaders(
-      NextResponse.json({ success: true, data: orders }, { status: 200 })
+      NextResponse.json({ orders: groupedItems }, { status: 200 })
     );
   } catch (error) {
-    console.error("Error fetching seller orders:", error);
+    console.error("Error fetching seller order items:", error);
     return addCorsHeaders(
       NextResponse.json(
-        { success: false, message: "Failed to fetch seller orders" },
+        { error: "Error fetching seller order items" },
         { status: 500 }
       )
     );
