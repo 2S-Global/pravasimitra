@@ -22,6 +22,10 @@ const LocationSettingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "City",
     },
+    isDel: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
