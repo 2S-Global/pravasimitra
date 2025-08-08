@@ -261,7 +261,7 @@ const hasNewImages = images.length > 0;
     data.append("location", location);
     data.append("unit", unit);
     data.append("quantity", quantity);
-    images.forEach((img) => data.append("images", img));
+    // images.forEach((img) => data.append("images", img));
 
       // ✅ Append new image files
       images.forEach((img) => {
