@@ -126,10 +126,11 @@ export const GET = withAuth(async (req, user) => {
       0
     );
 
+    const roundedCartTotal = Math.round(cartTotal * 100) / 100;
     const formattedCart = {
       userId: cart.userId,
       items: formattedItems,
-      cartTotal,
+      cartTotal:roundedCartTotal,
     };
 
     return addCorsHeaders(
