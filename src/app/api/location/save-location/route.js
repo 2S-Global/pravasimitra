@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
+import Country from "../../../../../models/Country";
+import City from "../../../../../models/City";
 import LocationSetting from "../../../../../models/LocationSetting";
 import mongoose from "mongoose";
 import { withAuth } from "../../../../../lib/withAuth";
