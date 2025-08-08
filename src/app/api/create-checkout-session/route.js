@@ -13,7 +13,7 @@ export async function OPTIONS() {
 // Handle POST request to create Stripe Checkout Session
 export async function POST(req) {
   try {
-    const { cartItems } = await req.json();
+    const { cartItems, successUrl, cancelUrl  } = await req.json();
 
     if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
       return addCorsHeaders(
@@ -39,8 +39,8 @@ export async function POST(req) {
       payment_method_types: ['card'],
       mode: 'payment',
       line_items,
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://pravasimitra.vercel.app'}/payment-success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://pravasimitra.vercel.app'}/payment-cancel`,
+      success_url: successUrl,
+  cancel_url: cancelUrl,
     });
 
     const res = NextResponse.json({ url: session.url }, { status: 200 });
