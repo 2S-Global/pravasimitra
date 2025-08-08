@@ -25,7 +25,7 @@ export const POST = withAuth(async (req, user) => {
     );
   }
 
-  const { billing, shipping, paymentMethod } = data;
+  const { billing, shipping, paymentMethod,transactionId  } = data;
 
   if (!billing || !shipping || !paymentMethod) {
     return addCorsHeaders(
@@ -70,10 +70,11 @@ export const POST = withAuth(async (req, user) => {
       userId: user.id,
       orderId: formattedOrderId,
       addressId: savedAddress._id,
-      transactionId: transactionId, 
+      transactionId: transactionId._id, 
       paymentMethod,
       status,
       items: cart.items,
+      
     });
     const savedOrder = await newOrder.save();
 
