@@ -70,7 +70,7 @@ export const POST = withAuth(async (req, user) => {
       userId: user.id,
       orderId: formattedOrderId,
       addressId: savedAddress._id,
-      transactionId: transactionId._id, 
+      transactionId: transactionId, 
       paymentMethod,
       status,
       items: cart.items,
