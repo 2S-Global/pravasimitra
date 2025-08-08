@@ -5,7 +5,7 @@ import { addCorsHeaders, optionsResponse } from '../../../../lib/cors';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Handle CORS preflight request
+// Handle CORS preflight
 export async function OPTIONS() {
   return optionsResponse();
 }
@@ -21,34 +21,27 @@ export async function POST(req) {
       );
     }
 
+    // Prepare Stripe line items in GBP
     const line_items = cartItems.map(item => ({
       price_data: {
         currency: 'gbp', // Pound Sterling
         product_data: {
           name: item.product?.title || item.title,
+          images: item.product?.images || [], // Optional: pass product images
         },
         unit_amount: Math.round((item.product?.price || item.price) * 100), // amount in pence
       },
       quantity: item.quantity,
     }));
 
-const session = await stripe.checkout.sessions.create({
-  payment_method_types: ['card'],
-  mode: 'payment',
-  line_items: cartItems.map(item => ({
-    price_data: {
-      currency: 'usd', // or 'inr'
-      product_data: {
-        name: item.product.title,
-        images: item.product.images
-      },
-      unit_amount: Math.round(item.itemPrice * 100), // 👈 cents, no decimals
-    },
-    quantity: item.quantity,
-  })),
-  success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://pravasimitra.vercel.app'}/payment-success`,
-  cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://pravasimitra.vercel.app'}/payment-cancel`,
-});
+    // Create Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://pravasimitra.vercel.app'}/payment-success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://pravasimitra.vercel.app'}/payment-cancel`,
+    });
 
     const res = NextResponse.json({ url: session.url }, { status: 200 });
     return addCorsHeaders(res);
