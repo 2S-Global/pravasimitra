@@ -1,7 +1,7 @@
 // app/api/create-checkout-session/route.js
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
-import { addCorsHeaders, optionsResponse } from '../../../../../lib/cors'; 
+import { addCorsHeaders, optionsResponse } from '../../../../lib/cors'; 
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
