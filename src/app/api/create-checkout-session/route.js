@@ -1,7 +1,7 @@
 // app/api/create-checkout-session/route.js
 import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
-import { addCorsHeaders, optionsResponse } from '../../../../lib/cors'; 
+import { addCorsHeaders, optionsResponse } from '../../../../lib/cors';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -40,14 +40,12 @@ export async function POST(req) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-cancel`,
     });
 
-    return addCorsHeaders(
-      NextResponse.json({ url: session.url }, { status: 200 })
-    );
+    const res = NextResponse.json({ url: session.url }, { status: 200 });
+    return addCorsHeaders(res);
 
   } catch (error) {
     console.error('Stripe session error:', error);
-    return addCorsHeaders(
-      NextResponse.json({ error: error.message }, { status: 500 })
-    );
+    const res = NextResponse.json({ error: error.message }, { status: 500 });
+    return addCorsHeaders(res);
   }
 }
