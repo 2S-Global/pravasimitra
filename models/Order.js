@@ -35,6 +35,10 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Address",
     },
+    transactionId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Transaction",
+    },
 
     paymentMethod: {
       type: String,
@@ -45,6 +49,7 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
 
     },
+    
     items: [orderItemSchema],
   },
   { timestamps: true }
