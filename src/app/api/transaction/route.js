@@ -34,7 +34,7 @@ export async function POST(req) {
       stripeSessionId: session.id,
       paymentIntentId: session.payment_intent,
       customerEmail: session.customer_details?.email || '',
-      amountTotal: session.amount_total,
+ amountTotal: session.amount_total / 100,
       currency: session.currency,
       paymentStatus: session.payment_status,
       rawSession: session, // optional, store full session object if needed
