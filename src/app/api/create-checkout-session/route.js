@@ -32,13 +32,23 @@ export async function POST(req) {
       quantity: item.quantity,
     }));
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      line_items,
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-cancel`,
-    });
+const session = await stripe.checkout.sessions.create({
+  payment_method_types: ['card'],
+  mode: 'payment',
+  line_items: cartItems.map(item => ({
+    price_data: {
+      currency: 'usd', // or 'inr'
+      product_data: {
+        name: item.product.title,
+        images: item.product.images
+      },
+      unit_amount: Math.round(item.itemPrice * 100), // 👈 cents, no decimals
+    },
+    quantity: item.quantity,
+  })),
+  success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://pravasimitra.vercel.app'}/payment-success`,
+  cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://pravasimitra.vercel.app'}/payment-cancel`,
+});
 
     const res = NextResponse.json({ url: session.url }, { status: 200 });
     return addCorsHeaders(res);
