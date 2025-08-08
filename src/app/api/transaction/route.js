@@ -12,7 +12,7 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-export async function POST(req) {
+export async function POST(req) { 
   await connectDB();
 
   try {
