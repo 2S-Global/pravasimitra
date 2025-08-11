@@ -2,6 +2,9 @@ import { withAuth } from "../../../../../lib/withAuth";
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import User from "../../../../../models/User";
+import LocationSetting from "../../../../../models/LocationSetting";
+import Country from "../../../../../models/Country";
+import City from "../../../../../models/City";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 // CORS Preflight
@@ -57,6 +60,17 @@ export const GET = withAuth(async (req, user) => {
     //   image: imageUrl,
     // };
 
+    // Fetch active location for this user
+    const activeLocation = await LocationSetting.findOne({
+      userId: userId,
+      isDel: false
+    })
+      .populate("currentCountry", "name")
+      .populate("currentCity", "name")
+      .populate("destinationCountry", "name")
+      .populate("destinationCity", "name")
+      .lean();
+
     // Format date fields
     const userToReturn = {
       ...existingUser,
@@ -64,6 +78,7 @@ export const GET = withAuth(async (req, user) => {
       dateOfBirth: formatDate(existingUser.dateOfBirth),
       passportExpiry: formatDate(existingUser.passportExpiry),
       visaExpiry: formatDate(existingUser.visaExpiry),
+      location: activeLocation || null,
     };
 
     return addCorsHeaders(
