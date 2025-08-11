@@ -6,7 +6,6 @@ import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
-
 export async function OPTIONS() {
   return optionsResponse();
 }
@@ -33,7 +32,6 @@ export const POST = withAuth(async (req, user) => {
   }
 
   let { productId, delta } = data;
-
 
   if (!productId || typeof delta !== "number") {
     return addCorsHeaders(
@@ -67,7 +65,7 @@ export const POST = withAuth(async (req, user) => {
     //   cart.items.splice(itemIndex, 1);
     // }
 
-     // Ensure price is stored with only 2 decimals
+    // Ensure price is stored with only 2 decimals
     cart.items[itemIndex].price = roundTwo(cart.items[itemIndex].price);
 
     await cart.save();
@@ -75,11 +73,11 @@ export const POST = withAuth(async (req, user) => {
     // Populate updated cart details for response
     await cart.populate({
       path: "items.productId",
-      populate: { path: "category" }
+      populate: { path: "category" },
     });
 
     // Calculate formatted items with subtotals
-    const formattedItems = cart.items.map(item => {
+    const formattedItems = cart.items.map((item) => {
       const unitPrice = roundTwo(item.price);
       const quantity = item.quantity;
       const subtotal = roundTwo(unitPrice * quantity);
@@ -103,16 +101,31 @@ export const POST = withAuth(async (req, user) => {
     });
 
     // Calculate cart total
-    const cartTotal = formattedItems.reduce((sum, item) => sum + item.subtotal, 0);
+    // const cartTotal = formattedItems.reduce((sum, item) => sum + item.subtotal, 0);
+
+    // const responseCart = {
+    //   userId: cart.userId,
+    //   items: formattedItems,
+    //   cartTotal
+    // };
+
+    let cartTotal = formattedItems.reduce(
+      (sum, item) => sum + item.subtotal,
+      0
+    );
+    cartTotal = roundTwo(cartTotal);
 
     const responseCart = {
       userId: cart.userId,
       items: formattedItems,
-      cartTotal
+      cartTotal: cartTotal.toFixed(2),
     };
 
     return addCorsHeaders(
-      NextResponse.json({ message: "Cart updated", cart: responseCart }, { status: 200 })
+      NextResponse.json(
+        { message: "Cart updated", cart: responseCart },
+        { status: 200 }
+      )
     );
   } catch (err) {
     console.error("Update cart quantity error:", err);
