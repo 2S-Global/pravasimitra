@@ -53,6 +53,7 @@ export const GET = withAuth(async (req) => {
         ? {
             _id: encodeObjectId(buyer._id),
             name: buyer.name,
+            image: order.userId?.image || "",
             email: buyer.email,
             phone: buyer.phone,
             buyerSince,
