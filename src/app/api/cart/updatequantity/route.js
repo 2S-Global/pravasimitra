@@ -11,6 +11,9 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
+// Helper function to round to 2 decimals
+const roundTwo = (num) => Math.round(num * 100) / 100;
+
 export const POST = withAuth(async (req, user) => {
   await connectDB();
 
@@ -56,13 +59,16 @@ export const POST = withAuth(async (req, user) => {
       );
     }
 
-    // Increment or decrement
+    // Increment or decrement quantity
     cart.items[itemIndex].quantity = delta;
 
     // if (cart.items[itemIndex].quantity <= 0) {
     //   // Remove item if quantity is now zero or negative
     //   cart.items.splice(itemIndex, 1);
     // }
+
+     // Ensure price is stored with only 2 decimals
+    cart.items[itemIndex].price = roundTwo(cart.items[itemIndex].price);
 
     await cart.save();
 
@@ -74,9 +80,9 @@ export const POST = withAuth(async (req, user) => {
 
     // Calculate formatted items with subtotals
     const formattedItems = cart.items.map(item => {
-      const unitPrice = item.price;
+      const unitPrice = roundTwo(item.price);
       const quantity = item.quantity;
-      const subtotal = unitPrice * quantity;
+      const subtotal = roundTwo(unitPrice * quantity);
 
       return {
         productId: item.productId._id,
@@ -86,13 +92,13 @@ export const POST = withAuth(async (req, user) => {
           //   (img) => `${process.env.IMAGE_URL}/e-marketplace/${img}`
           // ),
           images: item.productId.images,
-          price: item.productId.price,
+          price: roundTwo(item.productId.price),
           description: item.productId.description,
           category: item.productId.category,
         },
-        quantity: item.quantity,
-        itemPrice: item.price,
-        subtotal: item.price * item.quantity,
+        quantity,
+        itemPrice: unitPrice,
+        subtotal,
       };
     });
 

@@ -12,6 +12,8 @@ import MarketCategory from "../../../../../models/MarketCategory";
 export async function OPTIONS() {
   return optionsResponse();
 }
+// Helper to round to 2 decimal places
+const roundTwo = (num) => Math.round(num * 100) / 100;
 
 export const POST = withAuth(async (req, user) => {
   await connectDB();
@@ -31,7 +33,7 @@ export const POST = withAuth(async (req, user) => {
     );
   }
 
-  let { productId, quantity, price,sellerId } = data;
+  let { productId, quantity, price, sellerId } = data;
 
   productId = decodeObjectId(productId);
 
@@ -44,10 +46,19 @@ export const POST = withAuth(async (req, user) => {
   try {
     let cart = await Cart.findOne({ userId: user.id });
 
+    const roundedPrice = roundTwo(price);
+
     if (!cart) {
       cart = new Cart({
         userId: user.id,
-        items: [{ productId, quantity, price,sellerId }],
+        items: [
+          {
+            productId,
+            quantity,
+            price: roundedPrice,
+            sellerId,
+          },
+        ],
       });
     } else {
       const existingItem = cart.items.find(
@@ -56,9 +67,14 @@ export const POST = withAuth(async (req, user) => {
 
       if (existingItem) {
         existingItem.quantity += quantity;
-        existingItem.price = price;
+        existingItem.price = roundedPrice;
       } else {
-        cart.items.push({ productId, quantity, price,sellerId });
+        cart.items.push({
+          productId,
+          quantity,
+          price: roundedPrice,
+          sellerId,
+        });
       }
     }
 
@@ -88,13 +104,10 @@ export const GET = withAuth(async (req, user) => {
   try {
     const cart = await Cart.findOne({ userId: user.id }).populate({
       path: "items.productId",
-      populate: 
-        {
-          path: "category",
-          select: "name",
-        },
-      
-      
+      populate: {
+        path: "category",
+        select: "name",
+      },
     });
 
     if (!cart) {
@@ -106,19 +119,38 @@ export const GET = withAuth(async (req, user) => {
       );
     }
 
-    const formattedItems = cart.items.map((item) => ({
-      productId: item.productId._id,
-      product: {
-        title: item.productId.title,
-        images: item.productId.images,
-        price: item.productId.price,
-        description: item.productId.description,
-        category: item.productId.category,
-      },
-      quantity: item.quantity,
-      itemPrice: item.price,
-      subtotal: item.price * item.quantity,
-    }));
+    // const formattedItems = cart.items.map((item) => ({
+    //   productId: item.productId._id,
+    //   product: {
+    //     title: item.productId.title,
+    //     images: item.productId.images,
+    //     price: item.productId.price,
+    //     description: item.productId.description,
+    //     category: item.productId.category,
+    //   },
+    //   quantity: item.quantity,
+    //   itemPrice: item.price,
+    //   subtotal: item.price * item.quantity,
+    // }));
+
+    const formattedItems = cart.items.map((item) => {
+      const itemPrice = roundTwo(item.price);
+      const subtotal = roundTwo(itemPrice * item.quantity);
+
+      return {
+        productId: item.productId._id,
+        product: {
+          title: item.productId.title,
+          images: item.productId.images,
+          price: roundTwo(item.productId.price),
+          description: item.productId.description,
+          category: item.productId.category,
+        },
+        quantity: item.quantity,
+        itemPrice,
+        subtotal,
+      };
+    });
 
     // Calculate total
     const cartTotal = formattedItems.reduce(
@@ -130,7 +162,7 @@ export const GET = withAuth(async (req, user) => {
     const formattedCart = {
       userId: cart.userId,
       items: formattedItems,
-      cartTotal:roundedCartTotal,
+      cartTotal: roundedCartTotal,
     };
 
     return addCorsHeaders(
