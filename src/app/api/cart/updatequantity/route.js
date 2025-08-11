@@ -118,7 +118,7 @@ export const POST = withAuth(async (req, user) => {
     const responseCart = {
       userId: cart.userId,
       items: formattedItems,
-      cartTotal: cartTotal.toFixed(2),
+      cartTotal: cartTotal,
     };
 
     return addCorsHeaders(

@@ -10,6 +10,9 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
+// Helper function (reuse from cart API)
+const roundTwo = (num) => Math.round(num * 100) / 100;
+
 export const GET = withAuth(async (req, user) => {
   await connectDB();
 
@@ -42,10 +45,14 @@ export const GET = withAuth(async (req, user) => {
       let orderTotal = 0;
 
       for (const item of order.items) {
-        const price = item.price || 0;
+        //const price = item.price || 0;
+        const unitPrice = roundTwo(item.price || 0);
         const quantity = item.quantity || 0;
-        orderTotal += price * quantity;
+        const subtotal = roundTwo(unitPrice * quantity);
+        orderTotal += subtotal;
       }
+
+      orderTotal = roundTwo(orderTotal);
 
       // Add custom orderId if not present
       const orderId = order.orderId || `pravasi-${String(index + 1).padStart(4, "0")}`;

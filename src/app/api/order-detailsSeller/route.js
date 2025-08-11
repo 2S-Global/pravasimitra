@@ -6,9 +6,13 @@ import { addCorsHeaders, optionsResponse } from "../../../../lib/cors";
 import MarketProduct from "../../../../models/MarketProduct";
 import Address from "../../../../models/Address";
 import User from '../../../../models/User';
+
 export async function OPTIONS() {
   return optionsResponse();
 }
+
+// Helper: round to 2 decimals
+const roundTwo = (num) => Math.round((num || 0) * 100) / 100;
 
 export const GET = withAuth(async (req, user) => {
   await connectDB();
@@ -63,16 +67,24 @@ export const GET = withAuth(async (req, user) => {
 
     for (const item of relevantItems) {
       const product = item.productId;
+      const unitPrice = roundTwo(item.price);
+      const subtotal = roundTwo(unitPrice * item.quantity);
+
       summary.items.push({
         _id: item._id,
         productId: product?._id,
         title: product?.title || "",
-        price: item.price,
+        price: unitPrice,
         quantity: item.quantity,
+        subtotal,
         images: product?.images || [],
       });
-      summary.orderTotal += item.price * item.quantity;
+      summary.orderTotal += subtotal;
     }
+
+    // Final rounded total
+    summary.orderTotal = roundTwo(summary.orderTotal);
+    
 
     return addCorsHeaders(NextResponse.json({ order: summary }, { status: 200 }));
   } catch (error) {

@@ -4,15 +4,19 @@ import Order from "../../../../../models/Order";
 import MarketProduct from "../../../../../models/MarketProduct";
 import { withAuth } from "../../../../../lib/withAuth";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
-import User from '../../../../../models/User';
+import User from "../../../../../models/User";
+
 export async function OPTIONS() {
   return optionsResponse();
 }
 
+// Helper function (reuse from cart API)
+const roundTwo = (num) => Math.round(num * 100) / 100;
+
 export const GET = withAuth(async (req, user) => {
   await connectDB();
 
-  const userId = user?.id;   
+  const userId = user?.id;
 
   try {
     // Find orders where the logged-in user is a seller in any item
@@ -44,16 +48,20 @@ export const GET = withAuth(async (req, user) => {
       for (const item of relevantItems) {
         const product = item.productId;
 
+        // Round price
+        const unitPrice = roundTwo(item.price);
+        const subtotal = roundTwo(unitPrice * item.quantity);
+
         orderSummary.items.push({
           _id: item._id,
           productId: product?._id,
           title: product?.title || "",
-          price: item.price,
+          price: unitPrice,
           quantity: item.quantity,
           images: product?.images || [],
         });
 
-        orderSummary.orderTotal += item.price * item.quantity;
+        orderSummary.orderTotal += subtotal;
       }
 
       sellerOrders.push(orderSummary);

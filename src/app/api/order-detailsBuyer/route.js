@@ -10,6 +10,9 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
+// Helper to round numbers to 2 decimals
+const roundTwo = (num) => Math.round(num * 100) / 100;
+
 export const GET = withAuth(async (req) => {
   await connectDB();
 
@@ -44,7 +47,7 @@ export const GET = withAuth(async (req) => {
       _id: encodeObjectId(order._id),
       orderId: order.orderId,
       status: order.status,
-      totalAmount: order.totalAmount,
+      totalAmount: roundTwo(order.totalAmount),
       createdAt: order.createdAt,
       buyer: buyer
         ? {
@@ -64,17 +67,20 @@ export const GET = withAuth(async (req) => {
         : null,
       items: order.items.map((item) => {
         const product = item.productId;
+        const unitPrice = roundTwo(item.price || 0);
+        const subtotal = roundTwo(unitPrice * (item.quantity || 0));
 
         return {
           _id: encodeObjectId(item._id),
           productId: encodeObjectId(product?._id),
           quantity: item.quantity,
-          price: item.price,
+          price: unitPrice,
+          subtotal,
           productDetails: product
             ? {
                 _id: encodeObjectId(product._id),
                 title: product.title,
-                price: product.price,
+                price: roundTwo(product.price),
                 images: product.images,
                 description: product.description,
               }
@@ -83,12 +89,17 @@ export const GET = withAuth(async (req) => {
       }),
     };
 
-    const calculatedTotal = order.items.reduce((sum, item) => {
-  return sum + item.price * item.quantity;
-}, 0);
+    // const calculatedTotal = order.items.reduce((sum, item) => {
+    //   return sum + item.price * item.quantity;
+    // }, 0);
 
-responseOrder.calculatedTotal = calculatedTotal;
+     // Recalculate total from rounded subtotals
+    const calculatedTotal = responseOrder.items.reduce(
+      (sum, item) => sum + item.subtotal,
+      0
+    );
 
+    responseOrder.calculatedTotal = roundTwo(calculatedTotal);
 
     return addCorsHeaders(
       NextResponse.json({ orderDetails: responseOrder }, { status: 200 })
