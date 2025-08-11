@@ -9,6 +9,9 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
+// Helper to round to 2 decimal places
+const roundTwo = (num) => Math.round(num * 100) / 100;
+
 export const POST = withAuth(async (req, user) => {
   await connectDB();
 
@@ -22,9 +25,9 @@ export const POST = withAuth(async (req, user) => {
         NextResponse.json(
           {
             summary: {
-              price: "0",
+              price: "0.00",
               items: "0",
-              totalAmount: "0",
+              totalAmount: "0.00",
             },
           },
           { status: 200 }
@@ -52,13 +55,23 @@ export const POST = withAuth(async (req, user) => {
       totalAmount += (product?.price || 0) * quantity;
     });
 
+    // Round totals before returning
+    totalMRP = roundTwo(totalMRP);
+    totalAmount = roundTwo(totalAmount);
+
     return addCorsHeaders(
       NextResponse.json(
+        // {
+        //   summary: {
+        //     price: `${totalMRP}`,
+        //     items: `${uniqueItemCount}`,
+        //     totalAmount: `${totalAmount}`,
+        //   },
         {
           summary: {
-            price: `${totalMRP}`,
+            price: totalMRP.toFixed(2),
             items: `${uniqueItemCount}`,
-            totalAmount: `${totalAmount}`,
+            totalAmount: totalAmount.toFixed(2),
           },
         },
         { status: 200 }

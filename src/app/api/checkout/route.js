@@ -7,11 +7,9 @@ import Cart from "../../../../models/Cart";
 import Order from "../../../../models/Order";
 import Counter from "../../../../models/Counter";
 
-
 export async function OPTIONS() {
   return optionsResponse();
 }
-
 
 export const POST = withAuth(async (req, user) => {
   await connectDB();
@@ -25,7 +23,7 @@ export const POST = withAuth(async (req, user) => {
     );
   }
 
-  const { billing, shipping, paymentMethod,transactionId  } = data;
+  const { billing, shipping, paymentMethod, transactionId } = data;
 
   if (!billing || !shipping || !paymentMethod) {
     return addCorsHeaders(
@@ -36,8 +34,6 @@ export const POST = withAuth(async (req, user) => {
     );
   }
 
-
-  
   try {
     const newAddress = new Address({
       userId: user.id,
@@ -58,28 +54,29 @@ export const POST = withAuth(async (req, user) => {
       status = "pending";
     }
 
-
     let counter = await Counter.findOneAndUpdate(
-  { name: "order" },
-  { $inc: { value: 1 } },
-  { new: true, upsert: true } // Create if doesn't exist
-);
-    const formattedOrderId = `pravasi-${String(counter.value).padStart(4, "0")}`;
+      { name: "order" },
+      { $inc: { value: 1 } },
+      { new: true, upsert: true } // Create if doesn't exist
+    );
+    const formattedOrderId = `pravasi-${String(counter.value).padStart(
+      4,
+      "0"
+    )}`;
 
     const newOrder = new Order({
       userId: user.id,
       orderId: formattedOrderId,
       addressId: savedAddress._id,
-      transactionId: transactionId, 
+      transactionId: transactionId,
       paymentMethod,
       status,
       items: cart.items,
-      
     });
     const savedOrder = await newOrder.save();
 
     // if (paymentMethod.toLowerCase() === "cash") {
-      await Cart.deleteOne({ userId: user.id });
+    await Cart.deleteOne({ userId: user.id });
     //}
 
     return addCorsHeaders(
@@ -87,7 +84,7 @@ export const POST = withAuth(async (req, user) => {
         {
           message: "Order created successfully",
           id: savedOrder._id,
-     orderId: savedOrder.orderId,
+          orderId: savedOrder.orderId,
           addressId: savedAddress._id,
           order: savedOrder,
         },
