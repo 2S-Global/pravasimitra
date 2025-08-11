@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { connectDB } from "../../../../../lib/db";
 import User from "../../../../../models/User";
+import MembershipPlan from "../../../../../models/MembershipPlan";
 import { NextResponse } from "next/server";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
@@ -13,11 +14,19 @@ export async function POST(req) {
   await connectDB();
 
   try {
-    const { name, email, mobile, password } = await req.json();
+    const { name, email, mobile, password, membershipId } = await req.json();
 
-    if (!name || !email || !mobile || !password) {
+    if (!name || !email || !mobile || !password || !membershipId) {
       return addCorsHeaders(
         NextResponse.json({ msg: "All Fields Are Mandatory" })
+      );
+    }
+
+    // Check if membership plan exists
+    const plan = await MembershipPlan.findById(membershipId);
+    if (!plan) {
+      return addCorsHeaders(
+        NextResponse.json({ msg: "Invalid membership plan" }, { status: 404 })
       );
     }
 
@@ -45,6 +54,7 @@ export async function POST(req) {
       mobile,
       password: HashedPassword,
       image: defaultImageUrl,
+      membershipId: membershipId,
     });
 
     await newUser.save();

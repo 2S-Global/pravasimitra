@@ -44,9 +44,14 @@ const UserSchema = new mongoose.Schema(
     braId: {
       type: String,
     },
+    membershipId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MembershipPlan",
+    },
 
     isDel: { type: Boolean, default: false },
   },
+
   { timestamps: true }
 );
 
