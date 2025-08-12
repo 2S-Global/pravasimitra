@@ -46,15 +46,20 @@ export const GET = async (req) => {
       .populate("category", "name")
       .lean();
 
-    const baseImageUrl = `${
-      process.env.IMAGE_URL || "http://localhost:3000/assets/images"
-    }/e-marketplace`;
+    // const baseImageUrl = `${
+    //   process.env.IMAGE_URL || "http://localhost:3000/assets/images"
+    // }/e-marketplace`;
 
     const updatedProducts = products.map((product) => ({
       ...product,
       id: encodeObjectId(product._id),
-      images: product.images
-        ? product.images.map((img) => `${baseImageUrl}/${img}`)
+      // images: product.images
+      //   ? product.images.map((img) => `${baseImageUrl}/${img}`)
+      //   : [],
+      images: Array.isArray(product.images)
+        ? product.images.map((img) =>
+            img.startsWith("http") ? img : `${baseImageUrl}/e-marketplace/${img}`
+          )
         : [],
       _id: undefined,
     }));
