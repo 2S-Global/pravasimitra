@@ -9,20 +9,24 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-// FETCH CURRENT USER'S PLAN (with populate)
+// FETCH ALL PLANS + CURRENT USER'S ACTIVE PLAN ID
 export const GET = withAuth(async (req, user) => {
   await connectDB();
 
   try {
-    // Find user and populate membership plan details
-    const dbUser = await User.findById(user.id)
-      .populate("membershipId")
+    // Fetch all membership plans
+    const plans = await MembershipPlan.find()
+      .sort({ createdAt: -1 })
       .lean();
 
-    if (!dbUser || !dbUser.membershipId) {
+    // Get the current user (no need to populate here since we just need the ID)
+    const dbUser = await User.findById(user.id).lean();
+
+    // If user not found
+    if (!dbUser) {
       return addCorsHeaders(
         NextResponse.json(
-          { success: false, message: "No active membership found" },
+          { success: false, message: "User not found" },
           { status: 404 }
         )
       );
@@ -33,15 +37,15 @@ export const GET = withAuth(async (req, user) => {
         {
           success: true,
           data: {
-            plan: dbUser.membershipId, // populated plan details
-            activatedAt: dbUser.updatedAt,
+            plans,
+            userPlanId: dbUser.membershipId || null,
           },
         },
         { status: 200 }
       )
     );
   } catch (err) {
-    console.error("Error fetching user's plan:", err);
+    console.error("Error fetching plans:", err);
     return addCorsHeaders(
       NextResponse.json(
         { success: false, error: "Internal Server Error" },
