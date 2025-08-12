@@ -22,7 +22,7 @@ export async function POST(req) {
 
     const existingUser = await User.findOne({ email }).lean();
 
-    if (existingUser) {
+    if (existingUser && existingUser.isDel === false) {
       return addCorsHeaders(
         NextResponse.json({ success: false, msg: "Email is already registered" }, { status: 200 })
       );

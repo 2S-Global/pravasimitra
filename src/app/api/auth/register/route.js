@@ -30,34 +30,45 @@ export async function POST(req) {
       );
     }
 
-    const existingUser = await User.findOne({
-      $or: [{ email }],
-    });
+    // const existingUser = await User.findOne({
+    //   $or: [{ email }],
+    // });
 
-    if (existingUser) {
-      return addCorsHeaders(
-        NextResponse.json(
-          { msg: "Email already registered" },
-          { status: 200 }
-        )
-      );
-    }
+    // if (existingUser && !existingUser.isDel) {
+    //   return addCorsHeaders(
+    //     NextResponse.json({ msg: "Email already registered" }, { status: 200 })
+    //   );
+    // }
 
     const HashedPassword = await bcrypt.hash(password, 10);
 
-     // Set default image URL
-    const defaultImageUrl = "https://res.cloudinary.com/dwy9i2fqt/image/upload/v1754560507/default-user_hd6lwv.png";
+    // Set default image URL
+    const defaultImageUrl =
+      "https://res.cloudinary.com/dwy9i2fqt/image/upload/v1754560507/default-user_hd6lwv.png";
 
-    const newUser = new User({
-      name,
-      email,
-      mobile,
-      password: HashedPassword,
-      image: defaultImageUrl,
-      membershipId: membershipId,
-    });
+    // if (existingUser && existingUser.isDel) {
+    //   // Update deleted user instead of creating new one
+    //   existingUser.name = name;
+    //   existingUser.mobile = mobile;
+    //   existingUser.password = HashedPassword;
+    //   existingUser.image = defaultImageUrl;
+    //   existingUser.membershipId = membershipId;
+    //   existingUser.isDel = false; // Reactivate the user
+    //   await existingUser.save();
+    // } else {
+      // Create new user
+      
+      const newUser = new User({
+        name,
+        email,
+        mobile,
+        password: HashedPassword,
+        image: defaultImageUrl,
+        membershipId: membershipId,
+      });
 
-    await newUser.save();
+      await newUser.save();
+    
 
     return addCorsHeaders(
       NextResponse.json({ msg: "Registered Successfully" }, { status: 200 })
