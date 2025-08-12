@@ -29,6 +29,7 @@ export const GET = withAuth(async function (req, user) {
     const membershipPlan = userDoc.membershipId;
 
     const statusData = {
+      planId: membershipPlan._id,
       planName: membershipPlan.name,
       planPrice: membershipPlan.price,
       limits: membershipPlan.limits,
