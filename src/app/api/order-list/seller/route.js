@@ -61,7 +61,9 @@ export const GET = withAuth(async (req, user) => {
           images: product?.images || [],
         });
 
-        orderSummary.orderTotal += subtotal;
+     orderSummary.orderTotal = Number(
+  (orderSummary.orderTotal + subtotal).toFixed(2)
+);
       }
 
       sellerOrders.push(orderSummary);
