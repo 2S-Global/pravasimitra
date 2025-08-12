@@ -37,7 +37,7 @@ export async function POST(req) {
     if (existingUser) {
       return addCorsHeaders(
         NextResponse.json(
-          { msg: "Email or Mobile Number already registered" },
+          { msg: "Email already registered" },
           { status: 200 }
         )
       );
