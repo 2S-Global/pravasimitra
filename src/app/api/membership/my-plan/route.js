@@ -34,7 +34,7 @@ export const GET = withAuth(async (req, user) => {
           success: true,
           data: {
             plan: dbUser.membershipId, // populated plan details
-            // activatedAt: dbUser.updatedAt,
+            activatedAt: dbUser.updatedAt,
           },
         },
         { status: 200 }
