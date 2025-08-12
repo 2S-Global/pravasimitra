@@ -31,7 +31,7 @@ export async function POST(req) {
     }
 
     const existingUser = await User.findOne({
-      $or: [{ email }, { mobile }],
+      $or: [{ email }],
     });
 
     if (existingUser) {
