@@ -46,7 +46,7 @@ export const GET = withAuth(async (req, user) => {
     );
 
     const summary = {
-      orderId: order._id,
+      orderId: order.orderId,
       createdAt: order.createdAt,
       paymentMethod: order.paymentMethod || "",
       status: order.status || "",
