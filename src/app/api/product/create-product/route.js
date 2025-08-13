@@ -74,7 +74,7 @@ export const POST = withAuth(async function (req, user) {
   }
 
   // Fetch user location settings
-  const locationSettings = await LocationSettings.findOne({
+  const locationSettings = await LocationSetting.findOne({
     userId,
     isDel: false,
   });
