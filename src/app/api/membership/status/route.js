@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import { withAuth } from "../../../../../lib/withAuth";
-//import UserMembership from "../../../../../models/UserMembership";
 import User from "../../../../../models/User";
 import MembershipPlan from "../../../../../models/MembershipPlan";
+import Product from "../../../../../models/Product";
+import Room from "../../../../../models/Room";
+import MarketProduct from "../../../../../models/MarketProduct";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
 export async function OPTIONS() {
@@ -28,6 +30,13 @@ export const GET = withAuth(async function (req, user) {
 
     const membershipPlan = userDoc.membershipId;
 
+    // Count Posts for this user in real-time
+    const [buySellCount, rentLeaseCount, marketplaceCount] = await Promise.all([
+      Product.countDocuments({ createdBy: user.id , is_del: false }),
+      Room.countDocuments({ createdBy: user.id, is_del: false }),
+      MarketProduct.countDocuments({ createdBy: user.id, is_del: false })
+    ])
+
     const statusData = {
       planId: membershipPlan._id,
       planName: membershipPlan.name,
@@ -36,14 +45,14 @@ export const GET = withAuth(async function (req, user) {
       durationInDays: membershipPlan.durationInDays,
       isActive: membershipPlan.isActive,
       usage: {
-        buySell: 0,
-        rentLease: 0,
-        marketplace: 0
+        buySell: buySellCount,
+        rentLease: rentLeaseCount,
+        marketplace: marketplaceCount
       },
       remaining: {
-        buySell: membershipPlan.limits.buySell,
-        rentLease: membershipPlan.limits.rentLease,
-        marketplace: membershipPlan.limits.marketplace
+        buySell: Math.max(0, membershipPlan.limits.buySell - buySellCount),
+        rentLease: Math.max(0, membershipPlan.limits.rentLease - rentLeaseCount),
+        marketplace: Math.max(0, membershipPlan.limits.marketplace - marketplaceCount)
       }
     };
 

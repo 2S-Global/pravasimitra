@@ -5,6 +5,7 @@ import { connectDB } from "../../../../../lib/db";
 import cloudinary from "../../../../../lib/cloudinary";
 import Product from "../../../../../models/Product";
 import ProductCategory from "../../../../../models/ProductCategory";
+import LocationSetting from "../../../../../models/LocationSetting";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
@@ -23,7 +24,7 @@ async function parseFormData(req) {
   const title = form.get("title");
   const category = form.get("category");
   // const city = form.get("city");
-  // const state = form.get("state");
+  const state = form.get("state");
   const location = form.get("location");
   const price = form.get("price");
   const shortDesc = form.get("shortDesc") || "";
@@ -48,7 +49,7 @@ async function parseFormData(req) {
     title,
     category,
     // city,
-    // state,
+    state,
     location,
     price,
     shortDesc,
@@ -69,6 +70,21 @@ export const POST = withAuth(async function (req, user) {
   } catch (err) {
     return addCorsHeaders(
       NextResponse.json({ error: err.message }, { status: 400 })
+    );
+  }
+
+  // Fetch user location settings
+  const locationSettings = await LocationSettings.findOne({
+    userId,
+    isDel: false,
+  });
+
+  if (!locationSettings) {
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "You have to update your location first" },
+        { status: 400 }
+      )
     );
   }
 
@@ -129,10 +145,11 @@ export const POST = withAuth(async function (req, user) {
   }
 
   try {
+
     const newProduct = await Product.create({
       title: data.title,
       category: decodedCategoryId,
-      city: data.city,
+      //city: data.city,
       state: data.state,
       location: data.location,
       price: parseFloat(data.price),
@@ -152,7 +169,7 @@ export const POST = withAuth(async function (req, user) {
             title: newProduct.title,
             category: data.category,
             price: newProduct.price,
-            city: newProduct.city,
+            //city: newProduct.city,
             state: newProduct.state,
             location: newProduct.location,
             shortDesc: newProduct.shortDesc,

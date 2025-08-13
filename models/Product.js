@@ -6,10 +6,17 @@ const ProductSchema = new mongoose.Schema(
       type: String,
     },
     city: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "City",
+      required: true,
     },
     state: {
       type: String,
+    },
+    country: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Country",
+      required: true,
     },
     location: {
       type: String,
