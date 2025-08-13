@@ -4,7 +4,7 @@ import { withAuth } from "../../../../../lib/withAuth";
 import User from "../../../../../models/User";
 import MembershipPlan from "../../../../../models/MembershipPlan";
 import Product from "../../../../../models/Product";
-import Room from "../../../../../models/Room";
+import RoomItem from "../../../../../models/Room";
 import MarketProduct from "../../../../../models/MarketProduct";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
@@ -33,8 +33,8 @@ export const GET = withAuth(async function (req, user) {
     // Count Posts for this user in real-time
     const [buySellCount, rentLeaseCount, marketplaceCount] = await Promise.all([
       Product.countDocuments({ createdBy: user.id , is_del: false }),
-      Room.countDocuments({ createdBy: user.id, is_del: false }),
-      MarketProduct.countDocuments({ createdBy: user.id, is_del: false })
+      RoomItem.countDocuments({ createdBy: user.id, isDel: false }),
+      MarketProduct.countDocuments({ createdBy: user.id, isDel: false })
     ])
 
     const statusData = {
