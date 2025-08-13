@@ -1,27 +1,20 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import Product from "../../../../../models/Product";
+import LocationSetting from "../../../../../models/LocationSetting";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
-import ProductCategory from "../../../../../models/ProductCategory";
-
-/**
- * @description Get all products for a given category ID
- * @route GET /api/product/item-list
- * @queryparam {string} id - Encoded category ID (required)
- * @success {object} 200 - Products fetched successfully
- * @error {object} 400 - Missing or invalid category ID
- * @error {object} 500 - Failed to fetch products from the database
- */
+import { withAuth } from "../../../../../lib/withAuth";
 
 export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = async (req) => {
+export const GET = withAuth(async (req, user) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
   const categoryEncoded = searchParams.get("id");
+  const userId = user?.id;
 
   if (!categoryEncoded) {
     return addCorsHeaders(
@@ -34,17 +27,12 @@ export const GET = async (req) => {
 
   let query = { is_del: false };
 
+  // Decode category ID
   try {
     const categoryId = decodeObjectId(categoryEncoded);
-
-    if (
-      !categoryId ||
-      typeof categoryId !== "object" ||
-      !categoryId._bsontype
-    ) {
+    if (!categoryId || typeof categoryId !== "object" || !categoryId._bsontype) {
       throw new Error("Invalid ObjectId");
     }
-
     query.category = categoryId;
   } catch (err) {
     console.error("ID decoding failed:", err.message);
@@ -54,9 +42,30 @@ export const GET = async (req) => {
   }
 
   try {
+    // Get user's location setting
+    const location = await LocationSetting.findOne({ userId })
+      .select("currentCity currentCountry")
+      .lean();
+
+    if (!location || !location.currentCity || !location.currentCountry) {
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "User location not set" },
+          { status: 400 }
+        )
+      );
+    }
+
+    // Filter: exclude products posted by this user & match city & country
+    query.createdBy = { $ne: userId };
+    query.city = location.currentCity;
+    query.country = location.currentCountry;
+
     const products = await Product.find(query)
       .select("-__v -is_del")
       .populate("category", "name")
+      .populate("city", "name") // optional: populate city name
+      .populate("country", "name") // optional: populate country name
       .lean();
 
     if (!products.length) {
@@ -68,13 +77,11 @@ export const GET = async (req) => {
       );
     }
 
-    //const baseImageUrl = `${process.env.IMAGE_URL}/product-items`;
-
     const updatedProducts = products.map((product) => ({
       ...product,
       id: encodeObjectId(product._id),
       _id: undefined,
-      image: product.image || null, //full URL from Cloudinary
+      image: product.image || null,
       gallery: Array.isArray(product.gallery) ? product.gallery : [],
     }));
 
@@ -93,4 +100,4 @@ export const GET = async (req) => {
       NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
     );
   }
-};
+});
