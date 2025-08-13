@@ -45,6 +45,8 @@ export const GET = async (req) => {
       .populate("propertyType", "name")
       .populate("amenities", "name")
       .populate("createdBy", "name email mobile")
+      .populate("city", "name")
+      .populate("country", "name")
       .lean();
 
     if (!item) {
