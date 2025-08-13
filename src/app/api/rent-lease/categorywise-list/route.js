@@ -4,7 +4,7 @@ import RoomItem from "../../../../../models/Room";
 import RoomCategory from "../../../../../models/RoomCategory";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
-
+import LocationSetting from "../../../../../models/LocationSetting";
 /**
  * @description Get all room items for a given property type ID
  * @route GET /api/rent-lease/item-list
@@ -23,6 +23,7 @@ export const GET = async (req) => {
   const { searchParams } = new URL(req.url);
   const propertyTypeEncoded = searchParams.get("id");
 
+    const userId = user?.id;
   if (!propertyTypeEncoded) {
     return addCorsHeaders(
       NextResponse.json(
@@ -54,9 +55,30 @@ export const GET = async (req) => {
   }
 
   try {
+
+   const location = await LocationSetting.findOne({ userId })
+      .select("currentCity currentCountry")
+      .lean();
+
+    if (!location || !location.currentCity || !location.currentCountry) {
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "User location not set" },
+          { status: 400 }
+        )
+      );
+    }
+
+    // Filter: exclude products posted by this user & match city & country
+    query.createdBy = { $ne: userId };
+    query.city = location.currentCity;
+    query.country = location.currentCountry;
+
     const items = await RoomItem.find(query)
       .select("-__v -isDel")
       .populate("propertyType", "name")
+      .populate("city", "name") // optional: populate city name
+      .populate("country", "name") // optional: populate country name
       .lean();
 
     if (!items.length) {
