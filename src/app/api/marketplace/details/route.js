@@ -68,7 +68,7 @@ export const GET = async (req) => {
   } catch (err) {
     console.error("Fetch failed:", err);
     return addCorsHeaders(NextResponse.json(
-      { error: "Invalid or malformed RoomItem ID" },
+      { error: "Invalid or malformed Marketproduct ID" },
       { status: 400 }
     ));
   }
