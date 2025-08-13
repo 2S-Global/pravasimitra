@@ -4,21 +4,38 @@ import MarketProduct from "../../../../../models/MarketProduct";
 import MarketCategory from "../../../../../models/MarketCategory";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import { encodeObjectId, decodeObjectId } from "../../../../../lib/idCodec";
+import { withAuth } from "../../../../../lib/withAuth"; 
+import LocationSetting from "../../../../../models/LocationSetting";
 
 export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = async (req) => {
+export const GET = withAuth(async (req,user) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
-
+  const userId = user?.id;
   const categoryEncoded = searchParams.get("categoryId");
   const keyword = searchParams.get("keyword");
 
-  let query = {
+
+const locationSetting = await LocationSetting.findOne({ userId: userId });
+  if (!locationSetting) {
+    return addCorsHeaders(
+      NextResponse.json(
+        { success: false, error: "Location settings not found" },
+        { status: 404 }
+      )
+    );
+  }
+
+  const query = {
     isDel: false,
+    createdBy: { $ne: userId }, // Exclude user's own listings
+    city: locationSetting.currentCity,
+    country: locationSetting.currentCountry,
   };
+
 
   // Category filter
   if (categoryEncoded) {
@@ -36,7 +53,7 @@ export const GET = async (req) => {
   if (keyword) {
     query.$or = [
       { title: { $regex: keyword, $options: "i" } },
-      { description: { $regex: keyword, $options: "i" } },
+    
     ];
   }
 
@@ -73,4 +90,4 @@ export const GET = async (req) => {
       NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
     );
   }
-};
+});
