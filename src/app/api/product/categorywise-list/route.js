@@ -64,8 +64,7 @@ export const GET = withAuth(async (req, user) => {
     const products = await Product.find(query)
       .select("-__v -is_del")
       .populate("category", "name")
-      .populate("city", "name") // optional: populate city name
-      .populate("country", "name") // optional: populate country name
+
       .lean();
 
     if (!products.length) {

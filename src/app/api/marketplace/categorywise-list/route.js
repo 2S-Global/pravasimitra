@@ -80,8 +80,7 @@ export const GET = withAuth(async (req,user) => {
     const items = await MarketProduct.find(query)
       .select("-__v -isDel")
       .populate("category", "name")
-      .populate("city", "name") // optional: populate city name
-      .populate("country", "name") // optional: populate country name
+   
       .lean();
 
     if (!items.length) {
