@@ -145,11 +145,12 @@ export const POST = withAuth(async function (req, user) {
   }
 
   try {
-
     const newProduct = await Product.create({
       title: data.title,
       category: decodedCategoryId,
       //city: data.city,
+      city: locationSettings.currentCity,
+      country: locationSettings.currentCountry,
       state: data.state,
       location: data.location,
       price: parseFloat(data.price),
@@ -169,8 +170,9 @@ export const POST = withAuth(async function (req, user) {
             title: newProduct.title,
             category: data.category,
             price: newProduct.price,
-            //city: newProduct.city,
+            city: newProduct.city,
             state: newProduct.state,
+            country: newProduct.country,
             location: newProduct.location,
             shortDesc: newProduct.shortDesc,
             description: newProduct.description,
