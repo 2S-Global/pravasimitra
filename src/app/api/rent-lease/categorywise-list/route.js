@@ -5,6 +5,8 @@ import RoomCategory from "../../../../../models/RoomCategory";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import LocationSetting from "../../../../../models/LocationSetting";
+import { withAuth } from "../../../../../lib/withAuth";
+
 /**
  * @description Get all room items for a given property type ID
  * @route GET /api/rent-lease/item-list
@@ -18,7 +20,7 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = async (req) => {
+export const GET = withAuth(async (req,user) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
   const propertyTypeEncoded = searchParams.get("id");
@@ -119,4 +121,4 @@ export const GET = async (req) => {
       NextResponse.json({ error: "Failed to fetch items" }, { status: 500 })
     );
   }
-};
+});
