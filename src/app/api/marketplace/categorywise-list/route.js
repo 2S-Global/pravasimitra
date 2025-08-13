@@ -6,6 +6,7 @@ import MarketProduct from "../../../../../models/MarketProduct";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import cloudinary from "../../../../../lib/cloudinary";
 import { withAuth } from "../../../../../lib/withAuth";
+import LocationSetting from "../../../../../models/LocationSetting";
 /**
  * @description Get all MarketProduct items for a given category ID (only those not marked as deleted)
  * @route GET /api/marketplace/categorywise-list
