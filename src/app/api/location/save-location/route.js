@@ -35,26 +35,28 @@ export const POST = withAuth(async function (req, user) {
   }
 
   try {
-    // Soft-delete previous locations for this user
-    await LocationSetting.updateMany(
-      { userId: user?.id, isDel: false },
-      { $set: { isDel: true } }
-    );
+    // // Soft-delete previous locations for this user
+    // await LocationSetting.updateMany(
+    //   { userId: user?.id, isDel: false },
+    //   { $set: { isDel: true } }
+    // );
 
     // Insert a new active location
-    const saved = await LocationSetting.create({
-      userId: user?.id,
-      currentCountry: new mongoose.Types.ObjectId(currentCountry),
-      currentCity: new mongoose.Types.ObjectId(currentCity),
-      destinationCountry: new mongoose.Types.ObjectId(destinationCountry),
-      destinationCity: new mongoose.Types.ObjectId(destinationCity),
-      isDel: false
-    });
-
-    await saved.populate("currentCountry", "name");
-    await saved.populate("currentCity", "name");
-    await saved.populate("destinationCountry", "name");
-    await saved.populate("destinationCity", "name");
+    const saved = await LocationSetting.findOneAndUpdate(
+      { userId: user?.id },
+      {
+        currentCountry: new mongoose.Types.ObjectId(currentCountry),
+        currentCity: new mongoose.Types.ObjectId(currentCity),
+        destinationCountry: new mongoose.Types.ObjectId(destinationCountry),
+        destinationCity: new mongoose.Types.ObjectId(destinationCity)
+      },
+      { upsert: true, new: true }
+    )
+      .populate("currentCountry", "name")
+      .populate("currentCity", "name")
+      .populate("destinationCountry", "name")
+      .populate("destinationCity", "name")
+      .lean();
 
     return addCorsHeaders(
       NextResponse.json(

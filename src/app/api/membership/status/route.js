@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import { withAuth } from "../../../../../lib/withAuth";
-import UserMembership from "../../../../../models/UserMembership";
+//import UserMembership from "../../../../../models/UserMembership";
 import User from "../../../../../models/User";
 import MembershipPlan from "../../../../../models/MembershipPlan";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";

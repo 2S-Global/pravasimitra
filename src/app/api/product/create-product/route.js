@@ -22,8 +22,8 @@ async function parseFormData(req) {
 
   const title = form.get("title");
   const category = form.get("category");
-  const city = form.get("city");
-  const state = form.get("state");
+  // const city = form.get("city");
+  // const state = form.get("state");
   const location = form.get("location");
   const price = form.get("price");
   const shortDesc = form.get("shortDesc") || "";
@@ -47,8 +47,8 @@ async function parseFormData(req) {
   return {
     title,
     category,
-    city,
-    state,
+    // city,
+    // state,
     location,
     price,
     shortDesc,
