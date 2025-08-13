@@ -42,6 +42,8 @@ export const GET = async (req) => {
       .select("-__v -is_del")
       .populate("category", "name")
       .populate("createdBy", "name email mobile")
+      .populate("city", "name")
+      .populate("country", "name")
       .lean();
 
     if (!product) {
