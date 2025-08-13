@@ -10,9 +10,9 @@ const ProductSchema = new mongoose.Schema(
       ref: "City",
       required: true,
     },
-    state: {
-      type: String,
-    },
+    // state: {
+    //   type: String,
+    // },
     country: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Country",
