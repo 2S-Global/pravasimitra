@@ -14,73 +14,89 @@ export async function OPTIONS() {
 export const GET = withAuth(async (req, user) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
-  const searchTerm = searchParams.get("keyword");
   const userId = user?.id;
+  const categoryEncoded = searchParams.get("categoryId");
+  const keyword = searchParams.get("keyword");
 
-  if (!searchTerm) {
-    return addCorsHeaders(
-      NextResponse.json({ error: "Missing search term" }, { status: 400 })
-    );
-  }
+  // let query = {
+  //   is_del: false,
+  // };
 
-  try {
-    // Get user's location
-    const location = await LocationSetting.findOne({ userId })
-      .select("currentCity currentCountry")
-      .lean();
-
-    if (!location || !location.currentCity || !location.currentCountry) {
-      return addCorsHeaders(
-        NextResponse.json({ error: "User location not set" }, { status: 400 })
-      );
-    }
-
-    // Build query with location + exclude own posts
-    let query = {
-      is_del: false,
-      createdBy: { $ne: userId },
-      city: location.currentCity,
-      country: location.currentCountry,
-      title: { $regex: searchTerm, $options: "i" } // case-insensitive search
-    };
-
-    const products = await Product.find(query)
-      .select("-__v -is_del")
-      .populate("category", "name")
-      .populate("city", "name")
-      .populate("country", "name")
-      .lean();
-
-    if (!products.length) {
+  const locationSetting = await LocationSetting.findOne({ userId: userId });
+    if (!locationSetting) {
       return addCorsHeaders(
         NextResponse.json(
-          { msg: "No products found", productList: [] },
-          { status: 200 }
+          { success: false, error: "Location settings not found" },
+          { status: 404 }
         )
       );
     }
+  
+    const query = {
+      is_del: false,
+      createdBy: { $ne: userId }, // Exclude user's own listings
+      city: locationSetting.currentCity,
+      country: locationSetting.currentCountry,
+    };
 
-    const updatedProducts = products.map((product) => ({
+  // Category filter
+  if (categoryEncoded) {
+    try {
+      const categoryId = decodeObjectId(categoryEncoded);
+      query.category = categoryId;
+    } catch (err) {
+      return addCorsHeaders(
+        NextResponse.json({ error: "Invalid category ID" }, { status: 400 })
+      );
+    }
+  }
+
+  // Keyword filter
+  if (keyword) {
+    query.$or = [
+      { title: { $regex: keyword, $options: "i" } },
+      // { description: { $regex: keyword, $options: "i" } },
+    ];
+  }
+
+  try {
+    const products = await Product.find(query)
+      .select("-__v -isDel")
+      .populate("category", "name")
+      .lean();
+
+    // const baseImageUrl = `${
+    //   process.env.IMAGE_URL || "http://localhost:3000/assets/images"
+    // }/product-items`;
+
+    const updatedItems = products.map((product) => ({
       ...product,
       id: encodeObjectId(product._id),
+      // image: product.image ? `${baseImageUrl}/${product.image}` : null,
+      // gallery: Array.isArray(product.gallery)
+      //   ? product.gallery.map((img) => `${baseImageUrl}/${img}`)
+      //   : [],
+      image: product.image
+        ? product.image.startsWith("http")
+          ? product.image
+          : `${baseImageUrl}/${product.image}`
+        : null,
+
+      gallery: Array.isArray(product.gallery)
+        ? product.gallery.map((img) =>
+            img.startsWith("http") ? img : `${baseImageUrl}/${img}`
+          )
+        : [],
       _id: undefined,
-      image: product.image || null,
-      gallery: Array.isArray(product.gallery) ? product.gallery : [],
     }));
 
     return addCorsHeaders(
-      NextResponse.json(
-        {
-          msg: "Search results loaded successfully",
-          productList: updatedProducts,
-        },
-        { status: 200 }
-      )
+      NextResponse.json({ itemList: updatedItems }, { status: 200 })
     );
   } catch (err) {
-    console.error("Search failed:", err);
+    console.error("Search fetch failed:", err);
     return addCorsHeaders(
-      NextResponse.json({ error: "Failed to search products" }, { status: 500 })
+      NextResponse.json({ error: "Failed to fetch items" }, { status: 500 })
     );
   }
 });
