@@ -4,7 +4,7 @@ import { signToken } from "../../../../../lib/auth";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
-import LocationSetting from "../../../../../models/LocationSetting";
+
 export async function OPTIONS() {
   return optionsResponse();
 }
@@ -30,28 +30,6 @@ export async function POST(req) {
     return addCorsHeaders(res);
   }
 
-
-   const locationSettingDoc = await LocationSetting.findOne({
-    userId: user._id
-  })
-    .populate("currentCountry", "name")
-    .populate("currentCity", "name")
-    .populate("destinationCountry", "name")
-    .populate("destinationCity", "name")
-    .lean();
-
-  let locationSetting = {
-    isset: false,
-    data: null
-  };
-
-  if (locationSettingDoc && locationSettingDoc.isDel === false) {
-    locationSetting = {
-      isset: true,
-      data: locationSettingDoc
-    };
-  }
-
   const token = signToken({
     id: user._id,
     name: user.name,  
@@ -63,8 +41,7 @@ export async function POST(req) {
   const res = NextResponse.json({
     msg: `Welcome ${user.name}`,
     user,
-    token,
-    locationSetting 
+    token 
   });
 
 res.cookies.set("token", token, {
