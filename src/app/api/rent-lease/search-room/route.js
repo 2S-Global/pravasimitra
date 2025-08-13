@@ -25,7 +25,7 @@ export const GET = withAuth(async function (req, user) {
   const baseImageUrl = process.env.IMAGE_URL;
 
   // Fetch current location settings from DB
-  const locationSetting = await LocationSetting.findOne({ createdBy: userId });
+  const locationSetting = await LocationSetting.findOne({ userId: userId });
   if (!locationSetting) {
     return addCorsHeaders(
       NextResponse.json(
