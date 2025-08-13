@@ -7,6 +7,7 @@ import RoomItem from "../../../../../models/Room";
 import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
+import LocationSetting from "../../../../../models/LocationSetting";
 import cloudinary from "../../../../../lib/cloudinary";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
@@ -47,8 +48,8 @@ async function parseFormData(req) {
   const furnishedValue = form.get("furnished");
   const furnished = furnishedValue === "Yes" ? "Yes" : "No";
   const location = form.get("location");
-  const city = form.get("city");
-  const state = form.get("state");
+  //const city = form.get("city");
+  //const state = form.get("state");
   const amenities = form.getAll("amenities");
   const files = form.getAll("images");
 
@@ -94,8 +95,8 @@ async function parseFormData(req) {
     bathrooms,
     furnished,
     location,
-    city,
-    state,
+    // city,
+    // state,
     amenities,
     images,
   };
@@ -111,6 +112,21 @@ export const POST = withAuth(async function (req, user) {
   } catch (err) {
     return addCorsHeaders(
       NextResponse.json({ error: err.message }, { status: 400 })
+    );
+  }
+
+  // Fetch current location from LocationSetting
+  const locationSettings = await LocationSetting.findOne({
+    userId,
+    isDel: false,
+  });
+
+  if (!locationSettings) {
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "You have to update your location first" },
+        { status: 400 }
+      )
     );
   }
 
@@ -222,8 +238,10 @@ export const POST = withAuth(async function (req, user) {
       bathrooms: parseInt(data.bathrooms),
       furnished: data.furnished,
       location: data.location,
-      city: data.city,
-      state: data.state,
+      // city: data.city,
+      // state: data.state,
+      city: locationSettings.currentCity,
+      country: locationSettings.currentCountry,
       amenities: amenityObjectIds,
       createdBy: userId,
     });

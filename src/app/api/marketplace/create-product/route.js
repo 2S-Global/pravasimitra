@@ -4,6 +4,7 @@ import fs from "fs";
 import { connectDB } from "../../../../../lib/db";
 import MarketProduct from "../../../../../models/MarketProduct";
 import MarketCategory from "../../../../../models/MarketCategory";
+import LocationSetting from "../../../../../models/LocationSetting";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
@@ -23,8 +24,8 @@ async function parseFormData(req) {
 
   const title = form.get("title");
   const category = form.get("category");
-  const city = form.get("city");
-  const state = form.get("state");
+  // const city = form.get("city");
+  // const state = form.get("state");
   const location = form.get("location") || "";
   // const ingredients = form.get("ingredients") || "";
   const price = form.get("price");
@@ -49,8 +50,8 @@ async function parseFormData(req) {
   return {
     title,
     category,
-    city,
-    state,
+    //city,
+    //state,
     location,
     //ingredients,
     price,
@@ -74,6 +75,21 @@ export const POST = withAuth(async function (req, user) {
       NextResponse.json({ error: err.message }, { status: 400 })
     );
   }
+
+  // Fetch current location from LocationSetting
+    const locationSettings = await LocationSetting.findOne({
+      userId,
+      isDel: false,
+    });
+  
+    if (!locationSettings) {
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "You have to update your location first" },
+          { status: 400 }
+        )
+      );
+    }
 
   const allowedTypes = [
     "image/jpeg",
@@ -152,8 +168,9 @@ export const POST = withAuth(async function (req, user) {
       title: data.title,
       images: uploadedImageUrls,
       category: decodedCategoryId,
-      city: data.city,
-      state: data.state,
+      city: locationSettings.currentCity,
+      country: locationSettings.currentCountry,
+      //state: data.state,
       location: data.location,
       //ingredients: data.ingredients,
       price: parseFloat(data.price),
