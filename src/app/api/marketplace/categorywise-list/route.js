@@ -5,7 +5,7 @@ import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import MarketProduct from "../../../../../models/MarketProduct";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import cloudinary from "../../../../../lib/cloudinary";
-
+import { withAuth } from "../../../../../lib/withAuth";
 /**
  * @description Get all MarketProduct items for a given category ID (only those not marked as deleted)
  * @route GET /api/marketplace/categorywise-list
@@ -19,9 +19,9 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = async (req) => {
+export const GET = withAuth(async (req,user) => {
   await connectDB();
-
+    const userId = user?.id;
   const { searchParams } = new URL(req.url);
   // const category = searchParams.get("id");
   const categoryIdEncoded = searchParams.get("id");
@@ -58,9 +58,29 @@ export const GET = async (req) => {
   }
 
   try {
+
+   const location = await LocationSetting.findOne({ userId })
+      .select("currentCity currentCountry")
+      .lean();
+
+          if (!location || !location.currentCity || !location.currentCountry) {
+            return addCorsHeaders(
+              NextResponse.json(
+                { error: "User location not set" },
+                { status: 400 }
+              )
+            );
+          }
+      
+              query.createdBy = { $ne: userId };
+    query.city = location.currentCity;
+    query.country = location.currentCountry;
+
     const items = await MarketProduct.find(query)
       .select("-__v -isDel")
       .populate("category", "name")
+      .populate("city", "name") // optional: populate city name
+      .populate("country", "name") // optional: populate country name
       .lean();
 
     if (!items.length) {
@@ -99,4 +119,4 @@ export const GET = async (req) => {
       NextResponse.json({ error: "Failed to fetch items" }, { status: 500 })
     );
   }
-};
+});
