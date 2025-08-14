@@ -18,9 +18,9 @@ const connectDB = async () => {
 // 🔐 Generate a random, secure password
 const generatePassword = () => {
   return (
-    Math.random().toString(36).slice(-8) +
+    Math.random().toString(36).slice(-5) +
     "@" +
-    Math.floor(100 + Math.random() * 900)
+    Math.floor(10 + Math.random() * 90)
   );
 };
 
