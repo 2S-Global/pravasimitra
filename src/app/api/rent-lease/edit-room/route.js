@@ -37,7 +37,7 @@ async function parseFormData(req) {
   const furnishedValue = form.get("furnished");
   const furnished = furnishedValue === "Yes" ? "Yes" : "No";
   const location = form.get("location");
-  const city = form.get("city");
+  // const city = form.get("city");
   const state = form.get("state");
   const amenities = form.getAll("amenities");
   const files = form.getAll("images");
@@ -69,7 +69,7 @@ async function parseFormData(req) {
     bathrooms,
     furnished,
     location,
-    city,
+    // city,
     state,
     amenities,
     newImages: images.filter(Boolean),
@@ -164,7 +164,7 @@ export const PATCH = withAuth(async (req, user) => {
     bathrooms,
     furnished,
     location,
-    city,
+    // city,
     state,
     amenities,
     newImages,
@@ -211,6 +211,21 @@ export const PATCH = withAuth(async (req, user) => {
       NextResponse.json({ msg: "Invalid amenity ID(s)" }, { status: 400 })
     );
   }
+
+  // Get the existing product
+    const existingProduct = await RoomItem.findOne({
+      _id: decodedId,
+      createdBy: user.id,
+    });
+  
+    if (!existingProduct) {
+      return addCorsHeaders(
+        NextResponse.json(
+          { error: "Item not found or unauthorized" },
+          { status: 404 }
+        )
+      );
+    }
 
   const allowedTypes = [
     "image/jpeg",
@@ -306,29 +321,32 @@ export const PATCH = withAuth(async (req, user) => {
   //       { new: true }
   //     );
 
+  // Build updated product data using spread
+  const updatedData = {
+    ...existingProduct.toObject(), // start with old values
+    title,
+    propertyType: decodedPropertyType,
+    roomSize,
+    price: parseFloat(price),
+    shortDesc,
+    description,
+    bedrooms: parseInt(bedrooms, 10),
+    bathrooms: parseInt(bathrooms, 10),
+    furnished,
+    location,
+    state,
+    frequency,
+    amenities: amenityObjectIds,
+    images: savedFilenames,
+    city: existingProduct.city, // keep original city
+    country: existingProduct.country, // keep original country
+  };
+
   // ✅ usage of findOneAndUpdate with both _id and createdBy
   try {
     const updated = await RoomItem.findOneAndUpdate(
       { _id: decodedId, createdBy: user.id },
-      {
-        $set: {
-          title,
-          propertyType: new mongoose.Types.ObjectId(decodedPropertyType),
-          roomSize,
-          price: parseFloat(price),
-          shortDesc,
-          description,
-          bedrooms: parseInt(bedrooms, 10),
-          bathrooms: parseInt(bathrooms, 10),
-          furnished,
-          location,
-          city,
-          state,
-          frequency,
-          amenities: amenityObjectIds,
-          images: savedFilenames,
-        },
-      },
+      updatedData,
       { new: true }
     );
 
