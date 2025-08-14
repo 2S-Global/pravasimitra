@@ -6,6 +6,9 @@ import { addCorsHeaders, optionsResponse } from "../../../../lib/cors";
 import Cart from "../../../../models/Cart";
 import Order from "../../../../models/Order";
 import Counter from "../../../../models/Counter";
+import nodemailer from "nodemailer";
+import User from "../../../../models/User";
+import MarketProduct from "../../../../models/MarketProduct";
 
 export async function OPTIONS() {
   return optionsResponse();
@@ -42,7 +45,12 @@ export const POST = withAuth(async (req, user) => {
     });
     const savedAddress = await newAddress.save();
 
-    const cart = await Cart.findOne({ userId: user.id });
+    // Fetch cart & populate products
+    const cart = await Cart.findOne({ userId: user.id }).populate({
+      path: "items.productId",
+      model: "MarketProduct",
+    });
+
     if (!cart || !cart.items || cart.items.length === 0) {
       return addCorsHeaders(
         NextResponse.json({ error: "Cart is empty" }, { status: 400 })
@@ -59,6 +67,7 @@ export const POST = withAuth(async (req, user) => {
       { $inc: { value: 1 } },
       { new: true, upsert: true } // Create if doesn't exist
     );
+
     const formattedOrderId = `pravasi-${String(counter.value).padStart(
       4,
       "0"
@@ -78,6 +87,77 @@ export const POST = withAuth(async (req, user) => {
     // if (paymentMethod.toLowerCase() === "cash") {
     await Cart.deleteOne({ userId: user.id });
     //}
+
+    // ------------------
+    // 📧 SEND EMAILS
+    // ------------------
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    // 1️⃣ Email Buyer
+    await transporter.sendMail({
+      from: `"Pravasi Mitra" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: `Order Confirmation - ${formattedOrderId}`,
+      html: `
+        <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+        <br>
+        <h2>Order Confirmation:</h2>
+        <p>Hello ${user.name},</p>
+        <p>Your order <b>${formattedOrderId}</b> has been placed successfully.</p>
+        <p>We will notify you once it is processed.</p>
+        <p>Thank you for shopping with Pravasi Mitra.</p>
+      `,
+    });
+
+    // 2️⃣ Email Sellers (only their own products)
+    const sellerIds = [
+      ...new Set(cart.items.map((item) => item.productId.createdBy.toString())),
+    ];
+
+    const sellers = await User.find({ _id: { $in: sellerIds } });
+
+    await Promise.all(
+      sellers.map((seller) => {
+        const sellerProducts = cart.items.filter(
+          (item) =>
+            item.productId.createdBy.toString() === seller._id.toString()
+        );
+
+        const productListHtml = sellerProducts
+          .map(
+            (p) => `
+              <li>
+                <b>${p.productId.title}</b> - ${p.quantity} ${p.productId.unit} @ £${p.productId.price}
+              </li>
+            `
+          )
+          .join("");
+
+        return transporter.sendMail({
+          from: `"Pravasi Mitra" <${process.env.EMAIL_USER}>`,
+          to: seller.email,
+          subject: `New Order Received - ${formattedOrderId}`,
+          html: `
+            <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+            <br>
+            <p>Hello ${seller.name},</p>
+            <p>You have received a new order (<b>${formattedOrderId}</b>).</p>
+            <p>Buyer: ${user.name} (${user.email})</p>
+            <p>Ordered Products:</p>
+            <ul>${productListHtml}</ul>
+            <p>Please process the order at your earliest convenience.</p>
+          `,
+        });
+      })
+    );
 
     return addCorsHeaders(
       NextResponse.json(
