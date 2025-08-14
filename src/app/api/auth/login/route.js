@@ -31,26 +31,26 @@ export async function POST(req) {
   }
 
 
-   const locationSettingDoc = await LocationSetting.findOne({
-    userId: user._id
-  })
-    .populate("currentCountry", "name")
-    .populate("currentCity", "name")
-    .populate("destinationCountry", "name")
-    .populate("destinationCity", "name")
-    .lean();
+  //  const locationSettingDoc = await LocationSetting.findOne({
+  //   userId: user._id
+  // })
+  //   .populate("currentCountry", "name")
+  //   .populate("currentCity", "name")
+  //   .populate("destinationCountry", "name")
+  //   .populate("destinationCity", "name")
+  //   .lean();
 
-  let locationSetting = {
-    isset: false,
-    data: null
-  };
+  // let locationSetting = {
+  //   isset: false,
+  //   data: null
+  // };
 
-  if (locationSettingDoc && locationSettingDoc.isDel === false) {
-    locationSetting = {
-      isset: true,
-      data: locationSettingDoc
-    };
-  }
+  // if (locationSettingDoc && locationSettingDoc.isDel === false) {
+  //   locationSetting = {
+  //     isset: true,
+  //     data: locationSettingDoc
+  //   };
+  // }
 
   const token = signToken({
     id: user._id,
@@ -64,7 +64,7 @@ export async function POST(req) {
     msg: `Welcome ${user.name}`,
     user,
     token,
-    locationSetting 
+
   });
 
 res.cookies.set("token", token, {
