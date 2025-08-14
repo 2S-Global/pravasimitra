@@ -85,10 +85,28 @@ export const POST = withAuth(async (req, authUser) => {
       to: owner.email,
       subject: `Rental Inquiry: ${room.title}`,
       html: `
+        <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+        <br>
         <p>Hello ${owner.name},</p>
         <p>${user.name} is interested in your room: <b>${room.title}</b>.</p>
-        <p>Contact: <a href="mailto:${user.email}">${user.email}</a></p>
+        <p>You can reply at: <a href="mailto:${user.email}">${user.email}</a></p>
+        <p>Thank you for using Pravasi Mitra.</p>
       `,
+    });
+
+     // 📩 Send mail to Buyer
+    await transporter.sendMail({
+      from: `"Pravasi Mitra" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: `Your inquiry for ${room.title}`,
+      html: `
+      <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+      <br>
+      <p>Hello ${user.name},</p>
+      <p>Your inquiry for <b>${room.title}</b> has been sent to ${owner.name}.</p>
+      <p>Owner's contact: <a href="mailto:${owner.email}">${owner.email}</a></p>
+      <p>Thank you for using Pravasi Mitra.</p>
+    `,
     });
 
     return addCorsHeaders(
