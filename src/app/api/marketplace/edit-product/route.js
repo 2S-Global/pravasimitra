@@ -208,6 +208,21 @@ export const PATCH = withAuth(async (req, user) => {
     );
   }
 
+  // Get the existing product
+  const existingProduct = await MarketProduct.findOne({
+    _id: decodedId,
+    createdBy: user.id,
+  });
+
+  if (!existingProduct) {
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Item not found or unauthorized" },
+        { status: 404 }
+      )
+    );
+  }
+
   const allowedTypes = [
     "image/jpeg",
     "image/jpg",
@@ -215,6 +230,7 @@ export const PATCH = withAuth(async (req, user) => {
     "image/webp",
     "image/avif",
   ];
+
   const savedUrls = [...existingImages];
 
   // const uploadDir = path.join(
@@ -269,23 +285,26 @@ export const PATCH = withAuth(async (req, user) => {
     }
   }
 
+  // Build updated product data using spread
+  const updatedData = {
+    ...existingProduct.toObject(), // start with old values
+    title,
+    category: decodedCategoryId,
+    price: parseFloat(price),
+    description,
+    quantity: parseInt(quantity, 10),
+    unit,
+    state,
+    location,
+    images: savedUrls,
+    city: existingProduct.city, // keep original city
+    country: existingProduct.country, // keep original country
+  };
+
   try {
     const updated = await MarketProduct.findByIdAndUpdate(
       { _id: decodedId, createdBy: user.id },
-      {
-        $set: {
-          title,
-          category: decodedCategoryId,
-          price: parseFloat(price),
-          description,
-          quantity: parseInt(quantity, 10),
-          unit,
-          // city,
-          state,
-          location,
-          images: savedUrls,
-        },
-      },
+      updatedData,
       { new: true }
     );
 
