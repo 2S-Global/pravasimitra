@@ -31,7 +31,7 @@ async function parseFormData(req) {
   const files = form.getAll("images");
   const quantity = form.get("quantity");
   const unit = form.get("unit");
-  const city = form.get("city");
+  // const city = form.get("city");
   const state = form.get("state");
   const location = form.get("location");
 
@@ -81,7 +81,7 @@ async function parseFormData(req) {
     description,
     quantity,
     unit,
-    city,
+    // city,
     state,
     location,
     existingImages,
@@ -175,7 +175,7 @@ export const PATCH = withAuth(async (req, user) => {
     description,
     quantity,
     unit,
-    city,
+    // city,
     state,
     location,
     existingImages,
@@ -280,7 +280,7 @@ export const PATCH = withAuth(async (req, user) => {
           description,
           quantity: parseInt(quantity, 10),
           unit,
-          city,
+          // city,
           state,
           location,
           images: savedUrls,
