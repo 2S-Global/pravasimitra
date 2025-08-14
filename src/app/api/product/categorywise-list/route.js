@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../../lib/db";
 import Product from "../../../../../models/Product";
+import ProductCategory from "../../../../../models/ProductCategory";
 import LocationSetting from "../../../../../models/LocationSetting";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
