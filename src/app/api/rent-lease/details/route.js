@@ -7,6 +7,8 @@ import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import Amenity from "../../../../../models/Amenity";
+import City from "../../../../../models/City";
+import Country from "../../../../../models/Country";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 
