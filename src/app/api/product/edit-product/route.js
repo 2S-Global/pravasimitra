@@ -23,7 +23,7 @@ async function parseFormData(req) {
   const id = form.get("id");
   const title = form.get("title");
   const category = form.get("category");
-  const city = form.get("city");
+  // const city = form.get("city");
   const state = form.get("state");
   const location = form.get("location");
   const price = form.get("price");
@@ -63,7 +63,7 @@ async function parseFormData(req) {
     id,
     title,
     category,
-    city,
+    // city,
     state,
     location,
     price,
@@ -134,7 +134,7 @@ export const PATCH = withAuth(async (req, user) => {
     id,
     title,
     category,
-    city,
+    // city,
     state,
     location,
     price,
@@ -160,7 +160,29 @@ export const PATCH = withAuth(async (req, user) => {
     );
   }
 
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+  // Get the existing product
+  const existingProduct = await Product.findOne({
+    _id: decodedId,
+    createdBy: user.id,
+  });
+
+  if (!existingProduct) {
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "Item not found or unauthorized" },
+        { status: 404 }
+      )
+    );
+  }
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/avif",
+  ];
+
   const savedUrls = [...existingImages];
 
   // const uploadDir = path.join(process.cwd(), "public/assets/images/product");
@@ -214,23 +236,26 @@ export const PATCH = withAuth(async (req, user) => {
     }
   }
 
+   // Build updated product data using spread
+  const updatedData = {
+  ...existingProduct.toObject(), // keep all old values
+  title,
+  category: decodedCategoryId,
+  price: parseFloat(price),
+  description,
+  state,
+  location,
+  image: savedUrls[0] || existingProduct.image,
+  gallery: savedUrls.length ? savedUrls : existingProduct.gallery,
+  city: existingProduct.city,       //  keep original city
+  country: existingProduct.country, //  keep original country
+};
+
+
   try {
     const updated = await Product.findOneAndUpdate(
       { _id: decodedId, createdBy: user.id },
-      {
-        $set: {
-          title,
-          category: decodedCategoryId,
-          city,
-          state,
-          location,
-          price: parseFloat(price),
-          shortDesc,
-          description,
-          image: savedUrls[0] || null,
-          gallery: savedUrls,
-        },
-      },
+      updatedData,
       { new: true }
     );
 
