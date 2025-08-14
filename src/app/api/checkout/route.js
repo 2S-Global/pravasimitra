@@ -101,20 +101,32 @@ export const POST = withAuth(async (req, user) => {
       },
     });
 
+    // Build buyer's product list
+    const buyerProductListHtml = cart.items
+      .map(
+        (p) => `
+      <li>
+        <b>${p.productId.title}</b> - ${p.quantity} ${p.productId.unit} @ £${p.productId.price}
+      </li>
+    `
+      )
+      .join("");
+
     // 1️⃣ Email Buyer
     await transporter.sendMail({
       from: `"Pravasi Mitra" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: `Order Confirmation - ${formattedOrderId}`,
       html: `
-        <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
-        <br>
-        <h2>Order Confirmation:</h2>
-        <p>Hello ${user.name},</p>
-        <p>Your order <b>${formattedOrderId}</b> has been placed successfully.</p>
-        <p>We will notify you once it is processed.</p>
-        <p>Thank you for shopping with Pravasi Mitra.</p>
-      `,
+          <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+          <br>
+          <p>Hello ${user.name},</p>
+          <p>Your order Id: <b>${formattedOrderId}</b> has been placed successfully.</p>
+          <p>Ordered Products:</p>
+          <ul>${buyerProductListHtml}</ul>
+          <p>We will notify you once it is processed.</p>
+          <p>Thank you for shopping with Pravasi Mitra.</p>
+        `,
     });
 
     // 2️⃣ Email Sellers (only their own products)
