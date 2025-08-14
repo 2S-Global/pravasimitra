@@ -88,6 +88,7 @@ export const POST = withAuth(async (req, authUser) => {
         <p>Hello ${seller.name},</p>
         <p>${user.name} is interested in your product <b>${product.title}</b>.</p>
         <p>You can reply at: <a href="mailto:${user.email}">${user.email}</a></p>
+        <p>Thank you for using Pravasi Mitra.</p>
       `,
     });
 
