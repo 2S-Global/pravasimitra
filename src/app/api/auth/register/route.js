@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
 import { connectDB } from "../../../../../lib/db";
 import User from "../../../../../models/User";
 import MembershipPlan from "../../../../../models/MembershipPlan";
@@ -9,6 +10,35 @@ import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 export async function OPTIONS() {
   return optionsResponse();
 }
+
+// 📧 Send welcome email
+const sendWelcomeEmail = async (userEmail, userName, userPassword) => {
+  const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: `"Pravasi Mitra" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: "Welcome to Pravasi Mitra",
+    html: `
+      <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+      <p>Hello ${userName},</p>
+      <p>Welcome to Pravasi Mitra! Your account has been created successfully.</p>
+      <p>Here are your login credentials:</p>
+      <h3>Email: ${userEmail}</h3>
+      <h3>Password: ${userPassword}</h3>
+      <p>You can log in and update your profile anytime.</p>
+      <p>Thank you for joining us!</p>
+    `,
+  });
+};
 
 export async function POST(req) {
   await connectDB();
@@ -68,6 +98,9 @@ export async function POST(req) {
       });
 
       await newUser.save();
+
+      // 📧 Send welcome email
+    await sendWelcomeEmail(email, name, password);
     
 
     return addCorsHeaders(
