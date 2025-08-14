@@ -85,6 +85,7 @@ export const POST = withAuth(async (req, authUser) => {
       subject: `Inquiry: ${product.title}`,
       html: `
         <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+        <br>
         <p>Hello ${seller.name},</p>
         <p>${user.name} is interested in your product <b>${product.title}</b>.</p>
         <p>You can reply at: <a href="mailto:${user.email}">${user.email}</a></p>
@@ -99,6 +100,7 @@ export const POST = withAuth(async (req, authUser) => {
       subject: `Your inquiry for ${product.title}`,
       html: `
       <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+      <br>
       <p>Hello ${user.name},</p>
       <p>Your inquiry for <b>${product.title}</b> has been sent to ${seller.name}.</p>
       <p>Seller's contact: <a href="mailto:${seller.email}">${seller.email}</a></p>
