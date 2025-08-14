@@ -84,10 +84,25 @@ export const POST = withAuth(async (req, authUser) => {
       to: seller.email,
       subject: `Inquiry: ${product.title}`,
       html: `
+        <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
         <p>Hello ${seller.name},</p>
         <p>${user.name} is interested in your product <b>${product.title}</b>.</p>
         <p>You can reply at: <a href="mailto:${user.email}">${user.email}</a></p>
       `,
+    });
+
+    // 📩 Send mail to Buyer
+    await transporter.sendMail({
+      from: `"Pravasi Mitra" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: `Your inquiry for ${product.title}`,
+      html: `
+      <p><img src="https://res.cloudinary.com/dwy9i2fqt/image/upload/v1755090539/Pravasi_Mitra_Logo_vwfvsb.png" alt="Pravasi Mitra" style="width:150px;"></p>
+      <p>Hello ${user.name},</p>
+      <p>Your inquiry for <b>${product.title}</b> has been sent to ${seller.name}.</p>
+      <p>Seller's contact: <a href="mailto:${seller.email}">${seller.email}</a></p>
+      <p>Thank you for using Pravasi Mitra.</p>
+    `,
     });
 
     return addCorsHeaders(
