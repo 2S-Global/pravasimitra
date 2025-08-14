@@ -24,7 +24,7 @@ export const POST = withAuth(async function (req, user) {
 
   const { name, price, limits, durationInDays, isActive } = body;
 
-  if (!name || !price || !durationInDays) {
+  if (!name || !durationInDays) {
     return addCorsHeaders(
       NextResponse.json(
         { error: "Name, price, and durationInDays are required" },
