@@ -14,10 +14,21 @@ export const GET = withAuth(async (req, user) => {
   await connectDB();
 
   try {
+    // // Fetch all membership plans
+    // const plans = await MembershipPlan.find()
+    //   .sort({ createdAt: -1 })
+    //   .lean();
+
+    // Custom order for plans
+    const order = ["Basic", "Silver", "Gold", "Platinum"];
+
     // Fetch all membership plans
-    const plans = await MembershipPlan.find()
-      .sort({ createdAt: -1 })
-      .lean();
+    let plans = await MembershipPlan.find().lean();
+
+    // Sort according to custom order
+    plans.sort(
+      (a, b) => order.indexOf(a.name) - order.indexOf(b.name)
+    );
 
     // Get the current user (no need to populate here since we just need the ID)
     const dbUser = await User.findById(user.id).lean();
