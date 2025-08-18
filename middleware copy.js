@@ -25,17 +25,14 @@ export async function middleware(req) {
   }
 
   // 🟩 If visiting /login and already logged in → redirect to /user/dashboard
-if (isLoginPage && token) {
-  try {
-    await jwtVerify(token, SECRET);
-    return NextResponse.redirect(new URL("/user/dashboard", req.url));
-  } catch {
-    // Invalid token → clear cookie and allow login
-    const res = NextResponse.next();
-    res.cookies.set("token", "", { path: "/" });
-    return res;
+  if (isLoginPage && token) {
+    try {
+      await jwtVerify(token, SECRET);
+      return NextResponse.redirect(new URL("/user/dashboard", req.url));
+    } catch {
+      // Invalid token → clear or ignore
+    }
   }
-}
 
   return NextResponse.next();
 }
