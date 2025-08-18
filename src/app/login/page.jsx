@@ -103,7 +103,7 @@ const Login = () => {
                             placeholder="Email Addresss"
                             value={identifier}
                             onChange={(e) => setIdentifier(e.target.value)}
-                            autoComplete="username"
+                        
                           />
                         </div>
                         <div
@@ -116,7 +116,7 @@ const Login = () => {
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                             autoComplete="current-password"
+                    
                           />
                         </div>
                         <div className="mb-4">
