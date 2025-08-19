@@ -61,13 +61,38 @@ const Register = () => {
     return true;
   };
 
-  const handleNext = () => {
-    if (validateForm()) {
-      // Save valid data in sessionStorage
-      sessionStorage.setItem("registerData", JSON.stringify(form));
-      router.push("/register-final");
+const handleNext = async () => {
+  if (!validateForm()) return;
+
+  try {
+    const res = await fetch(`/api/auth/check-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: form.email }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      AlertService.error(data.message || 'Server error, try again later');
+      return;
     }
-  };
+
+    if (data.success === false) {
+      // Email already exists
+      AlertService.error(data.msg || 'Email is already registered');
+      return;
+    }
+
+    // ✅ If email does not exist → save and go next
+    sessionStorage.setItem("registerData", JSON.stringify(form));
+    router.push("/register-final");
+
+  } catch (err) {
+    AlertService.error("Something went wrong, please try again later.");
+    console.error(err);
+  }
+};
 
   return (
     <>

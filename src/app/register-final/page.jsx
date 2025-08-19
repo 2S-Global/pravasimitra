@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
@@ -8,19 +9,20 @@ import OtherBanner from '@/app/components/OtherBanner';
 import AlertService from '@/app/components/alertService';
 
 export default function RegisterFinalPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [packages, setPackages] = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [userData, setUserData] = useState(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-
   useEffect(() => {
-    // Get user registration data from sessionStorage
     const storedData = sessionStorage.getItem('registerData');
-    if (storedData) {
-      setUserData(JSON.parse(storedData));
+    if (!storedData) {
+      // Redirect to registration page if no data
+      router.push('/register');
+      return;
     }
+    setUserData(JSON.parse(storedData));
 
     const fetchPlans = async () => {
       try {
@@ -39,25 +41,30 @@ export default function RegisterFinalPage() {
     };
 
     fetchPlans();
-  }, []);
+  }, [router]);
 
   const handleSelect = async (pkg) => {
     setLoading(true);
     try {
       AlertService.message(`Redirecting to payment for ${pkg.name}...`);
-      localStorage.setItem('selectedPlan', JSON.stringify(pkg));
 
-      const successUrl = `myapp://payment-successMembership?session_id={CHECKOUT_SESSION_ID}`;
-      const cancelUrl = `myapp://payment-cancelled`;
+      // Save selected plan in sessionStorage
+      sessionStorage.setItem('selectedPlan', JSON.stringify(pkg));
 
-      const { data } = await axios.post(`${API_BASE}/membership-payment`, {
+      const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND; 
+      const successUrl = `${FRONTEND_URL}/payment-successMembership?session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${FRONTEND_URL}/payment-cancelled`;
+
+      const { data } = await axios.post(`/api/membership-payment`, {
         cartItems: [{ title: pkg.name, price: pkg.price, quantity: 1 }],
         successUrl,
         cancelUrl
       });
 
       if (!data || !data.url) throw new Error(data?.error || 'Unable to start payment process');
-      if (data.id) localStorage.setItem('stripeSessionId', data.id);
+
+      // Save Stripe session ID in sessionStorage
+      if (data.id) sessionStorage.setItem('stripeSessionId', data.id);
 
       window.location.href = data.url;
 
