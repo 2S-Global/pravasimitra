@@ -16,7 +16,7 @@ const Login = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { setCart } = useCartStore(); 
+  const { setCart } = useCartStore();
   const { setLoggedIn } = useAuthStore();
   const handleLogin = async () => {
     if (!identifier || !password) {
@@ -27,24 +27,32 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "/api/auth/login", // ✅ relative: works both locally and in production
+        "/api/auth/login",
         { identifier, password },
         { withCredentials: true }
       );
 
-      AlertService.success(response.data.msg);
-      //  console.log("Cookies after login:", document.cookie);
-      setLoggedIn();
-    try {
-      const cartResponse = await axios.get("/api/cart/addtocart", {
-        withCredentials: true,
-      });
-    setCart(cartResponse.data.cart);
-    } catch (cartError) {
-      console.error("Failed to fetch cart after login:", cartError);
-    }
+      // Assuming your API sends { success: true, msg: "Logged in" } on success
+      if (response.data.success) {
+        AlertService.success(response.data.msg);
+        setLoggedIn(); // only fire if login truly succeeded
 
-      router.push("/user/dashboard");
+        try {
+          const cartResponse = await axios.get("/api/cart/addtocart", {
+            withCredentials: true,
+          });
+          setCart(cartResponse.data.cart);
+        } catch (cartError) {
+          console.error("Failed to fetch cart after login:", cartError);
+        }
+
+        router.push("/user/dashboard");
+      } else {
+        // login failed but API returned 200
+        AlertService.error(
+          response.data.msg || "Login failed. Please try again."
+        );
+      }
     } catch (err) {
       console.error(err);
       const errorMessage =
@@ -103,8 +111,7 @@ const Login = () => {
                             placeholder="Email Addresss"
                             value={identifier}
                             onChange={(e) => setIdentifier(e.target.value)}
-                             autoComplete="off" 
-                        
+                            autoComplete="off"
                           />
                         </div>
                         <div
@@ -117,8 +124,7 @@ const Login = () => {
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                             autoComplete="off" 
-                    
+                            autoComplete="off"
                           />
                         </div>
                         <div className="mb-4">

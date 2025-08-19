@@ -243,7 +243,7 @@ const BuySellCategoryPage = () => {
                                   : ""}
                               </p>
                               <p className="fw-bold text-primary fs-5">
-                                ${item.price}
+                               £{item.price}
                               </p>
                               <button
                                 className="btn btn-outline-primary btn-sm"

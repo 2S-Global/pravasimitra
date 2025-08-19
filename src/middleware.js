@@ -28,6 +28,7 @@ export async function middleware(req) {
 if (isLoginPage && token) {
   try {
     await jwtVerify(token, SECRET);
+    console.log("middleware-",token);
     return NextResponse.redirect(new URL("/user/dashboard", req.url));
   } catch {
     // Invalid token → clear cookie and allow login

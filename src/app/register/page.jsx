@@ -1,21 +1,74 @@
-// app/login/page.js
-import Header from '@/app/components/Header';
-import Footer from '@/app/components/Footer';
-import OtherBanner from '@/app/components/OtherBanner';
-import Link from 'next/link';
+"use client";
 
-export const metadata = {
-  title: 'Register | Pravasi Mitra',
-  description: 'Login to your account securely using your mobile number and password.',
-  keywords: ['login', 'account', 'user', 'authentication'],
-  openGraph: {
-    title: 'Register - Pravasi Mitra',
-    description: 'Access your account through a secure login page.',
-    type: 'website',
-  },
-};
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
+import OtherBanner from "@/app/components/OtherBanner";
+import Link from "next/link";
+import AlertService from "@/app/components/alertService"; // your alert service
 
 const Register = () => {
+  const router = useRouter();
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const validateForm = () => {
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const mobileRegex = /^\d{10}$/;
+
+    if (!form.name) {
+      AlertService.error("Full Name is required");
+      return false;
+    }
+    if (!nameRegex.test(form.name)) {
+      AlertService.error("Name must contain only alphabets");
+      return false;
+    }
+    if (!form.email) {
+      AlertService.error("Email is required");
+      return false;
+    }
+    if (!emailRegex.test(form.email)) {
+      AlertService.error("Enter a valid email address");
+      return false;
+    }
+    if (!form.mobile) {
+      AlertService.error("Mobile number is required");
+      return false;
+    }
+    if (!mobileRegex.test(form.mobile)) {
+      AlertService.error("Mobile number must be 10 digits");
+      return false;
+    }
+    if (!form.password) {
+      AlertService.error("Password is required");
+      return false;
+    }
+    if (form.password.length < 6) {
+      AlertService.error("Password must be at least 6 characters");
+      return false;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      // Save valid data in sessionStorage
+      sessionStorage.setItem("registerData", JSON.stringify(form));
+      router.push("/register-final");
+    }
+  };
+
   return (
     <>
       <Header />
@@ -27,41 +80,91 @@ const Register = () => {
             <div className="row">
               <div className="col-lg-3" />
               <div className="col-lg-6">
-                <form method="post" action="/api/login" className="tm-form tm-login-form tm-form-bordered">
+                <div className="tm-form tm-login-form tm-form-bordered">
                   <h4>Register Now</h4>
                   <div className="tm-form-inner">
+                    <div className="tm-form-field">
+                      <label htmlFor="name">
+                        Full Name <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        onKeyPress={(e) => {
+                          // Allow only letters and space
+                          const regex = /^[A-Za-z\s]$/;
+                          if (!regex.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                    </div>
 
-                  <div className="tm-form-field">
-                  <label htmlFor="login-email">Name*</label>
-                  <input type="text" name="username" id="login-email" required />
-                  </div>
+                    <div className="tm-form-field">
+                      <label htmlFor="email">
+                        Email <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        value={form.email}
+                        onChange={handleChange}
+                      />
+                    </div>
 
-                   <div className="tm-form-field">
-                  <label htmlFor="login-email">Email*</label>
-                  <input type="text" name="username" id="login-email" required />
-                  </div>
                     <div className="tm-form-field">
-                      <label htmlFor="login-email">Mobile*</label>
-                      <input type="text" name="username" id="login-email" required />
+                      <label htmlFor="mobile">
+                        Mobile <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="mobile"
+                        id="mobile"
+                        value={form.mobile}
+                        onChange={handleChange}
+                        maxLength={10} // restrict maximum length to 10
+                        onKeyPress={(e) => {
+                          // Allow only digits
+                          const regex = /^[0-9]$/;
+                          if (!regex.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
                     </div>
+
                     <div className="tm-form-field">
-                      <label htmlFor="login-password">Password*</label>
-                      <input type="password" name="password" id="login-password" required />
+                      <label htmlFor="password">
+                        Password <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        value={form.password}
+                        onChange={handleChange}
+                      />
                     </div>
+
                     <div className="tm-form-field">
-                      <input type="checkbox" name="login-remember" id="login-remember" />
-                      <label htmlFor="login-remember">Remember Me</label>
-                    </div>
-                    <div className="tm-form-field">
-                      <button type="submit" name="login" className="tm-button">
-                        Login
+                      <button
+                        type="button"
+                        className="tm-button"
+                        onClick={handleNext}
+                      >
+                        Next
                       </button>
                     </div>
+
                     <div className="tm-form-field">
                       <Link href="/login">Returning User Login</Link>
                     </div>
                   </div>
-                </form>
+                </div>
               </div>
             </div>
           </div>

@@ -12,7 +12,7 @@ const Header = () => {
   const setLoggedOut = useAuthStore((state) => state.setLoggedOut);
   const router = useRouter();
 const totalQuantity = useCartStore((state) => state.totalQuantity);
-
+  const [loggingOut, setLoggingOut] = useState(false);
 const handleLogout = async () => {
   const { clearCart } = useCartStore.getState();
   try {
@@ -22,8 +22,10 @@ const handleLogout = async () => {
     clearCart();
 
     setLoggedOut();
-
-    router.push("/login");
+    setTimeout(() => {
+      router.replace("/login");
+      window.location.reload(); // optional, if you want a full reload
+    }, 2000);
 
   } catch (err) {
     console.error("Logout error:", err);
@@ -31,7 +33,10 @@ const handleLogout = async () => {
 
     setLoggedOut();
 
-    router.push("/login");
+    setTimeout(() => {
+      router.replace("/login");
+      window.location.reload(); // optional, if you want a full reload
+    }, 2000);
 
   }
 };
@@ -104,6 +109,8 @@ const handleLogout = async () => {
                   <li>
                     <Link href="/about-us">About</Link>
                   </li>
+                      {isLoggedIn && (
+                         <>
                   <li>
                     <Link href="/buy-sell/buysell-category"> Buy & Sell</Link>
                   </li>
@@ -117,6 +124,8 @@ const handleLogout = async () => {
                       MarketPlace
                     </Link>
                   </li>
+                  </>
+                      )}
                   <li className="tm-navigation-dropdown">
                     <Link href="/blogs">Blogs</Link>
                   </li>
