@@ -28,7 +28,7 @@ const EditRoomModal = ({ show, onClose, itemData, onItemAdded }) => {
   const [existingImages, setExistingImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
  const [submiting, setSubmiting] = useState(false);
-
+  const [currency,SetCurrency]=useState("");
   useEffect(() => {
     const fetchAndSet = async () => {
       try {
@@ -75,9 +75,21 @@ const EditRoomModal = ({ show, onClose, itemData, onItemAdded }) => {
       }
     };
 
+      const fetchCurrency=async ()=>{
+
+      try{
+        const response=await axios.get("/api/get-currency");
+        SetCurrency(response.data.currency);
+
+      }catch(error){
+      console.error("Error fetching currency:", error);
+      }
+    }
+
     if (itemData) {
       fetchAndSet();
     }
+    fetchCurrency();
   }, [itemData]); // ✅ useEffect dependency array
 
   const handleAmenityChange = (e) => {
@@ -212,8 +224,7 @@ const EditRoomModal = ({ show, onClose, itemData, onItemAdded }) => {
     data.append("bedrooms", bedrooms);
     data.append("bathrooms", bathrooms);
     data.append("roomSize", roomSize);
-    data.append("city", city);
-    data.append("state", state);
+
     data.append("location", location);
     data.append("furnished", furnished);
     data.append("frequency", frequency);
@@ -322,15 +333,6 @@ const EditRoomModal = ({ show, onClose, itemData, onItemAdded }) => {
       return false;
     }
 
-    if (!city) {
-      AlertService.error("City is required");
-      return false;
-    }
-
-    if (!state) {
-      AlertService.error("State is required");
-      return false;
-    }
     if (!location) {
       AlertService.error("Address is required");
       return false;
@@ -464,7 +466,7 @@ const EditRoomModal = ({ show, onClose, itemData, onItemAdded }) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
-                  Price ($) <Required />
+                  Price ({currency}) <Required />
                 </Form.Label>
                 <Form.Control
                   type="text"

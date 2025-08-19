@@ -20,7 +20,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
   const [existingImages, setExistingImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [categories, setCategories] = useState([]);
-
+  const [currency,SetCurrency]=useState("");
   useEffect(() => {
     const fetchAndSet = async () => {
       try {
@@ -63,10 +63,22 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
         setLoading(false); // stop loading after everything
       }
     };
+    
+    const fetchCurrency=async ()=>{
+
+      try{
+        const response=await axios.get("/api/get-currency");
+        SetCurrency(response.data.currency);
+
+      }catch(error){
+      console.error("Error fetching currency:", error);
+      }
+    }
 
     if (itemData) {
       fetchAndSet();
     }
+        fetchCurrency();
   }, [itemData]);
 
   const Required = () => <span className="text-danger">*</span>;
@@ -171,15 +183,15 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
       AlertService.error("Price is required");
       return false;
     }
-    if (!city) {
-      AlertService.error("City is required");
-      return false;
-    }
+    // if (!city) {
+    //   AlertService.error("City is required");
+    //   return false;
+    // }
 
-    if (!state) {
-      AlertService.error("State is required");
-      return false;
-    }
+    // if (!state) {
+    //   AlertService.error("State is required");
+    //   return false;
+    // }
     const hasNewImages = images.length > 0;
     const hasExistingImages = existingImages.length > 0;
 
@@ -218,9 +230,9 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
       data.append("price", price);
       data.append("description", description);
       data.append("category", category);
-      data.append("city", city);
+
       data.append("shortDesc", shortDesc);
-      data.append("state", state);
+
       data.append("location", location);
 
       // ✅ Append new image files
@@ -335,7 +347,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
               <Col md={6}>
                 <Form.Group>
                   <Form.Label className="fw-semibold">
-                    Price ($) <Required />
+                    Price ({currency}) <Required />
                   </Form.Label>
                   <Form.Control
                     type="text"
@@ -349,7 +361,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
               </Col>
             </Row>
 
-            <Row className="mb-4">
+            {/* <Row className="mb-4">
               <Col md={6}>
                 <Form.Group>
                   <Form.Label className="fw-semibold">
@@ -381,7 +393,7 @@ const EditItemModal = ({ show, onClose, itemData, onItemAdded }) => {
                   />
                 </Form.Group>
               </Col>
-            </Row>
+            </Row> */}
 
             <Row className="mb-4">
               <Col md={12}>

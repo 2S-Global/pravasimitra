@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 const AddItemModal = ({ show, onClose, onItemAdded }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
+  const [currency,SetCurrency]=useState("");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -34,7 +34,19 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
       }
     };
 
+    const fetchCurrency=async ()=>{
+
+      try{
+        const response=await axios.get("/api/get-currency");
+        SetCurrency(response.data.currency);
+
+      }catch(error){
+      console.error("Error fetching currency:", error);
+      }
+    }
+
     fetchCategories();
+    fetchCurrency();
   }, []);
   const Required = () => <span className="text-danger">*</span>;
 
@@ -95,15 +107,15 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
       AlertService.error("Price is required");
       return false;
     }
-    if (!city) {
-      AlertService.error("City is required");
-      return false;
-    }
+    // if (!city) {
+    //   AlertService.error("City is required");
+    //   return false;
+    // }
 
-    if (!state) {
-      AlertService.error("State is required");
-      return false;
-    }
+    // if (!state) {
+    //   AlertService.error("State is required");
+    //   return false;
+    // }
     if (images.length === 0) {
       AlertService.error("Please upload at least one image");
       return false;
@@ -153,9 +165,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
     data.append("title", title);
     data.append("price", price);
     data.append("category", category);
-    data.append("city", city);
     data.append("shortDesc", shortDesc);
-    data.append("state", state);
     data.append("description", description);
     data.append("location", location);
     images.forEach((img) => data.append("images", img));
@@ -207,6 +217,8 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
     });
     setImagePreviews([]);
   };
+
+
 
   return (
     <Modal
@@ -267,7 +279,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
-                  Price ($) <Required />
+                  Price ({currency}) <Required />
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -281,7 +293,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
             </Col>
           </Row>
 
-          <Row className="mb-4">
+          {/* <Row className="mb-4">
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
@@ -313,7 +325,7 @@ const AddItemModal = ({ show, onClose, onItemAdded }) => {
                 />
               </Form.Group>
             </Col> 
-          </Row>
+          </Row> */}
 
                 <Row className="mb-4">
             <Col md={12}>

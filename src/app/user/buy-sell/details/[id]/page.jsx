@@ -201,7 +201,7 @@ const ProductDetails = () => {
                 <span className="text-warning fw-semibold fs-5">★★★★☆</span>
                 <small className="ms-2 text-muted">(112 reviews)</small>
               </div> */}
-                <h3 className="text-primary fw-bold mb-4">${item.price}</h3>
+                <h3 className="text-primary fw-bold mb-4">{item.currency}{item.price}</h3>
                 <p className="text-muted mb-4" style={{ textAlign: "justify" }}>
                   {item.shortDesc}
                 </p>
@@ -252,6 +252,7 @@ const ProductDetails = () => {
                         background: "#c12020",
                         color: "#fff",
                         border: "#c12020",
+                        cursor:"auto"
                       }}
                     >
                       Description

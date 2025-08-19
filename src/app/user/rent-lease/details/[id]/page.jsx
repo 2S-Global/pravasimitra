@@ -130,7 +130,8 @@ const RentLeaseDetails = () => {
                       <p className="text-muted">{item.location}</p>
                     </div>
                     <h3 className="text-primary fw-bold">
-                      ${item.price}/{item.frequency}
+                      {item.currency0
+                      }{item.price}/{item.frequency}
                     </h3>
                   </div>
 
@@ -253,6 +254,11 @@ const RentLeaseDetails = () => {
                         role="tab"
                         aria-controls="desc"
                         aria-selected="true"
+                             style={{
+                        background: "#c12020",
+                        color: "#fff",
+                        border: "#c12020",
+                      }}
                       >
                         Description
                       </button>
@@ -267,6 +273,11 @@ const RentLeaseDetails = () => {
                         role="tab"
                         aria-controls="amenities"
                         aria-selected="false"
+                             style={{
+                        background: "#2A4595",
+                        color: "#fff",
+                        border: "#2A4595",
+                      }}
                       >
                         Amenities
                       </button>

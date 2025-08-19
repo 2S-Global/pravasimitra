@@ -29,7 +29,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
   const [categories, setCategories] = useState([]);
   const [amneties, setAmneties] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [currency,SetCurrency]=useState("");
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -40,6 +40,17 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
         console.error("Error fetching categories:", error);
       }
     };
+
+     const fetchCurrency=async ()=>{
+
+      try{
+        const response=await axios.get("/api/get-currency");
+        SetCurrency(response.data.currency);
+
+      }catch(error){
+      console.error("Error fetching currency:", error);
+      }
+    }
 
     const fetchAmenities = async () => {
       try {
@@ -53,6 +64,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
 
     fetchCategories();
     fetchAmenities();
+    fetchCurrency();
   }, []);
 
   const handleChange = (e) => {
@@ -154,7 +166,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
       return false;
     }
     if (!roomSize) {
-      AlertService.error("Room Size is required");
+      AlertService.error("Property Size is required");
       return false;
     }
     if (!frequency) {
@@ -180,15 +192,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
       return false;
     }
 
-    if (!city) {
-      AlertService.error("City is required");
-      return false;
-    }
 
-    if (!state) {
-      AlertService.error("State is required");
-      return false;
-    }
     if (!location) {
       AlertService.error("Address is required");
       return false;
@@ -246,9 +250,9 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
     data.append("bathrooms", bathrooms);
     data.append("description", description);
     data.append("roomSize", roomSize);
-    data.append("city", city);
+
     data.append("shortDesc", shortDesc);
-    data.append("state", state);
+
     data.append("location", location);
     data.append("furnished", furnished);
     data.append("frequency", frequency); // send address separately
@@ -385,7 +389,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
-                  Room Size <Required />
+                  Property Size <Required />
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -421,7 +425,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
-                  Price ($) <Required />
+                  Price ({currency}) <Required />
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -497,7 +501,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
             </Col>
           </Row>
 
-          <Row className="mb-4">
+          {/* <Row className="mb-4">
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
@@ -529,7 +533,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
                 />
               </Form.Group>
             </Col>
-          </Row>
+          </Row> */}
 
           <Row className="mb-4">
             <Col md={12}>

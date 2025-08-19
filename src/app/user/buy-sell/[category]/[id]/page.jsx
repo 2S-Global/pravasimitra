@@ -21,6 +21,7 @@ const BuySellCategoryPage = () => {
       setGridLoading(true);
       const productsRes = await axios.get("/api/product/categorywise-list", {
         params: { id: categoryId },
+        withCredentials: true,
       });
       setAllItems(productsRes.data.productList || []);
     } catch (error) {
@@ -224,7 +225,7 @@ const BuySellCategoryPage = () => {
                                   : item.title}
                               </h5>
                               <p className="card-text text-muted">
-                                {item.city} | {item.state}
+                                {item.location}
                               </p>
                               <p
                                 className="card-text text-muted"
@@ -243,7 +244,7 @@ const BuySellCategoryPage = () => {
                                   : ""}
                               </p>
                               <p className="fw-bold text-primary fs-5">
-                               £{item.price}
+                               {item.currency}{item.price}
                               </p>
                               <button
                                 className="btn btn-outline-primary btn-sm"

@@ -48,7 +48,7 @@ export async function OPTIONS(req) {
   if (allowedOrigin) {
     res.headers.set("Access-Control-Allow-Origin", allowedOrigin);
     res.headers.set("Access-Control-Allow-Credentials", "true");
-    res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.headers.set("Access-Control-Allow-Methods", "GET, POST,PATCH,PUT OPTIONS");
     res.headers.set("Access-Control-Allow-Headers", "Content-Type");
   }
   return res;

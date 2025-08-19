@@ -49,6 +49,7 @@ const ListHomes = () => {
       setGridLoading(true);
       const productsRes = await axios.get("/api/rent-lease/categorywise-list", {
         params: { id: categoryId },
+           withCredentials: true,
       });
       setProperties(productsRes.data.itemList || []);
     } catch (error) {
@@ -322,7 +323,7 @@ const ListHomes = () => {
                                   ? property.title.slice(0, 30) + "..."
                                   : property.title}</h5>
                               <p>
-                                {property.city} | {property.state}
+                                {property.location}
                               </p>
                               <p className="card-text text-muted">
                                 {property.shortDesc
@@ -336,7 +337,7 @@ const ListHomes = () => {
                                   : ""}
                               </p>
                               <p className="fw-bold text-primary fs-5">
-                                ${property.price}/{property.frequency.charAt(0).toUpperCase() + property.frequency.slice(1)}
+                                {property.currency}{property.price}/{property.frequency.charAt(0).toUpperCase() + property.frequency.slice(1)}
                               </p>
                               <button
                                 className="btn btn-outline-primary btn-sm"

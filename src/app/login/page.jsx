@@ -86,7 +86,7 @@ const Login = () => {
                     />
                   </div>
                   <div className="col-md-6 col-lg-7 d-flex align-items-center">
-                    <div className="card-body p-4 p-lg-5 text-black">
+                    <div className="card-body p-4 p-lg-5 text-black" style={{ boxShadow: "0px 4px 8px white" }}>
                       <form>
                         <div className="d-flex align-items-center mb-3 pb-1">
                           <i
