@@ -17,7 +17,7 @@ const ContactedUsersList = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [currency,SetCurrency]=useState("");
   const handleViewDetails = (itemName, contacts) => {
     setSelectedItemName(itemName);
     setSelectedItemContacts(contacts);
@@ -88,8 +88,11 @@ const ContactedUsersList = () => {
     }
   };
 
+
+
   useEffect(() => {
     fetchUsers();
+
   }, []);
 
   return (

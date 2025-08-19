@@ -19,7 +19,7 @@ const ListHomes = () => {
   const [priceRange, setPriceRange] = useState("");
   const [bedrooms, setBedrooms] = useState("");
   const [priceRangeOptions, setPriceRangeOptions] = useState([]);
-
+  const [currency,SetCurrency]=useState("");
   const handleClear = async () => {
   try {
     setLocation("");
@@ -58,6 +58,18 @@ const ListHomes = () => {
       setGridLoading(false);
     }
   };
+
+
+      const fetchCurrency=async ()=>{
+
+      try{
+        const response=await axios.get("/api/get-currency");
+        SetCurrency(response.data.currency);
+
+      }catch(error){
+      console.error("Error fetching currency:", error);
+      }
+    }
 
   const fetchPriceRange = async () => {
     try {
@@ -141,6 +153,7 @@ const ListHomes = () => {
     fetchCategories();
     fetchProducts(id);
     fetchPriceRange();
+    fetchCurrency();
   }, [id]);
 
   return (
@@ -202,7 +215,7 @@ const ListHomes = () => {
                           <option value="">Select</option>
                           {priceRangeOptions.map((range, index) => (
                             <option key={index} value={range.value}>
-                              {range.label}
+                              {currency}{range.label1} - {currency}{range.label2}
                             </option>
                           ))}
                         </select>
