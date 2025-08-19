@@ -89,6 +89,7 @@ export const GET = withAuth(async function (req, user) {
           contactCount: contactDocs.length,
           contacts,
           propertyType,
+          currency: item.currency || "",
         };
       })
     );

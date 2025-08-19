@@ -2,7 +2,10 @@ import mongoose from 'mongoose';
 
 const priceRangeSchema = new mongoose.Schema(
   {
-    label: {
+    label1: {
+      type: String,
+    },
+    label2: {
       type: String,
     },
     value: {

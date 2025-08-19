@@ -249,6 +249,7 @@ export const PATCH = withAuth(async (req, user) => {
   gallery: savedUrls.length ? savedUrls : existingProduct.gallery,
   city: existingProduct.city,       //  keep original city
   country: existingProduct.country, //  keep original country
+  currency: existingProduct.currency, // keep original currency
 };
 
 

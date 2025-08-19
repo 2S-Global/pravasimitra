@@ -7,6 +7,8 @@ import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import cloudinary from "../../../../../lib/cloudinary";
 import { withAuth } from "../../../../../lib/withAuth";
 import LocationSetting from "../../../../../models/LocationSetting";
+import Country from "../../../../../models/Country";
+
 /**
  * @description Get all MarketProduct items for a given category ID (only those not marked as deleted)
  * @route GET /api/marketplace/categorywise-list
@@ -67,6 +69,15 @@ export const GET = withAuth(async (req, user) => {
       return addCorsHeaders(
         NextResponse.json({ error: "User location not set" }, { status: 400 })
       );
+    }
+
+    // Get currency based on current country
+    let currency = "";
+    const country = await Country.findById(location.currentCountry)
+      .select("currency -_id")
+      .lean();
+    if (country?.currency) {
+      currency = country.currency;
     }
 
     query.createdBy = { $ne: userId };

@@ -340,6 +340,7 @@ export const PATCH = withAuth(async (req, user) => {
     images: savedFilenames,
     city: existingProduct.city, // keep original city
     country: existingProduct.country, // keep original country
+    currency: existingProduct.currency, // keep original currency
   };
 
   // ✅ usage of findOneAndUpdate with both _id and createdBy

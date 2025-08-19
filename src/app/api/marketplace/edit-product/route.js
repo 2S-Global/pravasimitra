@@ -299,6 +299,7 @@ export const PATCH = withAuth(async (req, user) => {
     images: savedUrls,
     city: existingProduct.city, // keep original city
     country: existingProduct.country, // keep original country
+    currency: existingProduct.currency, // keep original currency
   };
 
   try {

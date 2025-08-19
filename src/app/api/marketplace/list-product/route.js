@@ -78,6 +78,7 @@ export const GET = withAuth (async function (req,user) {
           _id: undefined,
           images: Array.isArray(item.images) ? item.images : [],
           category,
+          currency: item.currency || "",
           createdBy,
         };
       })
