@@ -32,7 +32,7 @@ const MarketPlaceCategory = () => {
 
   const handleClick = (categoryName,categoryId) => {
     const slug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, '-'))
-    router.push(`/marketplace/${slug}/${categoryId}`)
+    router.push(`/user/marketplace/${slug}/${categoryId}`)
   }
 
 

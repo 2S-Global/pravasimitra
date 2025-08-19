@@ -342,7 +342,7 @@ const ListHomes = () => {
                                 className="btn btn-outline-primary btn-sm"
                                 onClick={() =>
                                   router.push(
-                                    `/rent-lease/details/${property.id}`
+                                    `/user/rent-lease/details/${property.id}`
                                   )
                                 }
                                 style={{

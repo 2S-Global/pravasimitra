@@ -33,7 +33,7 @@ const MarketPlaceCategory = () => {
     const slug = encodeURIComponent(
       categoryName.toLowerCase().replace(/\s+/g, "-")
     );
-    router.push(`/buy-sell/${slug}/${categoryId}`);
+    router.push(`/user/buy-sell/${slug}/${categoryId}`);
   };
 
   return (

@@ -112,15 +112,15 @@ const handleLogout = async () => {
                       {isLoggedIn && (
                          <>
                   <li>
-                    <Link href="/buy-sell/buysell-category"> Buy & Sell</Link>
+                    <Link href="/user/buy-sell/buysell-category"> Buy & Sell</Link>
                   </li>
                   <li>
-                    <Link href="/rent-lease/rentlease-category">
+                    <Link href="/user/rent-lease/rentlease-category">
                       Rent & Lease
                     </Link>
                   </li>
                   <li>
-                    <Link href="/marketplace/marketplace-category">
+                    <Link href="/user/marketplace/marketplace-category">
                       MarketPlace
                     </Link>
                   </li>

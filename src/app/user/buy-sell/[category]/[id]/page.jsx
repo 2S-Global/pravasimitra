@@ -3,29 +3,26 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import OtherBanner from "@/app/components/OtherBanner";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import AlertService from "@/app/components/alertService";
 
-const MarketPlaceListing = () => {
+const BuySellCategoryPage = () => {
+  const router = useRouter();
   const { category, id } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(id || "");
   const [allCategories, setAllCategories] = useState([]);
   const [allItems, setAllItems] = useState([]);
   const [gridLoading, setGridLoading] = useState(false);
-  const router = useRouter();
 
   const fetchProducts = async (categoryId = "") => {
     try {
       setGridLoading(true);
-      const productsRes = await axios.get(
-        "/api/marketplace/categorywise-list",
-        {
-          params: { id: categoryId },
-        }
-      );
-      setAllItems(productsRes.data.itemList || []);
+      const productsRes = await axios.get("/api/product/categorywise-list", {
+        params: { id: categoryId },
+      });
+      setAllItems(productsRes.data.productList || []);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -33,16 +30,31 @@ const MarketPlaceListing = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const catRes = await axios.get("/api/product/category-list");
+      const categories = catRes.data.categories || [];
+      setAllCategories(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+    fetchProducts(id);
+  }, [id]);
+
   const handleSearch = async () => {
     try {
       setGridLoading(true);
-      const res = await axios.get("/api/marketplace/search-items", {
+      const res = await axios.get("/api/product/search-items", {
         params: {
           categoryId: selectedCategory,
           keyword: searchTerm,
         },
       });
-      setAllItems(res.data?.products || []);
+      setAllItems(res.data?.itemList || []);
     } catch (error) {
       console.error("Error searching products:", error);
       AlertService.error("Failed to search products.");
@@ -77,21 +89,6 @@ const MarketPlaceListing = () => {
     window.scrollTo(0, scrollY);
   };
 
-  const fetchCategories = async () => {
-    try {
-      const catRes = await axios.get("/api/marketplace/category-list");
-      const categories = catRes.data.categories || [];
-      setAllCategories(categories);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-    fetchProducts(id);
-  }, [id]);
-
   // Memoize the category buttons to prevent re-rendering
   const categoryButtons = useMemo(() => {
     return allCategories.length > 0 ? (
@@ -115,26 +112,26 @@ const MarketPlaceListing = () => {
       </button>
     );
   }, [allCategories, selectedCategory]);
+
   return (
     <>
       <Header />
       <OtherBanner
-        page_title={category}
-        banner_image="/assets/images/bg/marketplace.png"
+        page_title={category || "All Furniture"}
+        banner_image="/assets/images/bg/furniture_banner.jpg"
       />
-
       <div className="tm-section tm-login-register-area bg-white tm-padding-section">
         <div className="container">
           <div className="row col-md-12">
             <div className="profile-info col-md-12">
-              {/* Category Filter */}
-              <div className="mb-5 text-center">
+              {/* 📂 Main Category Filter */}
+              <div className="mb-4 text-center">
                 <div className="d-flex flex-wrap justify-content-center gap-2">
                   {categoryButtons}
                 </div>
               </div>
 
-              {/* Search Panel */}
+              {/* 🔍 Search Box */}
               <div className="search-panel p-4 mb-3 rounded shadow-sm border bg-light">
                 <div className="row g-3 align-items-center">
                   <div className="col-md-10">
@@ -168,11 +165,8 @@ const MarketPlaceListing = () => {
                 </div>
               </div>
 
-              {/* Listing */}
-              {/* <h4 className="text-center fw-bold text-decoration-underline mb-4">
-                {readableCategory}
-              </h4> */}
-              <div className="container my-4">
+              {/* 🪑 Product Grid */}
+              <div className="container my-5">
                 {gridLoading ? (
                   <div
                     className="d-flex justify-content-center align-items-center"
@@ -208,52 +202,53 @@ const MarketPlaceListing = () => {
                     ) : (
                       allItems.map((item, index) => (
                         <div className="col-md-4" key={index}>
-                          <div className="card h-100 shadow-sm border-0">
-                            <div style={{ position: "relative" }}>
-                              <img
-                                src={item.images[0]}
-                                className="card-img-top"
-                                alt={item.title}
-                                style={{ height: "250px", objectFit: "cover" }}
-                              />
-                              {item.images && (
-                                <div
-                                  className="badge bg-dark text-white position-absolute end-0"
-                                  style={{
-                                    padding: "7px",
-                                    top: "0px",
-                                  }}
-                                >
-                                  {item.images.length} Photos
-                                </div>
-                              )}
-                            </div>
+                          <div className="card h-100 shadow-sm border-0 position-relative">
+                            <img
+                              src={item.image}
+                              className="card-img-top"
+                              alt={item.title}
+                              style={{ height: "250px", objectFit: "cover" }}
+                            />
+                            {item.gallery && item.gallery.length > 1 && (
+                              <span
+                                className="badge bg-dark position-absolute top-0 end-0 m-2"
+                                style={{ padding: "7px" }}
+                              >
+                                {item.gallery.length} More Photos
+                              </span>
+                            )}
                             <div className="card-body text-center">
                               <h5 className="card-title">
-                                {" "}
                                 {item.title.length > 30
                                   ? item.title.slice(0, 30) + "..."
                                   : item.title}
                               </h5>
                               <p className="card-text text-muted">
-                                {" "}
+                                {item.city} | {item.state}
+                              </p>
+                              <p
+                                className="card-text text-muted"
+                                style={{
+                                  height: "60px",
+                                }}
+                              >
                                 {item.shortDesc
                                   ? item.shortDesc
                                       .split(" ")
-                                      .slice(0, 10)
+                                      .slice(0, 9)
                                       .join(" ") +
-                                    (item.shortDesc.split(" ").length > 10
+                                    (item.shortDesc.split(" ").length > 9
                                       ? "..."
                                       : "")
                                   : ""}
                               </p>
                               <p className="fw-bold text-primary fs-5">
-                                ${item.price}
+                               £{item.price}
                               </p>
                               <button
                                 className="btn btn-outline-primary btn-sm"
                                 onClick={() =>
-                                  router.push(`/marketplace/details/${item.id}`)
+                                  router.push(`/user/buy-sell/details/${item.id}`)
                                 }
                                 style={{
                                   background: "#c12020",
@@ -272,14 +267,14 @@ const MarketPlaceListing = () => {
                 )}
               </div>
 
-              {/* Floating SOS Button */}
+              {/* 🚨 Floating SOS Button */}
               <button
                 className="btn btn-danger rounded-circle position-fixed"
                 style={{ bottom: 20, right: 20, width: 50, height: 50 }}
               >
                 <img
                   src="/assets/images/icon-sos.png"
-                  alt=""
+                  alt="SOS"
                   style={{ maxWidth: 25 }}
                 />
               </button>
@@ -287,10 +282,9 @@ const MarketPlaceListing = () => {
           </div>
         </div>
       </div>
-
       <Footer />
     </>
   );
 };
 
-export default MarketPlaceListing;
+export default BuySellCategoryPage;
