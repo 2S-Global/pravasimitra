@@ -6,6 +6,7 @@ import cloudinary from "../../../../../lib/cloudinary";
 import Product from "../../../../../models/Product";
 import ProductCategory from "../../../../../models/ProductCategory";
 import LocationSetting from "../../../../../models/LocationSetting";
+import Country from "../../../../../models/Country";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
@@ -86,6 +87,17 @@ export const POST = withAuth(async function (req, user) {
         { status: 400 }
       )
     );
+  }
+
+   // Fetch currency from Country collection
+  let currency = "";
+  if (locationSettings.currentCountry) {
+    const country = await Country.findById(locationSettings.currentCountry)
+      .select("currency -_id")
+      .lean();
+    if (country?.currency) {
+      currency = country.currency;
+    }
   }
 
   const allowedTypes = [
@@ -170,6 +182,7 @@ export const POST = withAuth(async function (req, user) {
             title: newProduct.title,
             category: data.category,
             price: newProduct.price,
+            currency,
             city: newProduct.city,
             //state: newProduct.state,
             country: newProduct.country,

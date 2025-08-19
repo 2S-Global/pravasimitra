@@ -3,6 +3,7 @@ import { connectDB } from "../../../../../lib/db";
 import Product from "../../../../../models/Product";
 import ProductCategory from "../../../../../models/ProductCategory";
 import LocationSetting from "../../../../../models/LocationSetting";
+import Country from "../../../../../models/Country";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import { withAuth } from "../../../../../lib/withAuth";
@@ -57,6 +58,15 @@ export const GET = withAuth(async (req, user) => {
       );
     }
 
+     // Get currency based on current country
+    let currency = "";
+    const country = await Country.findById(location.currentCountry)
+      .select("currency -_id")
+      .lean();
+    if (country?.currency) {
+      currency = country.currency;
+    }
+
     // Filter: exclude products posted by this user & match city & country
     query.createdBy = { $ne: userId };
     query.city = location.currentCity;
@@ -89,6 +99,7 @@ export const GET = withAuth(async (req, user) => {
       NextResponse.json(
         {
           msg: "Products loaded successfully",
+          currency,
           productList: updatedProducts,
         },
         { status: 200 }
