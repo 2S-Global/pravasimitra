@@ -16,5 +16,5 @@ export default function LocationAlert() {
     }
   }, [searchParams]);
 
-  return null;
+  return null; 
 }

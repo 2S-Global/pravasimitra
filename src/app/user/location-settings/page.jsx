@@ -199,7 +199,7 @@ const LocationSettingsPage = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer /> 
     </>
   );
 };
