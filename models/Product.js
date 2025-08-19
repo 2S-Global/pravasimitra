@@ -28,6 +28,11 @@ const ProductSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
+    currency: {
+      type: mongoose.Schema.Types.String,
+      ref: "Country",
+      required: true,
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ProductCategory",
