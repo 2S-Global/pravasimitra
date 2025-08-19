@@ -73,7 +73,7 @@ export const GET = withAuth(async (req,user) => {
 
     // Filter: exclude products posted by this user & match city & country
     query.createdBy = { $ne: userId };
-    query.city = location.currentCity;
+    // query.city = location.currentCity;
     query.country = location.currentCountry;
 
     const items = await RoomItem.find(query)
