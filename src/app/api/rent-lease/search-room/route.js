@@ -5,7 +5,7 @@ import RoomCategory from "../../../../../models/RoomCategory";
 import LocationSetting from "../../../../../models/LocationSetting";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import { encodeObjectId, decodeObjectId } from "../../../../../lib/idCodec";
-import { withAuth } from "../../../../../lib/withAuth"; // assuming it's in lib
+import { withAuth } from "../../../../../lib/withAuth";
 
 export async function OPTIONS() {
   return optionsResponse();

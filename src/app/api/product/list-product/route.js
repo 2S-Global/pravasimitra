@@ -75,6 +75,7 @@ export const GET = withAuth(async function (req, user) {
           contactCount: contactDocs.length,
           contacts,
           category,
+          currency: item.currency || "",
         };
       })
     );

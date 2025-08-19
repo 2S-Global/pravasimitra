@@ -20,9 +20,9 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = withAuth(async (req,user) => {
+export const GET = withAuth(async (req, user) => {
   await connectDB();
-    const userId = user?.id;
+  const userId = user?.id;
   const { searchParams } = new URL(req.url);
   // const category = searchParams.get("id");
   const categoryIdEncoded = searchParams.get("id");
@@ -59,28 +59,24 @@ export const GET = withAuth(async (req,user) => {
   }
 
   try {
-
-   const location = await LocationSetting.findOne({ userId })
+    const location = await LocationSetting.findOne({ userId })
       .select("currentCity currentCountry")
       .lean();
 
-          if (!location || !location.currentCity || !location.currentCountry) {
-            return addCorsHeaders(
-              NextResponse.json(
-                { error: "User location not set" },
-                { status: 400 }
-              )
-            );
-          }
-      
-              query.createdBy = { $ne: userId };
-    query.city = location.currentCity;
+    if (!location || !location.currentCity || !location.currentCountry) {
+      return addCorsHeaders(
+        NextResponse.json({ error: "User location not set" }, { status: 400 })
+      );
+    }
+
+    query.createdBy = { $ne: userId };
+    // query.city = location.currentCity;
     query.country = location.currentCountry;
 
     const items = await MarketProduct.find(query)
       .select("-__v -isDel")
       .populate("category", "name")
-   
+
       .lean();
 
     if (!items.length) {

@@ -5,6 +5,7 @@ import RoomCategory from "../../../../../models/RoomCategory";
 import { decodeObjectId, encodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import LocationSetting from "../../../../../models/LocationSetting";
+import Country from "../../../../../models/Country";
 import { withAuth } from "../../../../../lib/withAuth";
 
 /**
@@ -20,12 +21,12 @@ export async function OPTIONS() {
   return optionsResponse();
 }
 
-export const GET = withAuth(async (req,user) => {
+export const GET = withAuth(async (req, user) => {
   await connectDB();
   const { searchParams } = new URL(req.url);
   const propertyTypeEncoded = searchParams.get("id");
 
-    const userId = user?.id;
+  const userId = user?.id;
   if (!propertyTypeEncoded) {
     return addCorsHeaders(
       NextResponse.json(
@@ -57,29 +58,35 @@ export const GET = withAuth(async (req,user) => {
   }
 
   try {
-
-   const location = await LocationSetting.findOne({ userId })
+    // Get user's location setting
+    const location = await LocationSetting.findOne({ userId })
       .select("currentCity currentCountry")
       .lean();
 
     if (!location || !location.currentCity || !location.currentCountry) {
       return addCorsHeaders(
-        NextResponse.json(
-          { error: "User location not set" },
-          { status: 400 }
-        )
+        NextResponse.json({ error: "User location not set" }, { status: 400 })
       );
+    }
+
+    // Get currency based on current country
+    let currency = "";
+    const country = await Country.findById(location.currentCountry)
+      .select("currency -_id")
+      .lean();
+    if (country?.currency) {
+      currency = country.currency;
     }
 
     // Filter: exclude products posted by this user & match city & country
     query.createdBy = { $ne: userId };
-    query.city = location.currentCity;
+    // query.city = location.currentCity;
     query.country = location.currentCountry;
 
     const items = await RoomItem.find(query)
       .select("-__v -isDel")
       .populate("propertyType", "name")
-    
+
       .lean();
 
     if (!items.length) {
