@@ -32,6 +32,11 @@ const RentItemSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
+    currency: {
+      type: mongoose.Schema.Types.String,
+      ref: "Country",
+      required: true,
+    },
     frequency: {
       type: String,
     },

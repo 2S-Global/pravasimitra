@@ -8,6 +8,7 @@ import { withAuth } from "../../../../../lib/withAuth";
 import RoomCategory from "../../../../../models/RoomCategory";
 import User from "../../../../../models/User";
 import LocationSetting from "../../../../../models/LocationSetting";
+import Country from "../../../../../models/Country";
 import cloudinary from "../../../../../lib/cloudinary";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
@@ -130,6 +131,17 @@ export const POST = withAuth(async function (req, user) {
     );
   }
 
+  // Fetch currency from Country collection
+  let currency = "";
+  if (locationSettings.currentCountry) {
+    const country = await Country.findById(locationSettings.currentCountry)
+      .select("currency -_id")
+      .lean();
+    if (country?.currency) {
+      currency = country.currency;
+    }
+  }
+
   const allowedTypes = [
     "image/jpeg",
     "image/jpg",
@@ -231,6 +243,7 @@ export const POST = withAuth(async function (req, user) {
       propertyType: decodedCategoryId,
       roomSize: data.roomSize,
       price: parseFloat(data.price),
+      currency,
       frequency: data.frequency,
       shortDesc: data.shortDesc,
       description: data.description,
