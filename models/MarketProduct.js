@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ref } from "process";
 
 const MarketProductSchema = new mongoose.Schema(
   {
@@ -33,6 +34,11 @@ const MarketProductSchema = new mongoose.Schema(
     // },
     price: {
       type: Number,
+    },
+    currency: {
+      type: mongoose.Schema.Types.String,
+      ref: "Country",
+      required: true,
     },
     // shortDesc: {
     //   type: String,

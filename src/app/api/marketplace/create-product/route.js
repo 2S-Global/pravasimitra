@@ -5,6 +5,7 @@ import { connectDB } from "../../../../../lib/db";
 import MarketProduct from "../../../../../models/MarketProduct";
 import MarketCategory from "../../../../../models/MarketCategory";
 import LocationSetting from "../../../../../models/LocationSetting";
+import Country from "../../../../../models/Country";
 import { withAuth } from "../../../../../lib/withAuth";
 import { decodeObjectId } from "../../../../../lib/idCodec";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
@@ -77,19 +78,30 @@ export const POST = withAuth(async function (req, user) {
   }
 
   // Fetch current location from LocationSetting
-    const locationSettings = await LocationSetting.findOne({
-      userId,
-      isDel: false,
-    });
-  
-    if (!locationSettings) {
-      return addCorsHeaders(
-        NextResponse.json(
-          { error: "You have to update your location first" },
-          { status: 400 }
-        )
-      );
+  const locationSettings = await LocationSetting.findOne({
+    userId,
+    isDel: false,
+  });
+
+  if (!locationSettings) {
+    return addCorsHeaders(
+      NextResponse.json(
+        { error: "You have to update your location first" },
+        { status: 400 }
+      )
+    );
+  }
+
+  // Fetch currency from Country collection
+  let currency = "";
+  if (locationSettings.currentCountry) {
+    const country = await Country.findById(locationSettings.currentCountry)
+      .select("currency -_id")
+      .lean();
+    if (country?.currency) {
+      currency = country.currency;
     }
+  }
 
   const allowedTypes = [
     "image/jpeg",
@@ -119,18 +131,18 @@ export const POST = withAuth(async function (req, user) {
     // const newFilename = `${Date.now()}_${file.filename}`;
     // const savePath = path.join(uploadDir, newFilename);
 
-  //   try {
-  //     fs.writeFileSync(savePath, file.buffer);
-  //     savedFilenames.push(newFilename);
-  //   } catch (err) {
-  //     console.error("Image save failed:", err);
-  //     return addCorsHeaders(
-  //       NextResponse.json({ error: "Image upload failed" }, { status: 500 })
-  //     );
-  //   }
-  // }
+    //   try {
+    //     fs.writeFileSync(savePath, file.buffer);
+    //     savedFilenames.push(newFilename);
+    //   } catch (err) {
+    //     console.error("Image save failed:", err);
+    //     return addCorsHeaders(
+    //       NextResponse.json({ error: "Image upload failed" }, { status: 500 })
+    //     );
+    //   }
+    // }
 
- try {
+    try {
       await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
@@ -174,6 +186,7 @@ export const POST = withAuth(async function (req, user) {
       location: data.location,
       //ingredients: data.ingredients,
       price: parseFloat(data.price),
+      currency,
       // shortDesc: data.shortDesc,
       description: data.description,
       quantity: parseInt(data.quantity, 10),
