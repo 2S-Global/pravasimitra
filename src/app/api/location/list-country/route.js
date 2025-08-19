@@ -20,7 +20,7 @@ export async function GET() {
 
   try {
     const countries = await Country.find({ status: 1, is_del: 0 })
-      .select("_id name")
+      .select("_id name currency")
       .sort({ name: 1 })
       .lean();
 

@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { addCorsHeaders, optionsResponse } from "../../../../../lib/cors";
 import LocationSetting from "../../../../../models/LocationSetting";
+
 export async function OPTIONS() {
   return optionsResponse();
 }
@@ -20,13 +21,13 @@ export async function POST(req) {
   }).select('+password').lean();
 
   if (!user) {
-    const res = NextResponse.json({ msg: "Invalid Email" }, { status: 200 });
+    const res = NextResponse.json({ success: false, msg: "Invalid Email" }, { status: 200 });
     return addCorsHeaders(res);
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    const res = NextResponse.json({ msg: "Incorrect Password" }, { status: 200 });
+    const res = NextResponse.json({ success: false, msg: "Incorrect Password" }, { status: 200 });
     return addCorsHeaders(res);
   }
 
@@ -61,6 +62,7 @@ export async function POST(req) {
   delete user.password;
 
   const res = NextResponse.json({
+    success: true,
     msg: `Welcome ${user.name}`,
     user,
     token,
