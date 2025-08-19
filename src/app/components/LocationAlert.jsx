@@ -1,5 +1,5 @@
-
-
+// app/components/LocationAlert.jsx
+'use client';
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AlertService from './alertService';
@@ -16,5 +16,5 @@ export default function LocationAlert() {
     }
   }, [searchParams]);
 
-  return null; 
+  return null;
 }

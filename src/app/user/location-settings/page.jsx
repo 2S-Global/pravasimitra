@@ -1,5 +1,5 @@
 'use client';
-
+import dynamic from 'next/dynamic';
 import { useState, useEffect } from "react";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
@@ -7,7 +7,8 @@ import OtherBanner from "@/app/components/OtherBanner";
 import Sidebar from "@/app/components/Sidebar";
 import AlertService from "@/app/components/alertService";
 import axios from "axios";
-import LocationAlert from "@/app/components/LocationAlert";
+const LocationAlert = dynamic(() => import('@/app/components/LocationAlert'), { ssr: false });
+
 
 const LocationSettingsPage = () => {
   const [form, setForm] = useState({
