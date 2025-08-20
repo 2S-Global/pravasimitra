@@ -8,6 +8,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/store/authStore";
 import AlertService from "@/app/components/alertService";
+import { useRef } from "react";
+
 
 const ProductDetails = () => {
   const router = useRouter();
@@ -18,11 +20,18 @@ const ProductDetails = () => {
   const [ingredient, setIngredient] = useState("");
   const [contactLoading, setContactLoading] = useState(false);
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+   const thumbnailRef = useRef(null); // 👈 reference to thumbnail scroll container
+  const scrollAmount = 120; // px to scroll each time
 
-  const handlePrevImage = () => {
+const handlePrevImage = () => {
     const currentIndex = item.images.indexOf(selectedImage);
     if (currentIndex > 0) {
       setSelectedImage(item.images[currentIndex - 1]);
+
+      // 👇 scroll thumbnails left
+      if (thumbnailRef.current) {
+        thumbnailRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+      }
     }
   };
 
@@ -30,6 +39,11 @@ const ProductDetails = () => {
     const currentIndex = item.images.indexOf(selectedImage);
     if (currentIndex < item.images.length - 1) {
       setSelectedImage(item.images[currentIndex + 1]);
+
+      // 👇 scroll thumbnails right
+      if (thumbnailRef.current) {
+        thumbnailRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      }
     }
   };
 
@@ -132,34 +146,33 @@ const ProductDetails = () => {
                   </button>
 
                   {/* Scrollable Thumbnails */}
-                  <div
-                    id="thumbnail-scroll"
-                    className="d-flex gap-2 overflow-auto px-5"
-                    style={{
-                      scrollBehavior: "smooth",
-                      scrollSnapType: "x mandatory",
-                    }}
-                  >
-                    {item.images.map((img, index) => (
-                      <img
-                        key={index}
-                        src={img}
-                        alt={`Thumbnail ${index}`}
-                        className={`img-thumbnail ${
-                          selectedImage === img ? "border border-danger" : ""
-                        }`}
-                        style={{
-                          height: "80px",
-                          width: "100px",
-                          objectFit: "cover",
-                          cursor: "pointer",
-                          scrollSnapAlign: "center",
-                          flex: "0 0 auto",
-                        }}
-                        onClick={() => setSelectedImage(img)}
-                      />
-                    ))}
-                  </div>
+         <div
+  id="thumbnail-scroll"
+  ref={thumbnailRef}   // 👈 attach ref
+  className="d-flex gap-2 overflow-auto px-5"
+  style={{
+    scrollBehavior: "smooth",
+    scrollSnapType: "x mandatory",
+  }}
+>
+  {item.images.map((img, index) => (
+    <img
+      key={index}
+      src={img}
+      alt={`Thumbnail ${index}`}
+      className={`img-thumbnail ${selectedImage === img ? "border border-danger" : ""}`}
+      style={{
+        height: "80px",
+        width: "100px",
+        objectFit: "cover",
+        cursor: "pointer",
+        scrollSnapAlign: "center",
+        flex: "0 0 auto",
+      }}
+      onClick={() => setSelectedImage(img)}
+    />
+  ))}
+</div>
 
                   {/* Next Button */}
                   <button
@@ -194,7 +207,7 @@ const ProductDetails = () => {
                   <small className="ms-2 text-muted">(112 reviews)</small>
                 </div> */}
 
-                <h3 className="text-primary fw-bold mb-4">${item.price}</h3>
+                <h3 className="text-primary fw-bold mb-4">{item.currency}{item.price}</h3>
                 <p className="text-muted mb-4" style={{ textAlign: "justify" }}>
                   {item.shortDesc}
                 </p>

@@ -130,7 +130,7 @@ const RentLeaseDetails = () => {
                       <p className="text-muted">{item.location}</p>
                     </div>
                     <h3 className="text-primary fw-bold">
-                      {item.currency0
+                      {item.currency
                       }{item.price}/{item.frequency}
                     </h3>
                   </div>

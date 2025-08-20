@@ -16,7 +16,7 @@ const EditMarketItemModal = ({ show, onClose, itemData, onItemAdded }) => {
     unit: "",
     images: [],
   });
-
+  const [currency,SetCurrency]=useState("");
   const [submiting, setSubmiting] = useState(false);
   const [categories, setCategories] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -70,9 +70,22 @@ const EditMarketItemModal = ({ show, onClose, itemData, onItemAdded }) => {
       }
     };
 
+      const fetchCurrency=async ()=>{
+
+      try{
+        const response=await axios.get("/api/get-currency");
+        SetCurrency(response.data.currency);
+
+      }catch(error){
+      console.error("Error fetching currency:", error);
+      }
+    }
+
     if (itemData) {
       fetchAndSet();
     }
+
+    fetchCurrency();
   }, [itemData]);
 
   const handleChange = (e) => {
@@ -201,15 +214,7 @@ const EditMarketItemModal = ({ show, onClose, itemData, onItemAdded }) => {
       AlertService.error("Unit Description is required");
       return false;
     }
-    if (!city) {
-      AlertService.error("City is required");
-      return false;
-    }
 
-    if (!state) {
-      AlertService.error("State is required");
-      return false;
-    }
 
     if (!location) {
       AlertService.error("Address is required");
@@ -256,8 +261,7 @@ const hasNewImages = images.length > 0;
     data.append("price", price);
     data.append("description", description);
     data.append("category", category);
-    data.append("city", city);
-    data.append("state", state);
+
     data.append("location", location);
     data.append("unit", unit);
     data.append("quantity", quantity);

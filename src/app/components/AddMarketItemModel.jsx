@@ -20,7 +20,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onItemAdded }) => {
   const [categories, setCategories] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [currency,SetCurrency]=useState("");
   const Required = () => <span className="text-danger">*</span>;
 
   useEffect(() => {
@@ -34,8 +34,21 @@ const AddMarketItemModel = ({ show, onClose, itemData, onItemAdded }) => {
       }
     };
 
+         const fetchCurrency=async ()=>{
+
+      try{
+        const response=await axios.get("/api/get-currency");
+        SetCurrency(response.data.currency);
+
+      }catch(error){
+      console.error("Error fetching currency:", error);
+      }
+    }
+    fetchCurrency();
     fetchCategories();
   }, []);
+
+
 
   const validateForm = () => {
     const {
@@ -74,15 +87,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onItemAdded }) => {
       AlertService.error("Unit Description is required");
       return false;
     }
-    if (!city) {
-      AlertService.error("City is required");
-      return false;
-    }
-
-    if (!state) {
-      AlertService.error("State is required");
-      return false;
-    }
+ 
 
     if (!location) {
       AlertService.error("Address is required");
@@ -177,8 +182,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onItemAdded }) => {
     data.append("price", price);
     data.append("description", description);
     data.append("category", category);
-    data.append("city", city);
-    data.append("state", state);
+
     data.append("location", location);
     data.append("unit", unit);
     data.append("quantity", quantity);
@@ -298,7 +302,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onItemAdded }) => {
             <Col md={6}>
               <Form.Group>
                 <Form.Label className="fw-semibold">
-                  Price ($) <Required />
+                  Price ({currency}) <Required />
                 </Form.Label>
                 <Form.Control
                   type="text"
@@ -345,7 +349,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onItemAdded }) => {
               </Form.Group>
             </Col>
           </Row>
-
+{/* 
           <Row className="mb-4">
             <Col md={6}>
               <Form.Group>
@@ -378,7 +382,7 @@ const AddMarketItemModel = ({ show, onClose, itemData, onItemAdded }) => {
                 />
               </Form.Group>
             </Col>
-          </Row>
+          </Row> */}
 
           <Row className="mb-4">
             <Col md={12}>

@@ -8,7 +8,7 @@ import { useState,useEffect } from "react";
 import AlertService from "../components/alertService";
 import { useOrderStore } from "@/app/store/orderStore";
 import axios from "axios";
-
+import styles from "./Checkout.module.css";
 const Checkout = () => {
   const router = useRouter();
   const [billing, setBilling] = useState({
@@ -151,7 +151,7 @@ const placeOrder = () => {
         page_title="Checkout"
         banner_image="/assets/images/bg/furniture_banner.jpg"
       />
-
+ <div className={styles.checkoutWrapper}>
       <section className="py-5 bg-light">
         <div className="container">
           <h2 className="fw-bold mb-4 text-center">Checkout</h2>
@@ -276,13 +276,13 @@ const placeOrder = () => {
                 <h5 className="fw-semibold mb-3">Shipping Information</h5>
 
                 <div className="form-check mb-3">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="sameAddress"
-                    checked={sameAsBilling}
-                    onChange={handleCheckbox}
-                  />
+           <input
+  className={`form-check-input ${styles.smallCheckbox}`}
+  type="checkbox"
+  id="sameAddress"
+  checked={sameAsBilling}
+  onChange={handleCheckbox}
+/>
                   <label className="form-check-label" htmlFor="sameAddress">
                     Shipping address is the same as billing address
                   </label>
@@ -444,7 +444,7 @@ const placeOrder = () => {
           </div>
         </div>
       </section>
-
+</div>
       <Footer />
     </>
   );

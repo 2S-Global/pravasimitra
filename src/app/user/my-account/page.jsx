@@ -108,7 +108,7 @@ const MyAccount = () => {
     try {
       const payload = {
         ...form,
-        dob: formatDateForAPI(form.dob),
+        dateOfBirth: formatDateForAPI(form.dob),
         passportExpiry: formatDateForAPI(form.passportExpiry),
         visaExpiry: formatDateForAPI(form.visaExpiry),
       };
@@ -221,6 +221,7 @@ const MyAccount = () => {
                             name="email"
                             value={form.email}
                             onChange={handleChange}
+                            readOnly
                           />
                         </div>
                       </div>

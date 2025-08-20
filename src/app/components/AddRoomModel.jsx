@@ -251,7 +251,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
     data.append("description", description);
     data.append("roomSize", roomSize);
 
-    data.append("shortDesc", shortDesc);
+
 
     data.append("location", location);
     data.append("furnished", furnished);
@@ -584,7 +584,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
             </div>
           </Form.Group>
 
-          <Form.Group className="mb-4">
+          {/* <Form.Group className="mb-4">
             <Form.Label className="fw-semibold">Short Description</Form.Label>
             <Form.Control
               as="textarea"
@@ -595,7 +595,7 @@ const AddRoomModal = ({ show, onClose, onItemAdded }) => {
               placeholder="Short description about the Room..."
               className="rounded-3 shadow-sm"
             />
-          </Form.Group>
+          </Form.Group> */}
 
           <Form.Group className="mb-3">
             <Form.Label className="fw-semibold">Description</Form.Label>

@@ -219,7 +219,7 @@ const EditRoomModal = ({ show, onClose, itemData, onItemAdded }) => {
     data.append("id", itemData.id);
     data.append("price", price);
     data.append("description", description);
-    data.append("shortDesc", shortDesc);
+
     data.append("propertyType", propertyType);
     data.append("bedrooms", bedrooms);
     data.append("bathrooms", bathrooms);
@@ -542,39 +542,7 @@ const EditRoomModal = ({ show, onClose, itemData, onItemAdded }) => {
             </Col>
           </Row>
 
-          <Row className="mb-4">
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label className="fw-semibold">
-                  City <Required />
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder="e.g. Houston"
-                  className="rounded-3 shadow-sm"
-                />
-              </Form.Group>
-            </Col>
-
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label className="fw-semibold">
-                  State <Required />
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  name="state"
-                  value={formData.state}
-                  onChange={handleChange}
-                  placeholder="e.g. New Jersey"
-                  className="rounded-3 shadow-sm"
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+      
 
           <Row className="mb-4">
             <Col md={12}>
@@ -628,18 +596,7 @@ const EditRoomModal = ({ show, onClose, itemData, onItemAdded }) => {
             </div>
           </Form.Group>
 
-          <Form.Group className="mb-4">
-            <Form.Label className="fw-semibold">Short Description</Form.Label>
-            <Form.Control
-              as="textarea"
-              name="shortDesc"
-              rows={2}
-              value={formData.shortDesc}
-              onChange={handleChange}
-              placeholder="Short description about the Room..."
-              className="rounded-3 shadow-sm"
-            />
-          </Form.Group>
+ 
 
           <Form.Group className="mb-3">
             <Form.Label className="fw-semibold">Description</Form.Label>

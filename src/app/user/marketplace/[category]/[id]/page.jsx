@@ -248,7 +248,7 @@ const MarketPlaceListing = () => {
                                   : ""}
                               </p>
                               <p className="fw-bold text-primary fs-5">
-                                ${item.price}
+                                {item.currency}{item.price}
                               </p>
                               <button
                                 className="btn btn-outline-primary btn-sm"
