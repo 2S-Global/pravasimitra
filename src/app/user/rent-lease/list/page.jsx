@@ -119,7 +119,17 @@ const ContactedUsersList = () => {
 
                 <div className="container my-4">
                   {/* Add New Button */}
-                  <div className="mb-3 text-end mb-5">
+                      <div className="mb-5 text-end d-flex justify-content-end gap-2">
+
+                            <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={() =>
+                        (window.location.href = "/user/rent-lease/buyer-list")
+                      }
+                    >
+                      <i className="bi bi-list-check me-1" /> My Apply
+                    </button>
                     <button
                       type="button"
                       className="btn btn-primary "
@@ -144,7 +154,7 @@ const ContactedUsersList = () => {
                           <th>Room Image</th>
                           <th>Property Type</th>
                           <th>Price</th>
-                          <th>Room Size</th>
+                          <th>Room Size (<strong>sqft</strong>)</th>
                           <th>Date Posted</th>
                           <th>Interested Users</th>
                           <th>Actions</th>
@@ -191,8 +201,8 @@ const ContactedUsersList = () => {
                                 />
                               </td>
                               <td>{user.propertyType?.name || "N/A"}</td>
-                              <td>{user.price}</td>
-                              <td>{user.roomSize}</td>
+                              <td><strong>{user.currency}</strong>{user.price}</td>
+                              <td>{user.roomSize} </td>
 
                               <td>
                                 {new Date(user.createdAt).toLocaleDateString(

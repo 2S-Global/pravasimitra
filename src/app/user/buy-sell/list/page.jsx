@@ -113,10 +113,22 @@ const ContactedUsersList = () => {
 
                 <div className="container my-4">
                   {/* Add New Button */}
-                  <div className="mb-5 text-end">
+                  <div className="mb-5 text-end d-flex justify-content-end gap-2">
+                    {/* My Apply Button */}
                     <button
                       type="button"
-                      className="btn btn-primary "
+                      className="btn btn-outline-secondary"
+                      onClick={() =>
+                        (window.location.href = "/user/buy-sell/buyer-list")
+                      }
+                    >
+                      <i className="bi bi-list-check me-1" /> My Apply
+                    </button>
+
+                    {/* Add New Button */}
+                    <button
+                      type="button"
+                      className="btn btn-primary"
                       onClick={handleAdd}
                       style={{
                         background: "#c12020",
@@ -137,7 +149,7 @@ const ContactedUsersList = () => {
                           <th>Item Name</th>
                           <th>Item Image</th>
                           <th>Category Name</th>
-                          <th>Price ($)</th>
+                          <th>Price</th>
                           <th>Date</th>
                           <th>Interested Users</th>
                           <th>Action</th>
@@ -185,7 +197,7 @@ const ContactedUsersList = () => {
                               </td>
                               <td>{user.category?.name}</td>
 
-                              <td>{user.price}</td>
+                              <td><strong>{user.currency}</strong>{user.price}</td>
 
                               <td>
                                 {new Date(user.createdAt).toLocaleDateString(
