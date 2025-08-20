@@ -43,6 +43,7 @@ export const GET = withAuth(async (req, user) => {
         },
         items: [],
         orderTotal: 0,
+        currency: "", // Initialize currency
       };
 
       for (const item of relevantItems) {
@@ -59,11 +60,17 @@ export const GET = withAuth(async (req, user) => {
           price: unitPrice,
           quantity: item.quantity,
           images: product?.images || [],
+          currency: product?.currency || "", // Use product currency
         });
 
      orderSummary.orderTotal = Number(
-  (orderSummary.orderTotal + subtotal).toFixed(2)
-);
+          (orderSummary.orderTotal + subtotal).toFixed(2)
+        );
+
+        // Set order currency from product (assume all items same currency)
+        if (!orderSummary.currency && product?.currency) {
+          orderSummary.currency = product.currency;
+        }
       }
 
       sellerOrders.push(orderSummary);

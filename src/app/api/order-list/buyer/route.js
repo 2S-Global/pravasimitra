@@ -33,7 +33,7 @@ export const GET = withAuth(async (req, user) => {
       .populate({
         path: "items.productId",
         model: MarketProduct,
-        select: "title images price", // only necessary fields
+        select: "title images price currency", // only necessary fields
       })
       .populate({
         path: "addressId",
@@ -43,6 +43,7 @@ export const GET = withAuth(async (req, user) => {
 
     const ordersWithTotal = orders.map((order, index) => {
       let orderTotal = 0;
+      let currency = null; // track currency per order
 
       for (const item of order.items) {
         //const price = item.price || 0;
@@ -50,7 +51,14 @@ export const GET = withAuth(async (req, user) => {
         const quantity = item.quantity || 0;
         const subtotal = roundTwo(unitPrice * quantity);
         orderTotal += subtotal;
+      
+
+      // Pick currency from product
+        if (item.productId && item.productId.currency) {
+          currency = item.productId.currency;
+        }
       }
+
 
       orderTotal = roundTwo(orderTotal);
 
@@ -61,6 +69,7 @@ export const GET = withAuth(async (req, user) => {
         ...order,
         orderId,
         orderTotal,
+        currency: currency || "",
       };
     });
 
