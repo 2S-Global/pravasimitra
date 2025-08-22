@@ -32,7 +32,7 @@ const locationSetting = await LocationSetting.findOne({ userId: userId });
   const query = {
     isDel: false,
     createdBy: { $ne: userId }, // Exclude user's own listings
-    city: locationSetting.currentCity,
+    // city: locationSetting.currentCity,
     country: locationSetting.currentCountry,
   };
 

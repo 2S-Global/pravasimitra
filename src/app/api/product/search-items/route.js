@@ -35,7 +35,7 @@ export const GET = withAuth(async (req, user) => {
     const query = {
       is_del: false,
       createdBy: { $ne: userId }, // Exclude user's own listings
-      city: locationSetting.currentCity,
+      // city: locationSetting.currentCity,
       country: locationSetting.currentCountry,
     };
 
